@@ -6,7 +6,7 @@ import { Pencil, Trash } from "lucide-react";
 import Spinner from "../../spinner/Spinner";
 import ModalAddUser from "./ModalAddUser";
 import ModalEditUser from "./ModalEditUser";
-import Pagination from "../product/Pagination-PD";
+import Pagination from "../product/Pagination";
 
 const UserList = () => {
   const [users, setUsers] = useState([]);
