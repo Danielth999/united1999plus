@@ -9,7 +9,9 @@ const upload = multer({ dest: "./public/uploads" }); // กำหนดโฟล
 
 const apiRoute = nextConnect({
   onError(error, req, res) {
-    res.status(501).json({ error: `Sorry something happened! ${error.message}` });
+    res
+      .status(501)
+      .json({ error: `Sorry something happened! ${error.message}` });
   },
   onNoMatch(req, res) {
     res.status(405).json({ error: `Method '${req.method}' not allowed` });
@@ -46,10 +48,22 @@ apiRoute.post(async (req, res) => {
   }
 });
 
-export const config = {
+export const POST = apiRoute;
+
+POST.config = {
   api: {
     bodyParser: false, // ปิดการใช้งาน bodyParser เพื่อให้ multer จัดการ multipart data
   },
 };
 
-export default apiRoute;
+
+export const GET = async (req, res) => {
+  try {
+    const products = await prisma.product.findMany();
+    res.status(200).json(products);
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+};
+
+export default GET;

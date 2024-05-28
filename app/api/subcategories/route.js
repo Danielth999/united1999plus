@@ -1,14 +1,13 @@
 import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
-export const GET = async (req) => {
+export const GET = async (req, res) => {
   try {
     const subcategories = await prisma.subcategory.findMany();
-    Response.json(subcategories);
+    res.status(200).json(subcategories);
   } catch (e) {
-    Response.json({ error: e.message }
-
-     
-    );
+    res.status(500).json({ error: e.message });
   }
 };
+
+export default GET;
