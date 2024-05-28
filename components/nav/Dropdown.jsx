@@ -49,7 +49,7 @@ const Dropdown = () => {
   };
 
   return (
-    <div className="relative inline-block" ref={dropdownRef}>
+    <div className="relative hidden md:inline-block" ref={dropdownRef}>
       <div className="inline-block">
         <button
           onClick={toggleMainDropdown}
