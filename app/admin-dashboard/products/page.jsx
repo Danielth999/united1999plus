@@ -1,10 +1,7 @@
-import ProductList from '@/components/admin-dashboard/product/ProductList'
-import React from 'react'
+import React from "react";
 
 const Product = () => {
-  return (
-    <div><ProductList/></div>
-  )
-}
+  return <div></div>;
+};
 
-export default Product
+export default Product;
