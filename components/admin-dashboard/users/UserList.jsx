@@ -1,12 +1,12 @@
 "use client";
 import { useState, useEffect } from "react";
 import axios from "axios";
-import Link from "next/link";
+
 import { Pencil, Trash } from "lucide-react";
 import Spinner from "../../spinner/Spinner";
 import ModalAddUser from "./ModalAddUser";
 import ModalEditUser from "./ModalEditUser";
-import Pagination from "../product/Pagination";
+
 
 const UserList = () => {
   const [users, setUsers] = useState([]);
@@ -155,12 +155,7 @@ const UserList = () => {
                 </tfoot>
               </table>
               <div className="flex justify-center mt-4">
-                <Pagination
-                  itemsPerPage={usersPerPage}
-                  totalItems={filteredUsers.length}
-                  paginate={paginate}
-                  currentPage={currentPage}
-                />
+               
               </div>
             </div>
           </div>
