@@ -1,7 +1,11 @@
 import React from "react";
-
+import ProductList from "../../../components/admin-dashboard/product/ProductList";
 const Product = () => {
-  return <div></div>;
+  return (
+    <>
+      <ProductList />
+    </>
+  );
 };
 
 export default Product;

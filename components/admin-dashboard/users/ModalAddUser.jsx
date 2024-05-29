@@ -76,7 +76,7 @@ const ModalAddUser = ({onUserAdded}) => {
               <select name="role" value={newUser.role} onChange={handleChange} className="select select-bordered w-full mb-2" required>
                 <option disabled>สิทธิ์การใช้งาน</option>
                 <option value="admin">Admin</option>
-                <option value="member">User</option>
+                <option value="member">User</option>ฟ
               </select>
               <div className="flex justify-end ">
                 <button type="submit" className="btn text-white bg-[#204d9c]">

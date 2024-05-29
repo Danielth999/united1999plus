@@ -70,6 +70,7 @@ const Navbar = () => {
               />
             </Link>
             <Dropdown />
+            
           </div>
 
           <div className="hidden md:flex items-center h-[70px] flex-1 justify-center">
