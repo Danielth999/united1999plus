@@ -103,9 +103,12 @@ const Navbar = () => {
                   <li>
                     <Link href={"/#"}>ข้อมูลส่วนตัว</Link>
                   </li>
-                  <li>
-                    <Link href={"/admin-dashboard/dashboard"}>ระบบจัดการ</Link>
-                  </li>
+                  {session && session.user.role === "admin" ? (
+                    <li>
+                      <Link href="/admin-dashboard/dashboard">ระบบจัดการ</Link>
+                    </li>
+                  ) : null}
+
                   <li>
                     <button
                       onClick={() => signOut()}
