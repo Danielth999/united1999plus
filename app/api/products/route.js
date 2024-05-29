@@ -8,14 +8,14 @@ const prisma = new PrismaClient();
 export const GET = async (req) => {
   try {
     const products = await prisma.product.findMany();
-    return Response.json(
+    return NextResponse.json(
       { products },
       {
         status: 200,
       }
     );
   } catch (error) {
-    return Response.json(
+    return NextResponse.json(
       { message: "Error fetching products" },
       {
         status: 500,
@@ -60,9 +60,3 @@ export async function POST(req) {
     return NextResponse.json({ error: 'Failed to create product' }, { status: 500 });
   }
 }
-
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-};
