@@ -1,6 +1,6 @@
 import React from "react";
 import Link from "next/link";
-import { Phone , Mail, MapPin } from "lucide-react";
+import { Phone, Mail, MapPin } from "lucide-react";
 const Header = () => {
   return (
     <>
@@ -13,7 +13,7 @@ const Header = () => {
               className="text-[#204d9c] font-bold"
               href={"tel:098-765-1234"}
             >
-              098-765-1234
+              038-623-126
             </Link>
           </li>
           <li className="flex items-center space-x-2">
@@ -22,7 +22,7 @@ const Header = () => {
               href="mailto:dbunited1999@gmail.com"
               className="text-[#204d9c] font-bold"
             >
-              test@gmail.com
+              united.sale.ry@gmail.com
             </a>
           </li>
           <li className="flex items-center space-x-2">
