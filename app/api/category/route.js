@@ -8,9 +8,7 @@ const prisma = new PrismaClient();
 export const GET = async () => {
   try {
     const categories = await prisma.category.findMany({
-      include: {
-        subcategories: true,
-      },
+   
     });
     return NextResponse.json(categories, { status: 200 });
   } catch (error) {

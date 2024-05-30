@@ -94,7 +94,7 @@ const ProductList = () => {
                     <th>ชื่อผลิตภัณฑ์</th>
                     <th>รายละเอียด</th>
                     <th>ราคา</th>
-                    <th>จำนวนสินค้า</th>
+
                     <th>จัดการ</th>
                   </tr>
                 </thead>
@@ -117,7 +117,7 @@ const ProductList = () => {
                       <td>{product.name}</td>
                       <td>{product.description}</td>
                       <td>{product.price.toFixed(2)} บาท</td>
-                      <td>{product.stock}</td>
+
                       <td>
                         <button
                           onClick={() => handleEditClick(product)}

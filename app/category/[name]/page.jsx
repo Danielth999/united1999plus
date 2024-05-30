@@ -1,10 +1,10 @@
 'use client'
 import { useParams } from "next/navigation";
 const FoodPackaging = () => {
-  const { maincate } = useParams();
+  const { name } = useParams();
   return (<div>
     
-    page :{maincate}
+    page :{name}
     </div>)
 };
 

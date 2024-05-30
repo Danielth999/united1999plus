@@ -101,29 +101,17 @@ const CategoryList = () => {
                     <th>#ID</th>
                     <th>ชื่อหมวดหมู่</th>
                     <th>ชื่อหมวดหมู่ภาษาอังกฤษ</th>
-                    <th>หมวดหมู่ย่อย</th>
                     <th>จัดการ</th>
                   </tr>
                 </thead>
                 <tbody>
-                  
                   {Array.isArray(currentCategories) &&
                   currentCategories.length > 0 ? (
                     currentCategories.map((category) => (
                       <tr className="hover" key={category.categoryId}>
                         <th>{category.categoryId}</th>
                         <td>{category.name}</td>
-                        <td>
-                          {category.subcategories && category.subcategories.length > 0 ? (
-                            <select className="select select-bordered w-full max-w-xs">
-                              {category.subcategories.map((subcategory) => (
-                                <option key={subcategory.subcategoryId}>{subcategory.name}</option>
-                              ))}
-                            </select>
-                          ) : (
-                            "ไม่มีหมวดหมู่ย่อย"
-                          )}
-                        </td>
+                        <td>{category.nameSlug}</td>
                         <td>
                           <button
                             onClick={() => handleEditClick(category)}
@@ -138,7 +126,6 @@ const CategoryList = () => {
                             <Trash />
                           </button>
                         </td>
-                        tr
                       </tr>
                     ))
                   ) : (

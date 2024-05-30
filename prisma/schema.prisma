@@ -8,53 +8,29 @@ datasource db {
 }
 
 model User {
-  email     String         @unique
-  password  String
-  username  String         @unique
-  userId    Int            @id @default(autoincrement())
-  favorites FavoriteItem[]
-  roles     String         @default("user")
+  email    String @unique
+  password String
+  username String @unique
+  userId   Int    @id @default(autoincrement())
+  roles    String @default("user")
 }
 
 model Category {
-  name          String
-  categoryId    Int           @id @default(autoincrement())
-  nameSlug      String
-  cateImg       String?
-  subcategories Subcategory[]
-}
-
-model Subcategory {
-  subcategoryId Int       @id @default(autoincrement())
-  name          String
-  categoryId    Int
-  nameSlug      String
-  products      Product[]
-  category      Category  @relation(fields: [categoryId], references: [categoryId])
-
-  @@unique([name, categoryId])
+  name       String
+  categoryId Int       @id @default(autoincrement())
+  nameSlug   String
+  cateImg    String?
+  Product    Product[]
 }
 
 model Product {
-  name          String
-  description   String
-  createdAt     DateTime       @default(now())
-  price         Float
-  productId     Int            @id @default(autoincrement())
-  stock         Int
-  subcategoryId Int
-  updatedAt     DateTime       @updatedAt
-  imageUrl      String?
-  favorites     FavoriteItem[]
-  subcategory   Subcategory    @relation(fields: [subcategoryId], references: [subcategoryId])
-}
-
-model FavoriteItem {
-  favoriteId Int     @id @default(autoincrement())
-  userId     Int
-  productId  Int
-  product    Product @relation(fields: [productId], references: [productId])
-  user       User    @relation(fields: [userId], references: [userId])
-
-  @@unique([userId, productId])
+  name        String
+  description String
+  createdAt   DateTime @default(now())
+  price       Float
+  productId   Int      @id @default(autoincrement())
+  updatedAt   DateTime @updatedAt
+  imageUrl    String?
+  categoryId  Int
+  Category    Category @relation(fields: [categoryId], references: [categoryId])
 }

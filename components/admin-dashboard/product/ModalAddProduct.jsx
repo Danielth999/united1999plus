@@ -1,30 +1,31 @@
-'use client';
+"use client";
 
-import axios from 'axios';
-import { useState, useEffect } from 'react';
+import axios from "axios";
+import { useState, useEffect } from "react";
 
 const ModalAddProduct = ({ onProductAdded }) => {
-  const [subcategories, setSubcategories] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [formData, setFormData] = useState({
-    name: '',
-    description: '',
-    price: '',
-    stock: '',
-    subcategoryId: '',
-    image: null,
+    name: "",
+    description: "",
+    price: "",
+    categoryId: "",
+    image: null
   });
 
-  const fetchSubcategories = async () => {
+  const fetchCategories = async () => {
     try {
-      const response = await axios.get(process.env.NEXT_PUBLIC_API_URL + '/api/sub-category');
-      setSubcategories(response.data);
+      const response = await axios.get(
+        process.env.NEXT_PUBLIC_API_URL + "/api/category"
+      );
+      setCategories(response.data);
     } catch (error) {
       console.error(error);
     }
   };
 
   useEffect(() => {
-    fetchSubcategories();
+    fetchCategories();
   }, []);
 
   const handleChange = (e) => {
@@ -45,36 +46,44 @@ const ModalAddProduct = ({ onProductAdded }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const data = new FormData();
-    data.append('name', formData.name);
-    data.append('description', formData.description);
-    data.append('price', formData.price);
-    data.append('stock', formData.stock);
-    data.append('subcategoryId', formData.subcategoryId);
-    data.append('image', formData.image);
+    data.append("name", formData.name);
+    data.append("description", formData.description);
+    data.append("price", formData.price);
+
+    data.append("categoryId", formData.categoryId);
+    data.append("image", formData.image);
 
     try {
-      const response = await axios.post(process.env.NEXT_PUBLIC_API_URL + '/api/products', data, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
+      const response = await axios.post(
+        process.env.NEXT_PUBLIC_API_URL + "/api/products",
+        data,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
       onProductAdded(response.data);
-      document.getElementById('add_product_modal').close();
+      document.getElementById("add_product_modal").close();
     } catch (error) {
-      console.error('Error uploading product:', error);
+      console.error("Error uploading product:", error);
     }
   };
 
   return (
     <>
       <button
-        onClick={() => document.getElementById('add_product_modal').showModal()}
+        onClick={() => document.getElementById("add_product_modal").showModal()}
         className="btn bg-[#204d9c] text-white"
       >
         เพิ่มสินค้าใหม่
       </button>
       <dialog id="add_product_modal" className="modal">
-        <form onSubmit={handleSubmit} encType="multipart/form-data" className="modal-box p-5">
+        <form
+          onSubmit={handleSubmit}
+          encType="multipart/form-data"
+          className="modal-box p-5"
+        >
           <h3 className="font-bold text-lg mb-4">เพิ่มสินค้าใหม่</h3>
           <input
             type="text"
@@ -102,26 +111,18 @@ const ModalAddProduct = ({ onProductAdded }) => {
             placeholder="Price"
             required
           />
-          <input
-            type="number"
-            name="stock"
-            value={formData.stock}
-            onChange={handleChange}
-            className="input input-bordered w-full mb-3"
-            placeholder="Stock"
-            required
-          />
+
           <select
-            name="subcategoryId"
-            value={formData.subcategoryId}
+            name="categoryId"
+            value={formData.categoryId}
             onChange={handleChange}
             className="select select-bordered w-full mb-3"
             required
           >
-            <option value="">เลือกหมวดหมู่ย่อย</option>
-            {subcategories.map((subcategory) => (
-              <option key={subcategory.subcategoryId} value={subcategory.subcategoryId}>
-                {subcategory.name}
+            <option value="">เลือกหมวดหมู่</option>
+            {categories.map((category) => (
+              <option key={category.categoryId} value={category.categoryId}>
+                {category.name}
               </option>
             ))}
           </select>
@@ -137,7 +138,9 @@ const ModalAddProduct = ({ onProductAdded }) => {
             </button>
             <button
               type="button"
-              onClick={() => document.getElementById('add_product_modal').close()}
+              onClick={() =>
+                document.getElementById("add_product_modal").close()
+              }
               className="btn text-white btn-error"
             >
               ยกเลิก
