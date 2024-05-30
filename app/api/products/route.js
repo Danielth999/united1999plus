@@ -60,3 +60,5 @@ export async function POST(req) {
     return NextResponse.json({ error: 'Failed to create product' }, { status: 500 });
   }
 }
+
+export const dynamic = 'force-dynamic';  // ใช้ dynamic configuration
