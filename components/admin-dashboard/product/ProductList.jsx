@@ -18,12 +18,11 @@ const ProductList = () => {
 
   const fetchProducts = async () => {
     try {
-      const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/products`);
-      if (res.data && Array.isArray(res.data.products)) {
-        setProducts(res.data.products);
-      } else {
-        throw new Error("Fetched data is not in the expected format");
-      }
+      const res = await axios.get(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/products`
+      );
+
+      setProducts(res.data);
     } catch (error) {
       console.log("Error fetching products:", error);
     } finally {
@@ -37,7 +36,9 @@ const ProductList = () => {
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/api/products/${id}`);
+      await axios.delete(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/products/${id}`
+      );
       fetchProducts(); // Refresh the product list
     } catch (error) {
       console.error("Error deleting product:", error);

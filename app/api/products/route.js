@@ -7,9 +7,13 @@ const prisma = new PrismaClient();
 
 export const GET = async (req) => {
   try {
-    const products = await prisma.product.findMany();
+    const products = await prisma.product.findMany({
+      include: {
+        subcategory: true,
+      }
+    });
     return NextResponse.json(
-      { products },
+      products ,
       {
         status: 200,
       }
@@ -60,5 +64,4 @@ export async function POST(req) {
     return NextResponse.json({ error: 'Failed to create product' }, { status: 500 });
   }
 }
-
-export const dynamic = 'force-dynamic';  // ใช้ dynamic configuration
+export const dynamic = 'force-dynamic';  

@@ -1,10 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import { NextResponse } from "next/server";
 
-
 const prisma = new PrismaClient();
-
-
 
 export const GET = async () => {
   try {
@@ -16,6 +13,9 @@ export const GET = async () => {
     return NextResponse.json(subcategories, { status: 200 });
   } catch (error) {
     console.error("Error fetching subcategories:", error);
-    return NextResponse.json({ error: "Failed to fetch subcategories" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to fetch subcategories" },
+      { status: 500 }
+    );
   }
 };
