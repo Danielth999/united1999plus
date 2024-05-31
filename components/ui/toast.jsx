@@ -6,7 +6,7 @@ import { X } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 
-const ToastProvider = ({ children, duration = 1000 }) => (
+const ToastProvider = ({ children, duration = 2000 }) => (
   <ToastPrimitives.Provider duration={duration}>
     {children}
     <ToastViewport />

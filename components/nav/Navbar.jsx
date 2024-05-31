@@ -65,7 +65,7 @@ const Navbar = () => {
             </div>
           </div>
 
-          <div className="hidden md:flex items-center h-[70px] flex-1 justify-center">
+          <div className="hidden md:flex md:mx-4 items-center h-[70px] flex-1 justify-center">
             <input
               type="search"
               className="w-full max-w-md border outline-none rounded-l-md p-2"

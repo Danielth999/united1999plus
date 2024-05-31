@@ -58,8 +58,8 @@ const Category = () => {
           </Slider>
         </div>
         {/* Grid for medium and larger screens */}
-        <div className="hidden sm:flex justify-center">
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-12 xl:grid-cols-4 gap-4">
+        <div className="hidden md:flex justify-center">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3 place-content-center gap-4">
             {category.map((item) => (
               <div
                 key={item.categoryId}
