@@ -39,7 +39,9 @@ const CleaningProducts = () => {
   return (
     <>
       <div className="mt-10">
-        <h1 className="font-bold text-xl text-black text-center sm:text-left">ผลิตภัณฑ์ทำความสะอาด</h1>
+        <h1 className="font-bold text-xl text-black ">
+        อุปกรณ์สำนักงาน
+        </h1>
       </div>
       {loading ? (
         <div className="flex justify-center mt-10">
@@ -47,11 +49,11 @@ const CleaningProducts = () => {
         </div>
       ) : (
         <div className="container mx-auto px-4">
-          <div className="flex flex-wrap justify-center gap-4 mt-5">
+          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 mt-5">
             {product.map((item) => (
               <Card
                 key={item.productId}
-                className="hover:shadow-xl border flex flex-col w-full sm:w-1/2 md:w-1/3 lg:w-1/4 xl:w-1/5"
+                className="hover:shadow-xl border flex flex-col"
               >
                 <CardHeader className="border-b">
                   <div className="relative w-full h-48 overflow-hidden">
@@ -61,7 +63,6 @@ const CleaningProducts = () => {
                       fill
                       style={{ objectFit: 'contain' }}
                       className="max-h-full"
-                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                     />
                   </div>
                 </CardHeader>
