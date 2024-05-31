@@ -1,9 +1,9 @@
 import Navbar from "@/components/nav/Navbar";
 import Carousel from "@/components/Carousel";
 import Category from "@/components/Category";
-import Packaging from "@/components/product/packaging";
-import OfficeSupplies from "@/components/product/officeSupplies";
-import CleaningProducts from "@/components/product/cleaningProducts";
+import Packaging from "@/components/product/Packaging";
+import OfficeSupplies from "@/components/product/OfficeSupplies";
+import CleaningProducts from "@/components/product/CleaningProducts";
 
 import Footer from "@/components/Footer";
 
