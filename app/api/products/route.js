@@ -1,7 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import { NextResponse } from "next/server";
-import fs from "fs";
-import path from "path";
+import cloudinary from "@/lib/cloudinary";
 
 const prisma = new PrismaClient();
 
@@ -12,7 +11,7 @@ export const GET = async (req) => {
         Category: true,
       },
     });
-    return NextResponse.json(products , { status: 200 });
+    return NextResponse.json(products, { status: 200 });
   } catch (error) {
     console.error("Error fetching products:", error);
     return NextResponse.json(
@@ -30,15 +29,8 @@ export async function POST(req) {
     const price = formData.get("price");
     const categoryId = formData.get("categoryId");
     const image = formData.get("image");
-    console.log({ name, description, price, categoryId, image });
-    if (
-      !name ||
-      !description ||
-      !price ||
-      !categoryId ||
-      !image ||
-      !image.name
-    ) {
+
+    if (!name || !description || !price || !categoryId || !image) {
       console.error("Validation error: Missing required fields");
       return NextResponse.json(
         { error: "All fields are required" },
@@ -46,23 +38,23 @@ export async function POST(req) {
       );
     }
 
+    // Convert image to buffer
     const imageBuffer = Buffer.from(await image.arrayBuffer());
-    const imagePath = path.join(
-      process.cwd(),
-      "public",
-      "uploads",
-      Date.now() + path.extname(image.name)
-    );
 
-    try {
-      fs.writeFileSync(imagePath, imageBuffer);
-    } catch (writeError) {
-      console.error("Error writing image:", writeError);
-      return NextResponse.json(
-        { error: "Failed to save image" },
-        { status: 500 }
+    // Upload image to Cloudinary
+    const uploadResult = await new Promise((resolve, reject) => {
+      const uploadStream = cloudinary.uploader.upload_stream(
+        { folder: "products" },
+        (error, result) => {
+          if (error) {
+            reject(error);
+          } else {
+            resolve(result);
+          }
+        }
       );
-    }
+      uploadStream.end(imageBuffer);
+    });
 
     const product = await prisma.product.create({
       data: {
@@ -70,7 +62,7 @@ export async function POST(req) {
         description,
         price: parseFloat(price),
         categoryId: parseInt(categoryId, 10),
-        imageUrl: `/uploads/${path.basename(imagePath)}`,
+        imageUrl: uploadResult.secure_url,
       },
     });
 
