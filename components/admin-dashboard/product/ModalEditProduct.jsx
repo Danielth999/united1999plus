@@ -1,5 +1,17 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import Image from "next/image";
 
 const ModalEditProduct = ({ product, onProductUpdated }) => {
   const [editProduct, setEditProduct] = useState({
@@ -7,11 +19,13 @@ const ModalEditProduct = ({ product, onProductUpdated }) => {
     description: "",
     price: "",
     stock: "",
-    subcategoryId: "", // เพิ่ม field สำหรับ subcategoryId
-    image: null, // เพิ่ม field สำหรับไฟล์ภาพ
+    subcategoryId: "",
+    image: null,
   });
 
   const [subcategories, setSubcategories] = useState([]);
+  const [previewImage, setPreviewImage] = useState(null);
+  const [open, setOpen] = useState(false);
 
   useEffect(() => {
     if (product) {
@@ -20,19 +34,18 @@ const ModalEditProduct = ({ product, onProductUpdated }) => {
         description: product.description,
         price: product.price,
         stock: product.stock,
-        subcategoryId: product.subcategory?.id || "", // กำหนดค่า subcategoryId จาก product
-        image: null, // รีเซ็ตไฟล์ภาพเมื่อเปิด modal
+        subcategoryId: product.subcategory?.id || "",
+        image: null,
       });
-      document.getElementById("edit_product_modal").showModal();
+      setPreviewImage(product.imageUrl || null);
+      setOpen(true); // Open the dialog
     }
   }, [product]);
 
   useEffect(() => {
     const fetchSubcategories = async () => {
       try {
-        const res = await axios.get(
-          `${process.env.NEXT_PUBLIC_API_URL}/api/sub-category`
-        );
+        const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/sub-category`);
         setSubcategories(res.data.subcategories);
       } catch (error) {
         console.error("Error fetching subcategories:", error);
@@ -48,7 +61,9 @@ const ModalEditProduct = ({ product, onProductUpdated }) => {
   };
 
   const handleFileChange = (e) => {
-    setEditProduct({ ...editProduct, image: e.target.files[0] });
+    const file = e.target.files[0];
+    setEditProduct({ ...editProduct, image: file });
+    setPreviewImage(URL.createObjectURL(file));
   };
 
   const handleSubmit = async (e) => {
@@ -58,7 +73,7 @@ const ModalEditProduct = ({ product, onProductUpdated }) => {
     formData.append("description", editProduct.description);
     formData.append("price", editProduct.price);
     formData.append("stock", editProduct.stock);
-    formData.append("subcategoryId", editProduct.subcategoryId); // เพิ่ม subcategoryId ใน formData
+    formData.append("subcategoryId", editProduct.subcategoryId);
     if (editProduct.image) {
       formData.append("image", editProduct.image);
     }
@@ -74,90 +89,88 @@ const ModalEditProduct = ({ product, onProductUpdated }) => {
         }
       );
       onProductUpdated(); // Refresh the product list
-      document.getElementById("edit_product_modal").close(); // Close the modal
+      setOpen(false); // Close the dialog
+      setPreviewImage(null); // Clear preview image
     } catch (error) {
       console.log("Error updating product:", error);
     }
   };
 
   return (
-    <dialog id="edit_product_modal" className="modal">
-      <form onSubmit={handleSubmit} className="modal-box">
-        <h3 className="font-bold text-lg">แก้ไขผลิตภัณฑ์</h3>
-        <input
-          type="text"
-          name="name"
-          value={editProduct.name}
-          onChange={handleChange}
-          className="input input-bordered w-full my-2"
-          placeholder="ชื่อผลิตภัณฑ์"
-          required
-        />
-        <textarea
-          name="description"
-          value={editProduct.description}
-          onChange={handleChange}
-          className="textarea textarea-bordered w-full my-2"
-          placeholder="รายละเอียด"
-          required
-        />
-        <input
-          type="number"
-          name="price"
-          value={editProduct.price}
-          onChange={handleChange}
-          className="input input-bordered w-full my-2"
-          placeholder="ราคา"
-          required
-        />
-        <input
-          type="number"
-          name="stock"
-          value={editProduct.stock}
-          onChange={handleChange}
-          className="input input-bordered w-full my-2"
-          placeholder="จำนวนสินค้า"
-          required
-        />
-        <select
-          name="subcategoryId"
-          value={editProduct.subcategoryId}
-          onChange={handleChange}
-          className="select select-bordered w-full my-2"
-          required
-        >
-          <option value="" disabled>
-            เลือกหมวดหมู่ย่อย
-          </option>
-          {Array.isArray(subcategories) &&
-            subcategories.map((subcategory) => (
-              <option key={subcategory.id} value={subcategory.id}>
-                {subcategory.name}
-              </option>
-            ))}
-        </select>
-        <input
-          type="file"
-          name="image"
-          onChange={handleFileChange}
-          className="input input-bordered w-full my-2"
-        />
-        <div className="modal-action">
-          <button type="submit" className="btn btn-primary">
-            บันทึก
-          </button>
-          <button
-            type="button"
-            className="btn"
-            onClick={() =>
-              document.getElementById("edit_product_modal").close()
-            }
-          >
-            ยกเลิก
-          </button>
-        </div>
-      </form>
-    </dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>แก้ไขผลิตภัณฑ์</DialogTitle>
+          <DialogDescription>กรุณากรอกข้อมูลเพื่อแก้ไขผลิตภัณฑ์</DialogDescription>
+        </DialogHeader>
+        <form onSubmit={handleSubmit} encType="multipart/form-data" className="flex flex-row space-x-4">
+          <div className="space-y-4 flex-1">
+            <Input
+              type="text"
+              name="name"
+              value={editProduct.name}
+              onChange={handleChange}
+              placeholder="ชื่อผลิตภัณฑ์"
+              required
+            />
+            <Textarea
+              name="description"
+              value={editProduct.description}
+              onChange={handleChange}
+              placeholder="รายละเอียด"
+              required
+            />
+            <Input
+              type="number"
+              name="price"
+              value={editProduct.price}
+              onChange={handleChange}
+              placeholder="ราคา"
+              required
+            />
+            <Input
+              type="number"
+              name="stock"
+              value={editProduct.stock}
+              onChange={handleChange}
+              placeholder="จำนวนสินค้า"
+              required
+            />
+            <Select
+              name="subcategoryId"
+              value={editProduct.subcategoryId}
+              onValueChange={(value) => setEditProduct((prevData) => ({ ...prevData, subcategoryId: value }))}
+              required
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="เลือกหมวดหมู่ย่อย" />
+              </SelectTrigger>
+              <SelectContent>
+                {subcategories.map((subcategory) => (
+                  <SelectItem key={subcategory.id} value={subcategory.id}>
+                    {subcategory.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Input
+              type="file"
+              name="image"
+              onChange={handleFileChange}
+            />
+          </div>
+          {previewImage && (
+            <div className="flex-shrink-0">
+              <Image src={previewImage} alt="Preview" width={200} height={200} className="object-cover" />
+            </div>
+          )}
+          <div className="flex flex-col justify-end space-y-2 mt-4">
+            <Button type="submit" className="bg-[#204d9c] text-white">บันทึก</Button>
+            <Button type="button" variant="destructive" onClick={() => setOpen(false)}>ยกเลิก</Button>
+          </div>
+        </form>
+      </DialogContent>
+    </Dialog>
   );
 };
 

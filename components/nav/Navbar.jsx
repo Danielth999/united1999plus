@@ -6,35 +6,19 @@ import logo from "../../public/logo/logo-real-no-bg.png";
 import { useSession, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
-
-import {
-  Search,
-  LayoutGrid,
-  Phone,
-  Mail,
-  MapPin,
-  CircleUser,
-  Menu,
-  X,
-  KeyRound,
-  UserRound,
-} from "lucide-react";
-
+import { Search, Menu, X, LayoutGrid } from "lucide-react";
 import Header from "./Header";
-import Dropdown from "./Dropdown";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
 const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [cate, setCate] = useState([]);
   const { data: session, status } = useSession();
   const router = useRouter();
-  // console.log(session);
 
   const fetchCategory = async () => {
     try {
-      const res = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/category`
-      );
+      const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/category`);
       setCate(res.data);
     } catch (error) {
       console.log("error is", error);
@@ -43,34 +27,42 @@ const Navbar = () => {
 
   useEffect(() => {
     fetchCategory();
-  }, []); // กำหนด dependencies เป็นค่าว่าง
+  }, []);
 
   return (
     <>
       <Header />
-      {/* Navigation */}
-      <nav className="bg-white shadow-md">
+      <nav className="bg-white shadow-md ">
         <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between h-[80px] px-4 md:px-6">
           <div className="flex items-center space-x-4">
             <div className="flex md:hidden items-center">
-              <button
-                onClick={() => setMenuOpen(!menuOpen)}
-                className="text-[#204d9c]"
-              >
+              <button onClick={() => setMenuOpen(!menuOpen)} className="text-[#204d9c]">
                 {menuOpen ? <X /> : <Menu />}
               </button>
             </div>
             <Link href="/">
-              <Image
-                src={logo}
-                width={50}
-                height={50}
-                alt="logo"
-                className="w-auto h-auto"
-              />
+              <Image src={logo} width={50} height={50} alt="logo" className="w-auto h-auto" />
             </Link>
-            <Dropdown />
-            
+            <div className="hidden md:flex items-center space-x-4">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button className="text-[#204d9c] flex items-center font-semibold">
+                    หมวดหมู่ <LayoutGrid className="ml-2" />
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                  {cate.map((category) => (
+                    <DropdownMenuItem key={category.categoryId}>
+                      <Link href={`category/${category.nameSlug}`}>
+                        <span className="flex justify-between w-full px-4 py-2 text-left text-black hover:bg-gray-100">
+                          {category.name}
+                        </span>
+                      </Link>
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
           </div>
 
           <div className="hidden md:flex items-center h-[70px] flex-1 justify-center">
@@ -84,42 +76,35 @@ const Navbar = () => {
             </button>
           </div>
 
-          {/* Authentication for desktop */}
           {status === "authenticated" && session ? (
             <div className="flex items-center space-x-4">
-              <div className="dropdown  dropdown-hover">
-                <div
-                  tabIndex={0}
-                  role="button"
-                  className="btn bg-[#dee4f0] flex items-center m-1 rounded-full text-[#204d9c] w-28"
-                >
-                  <div className="overflow-hidden overflow-ellipsis whitespace-nowrap text-md">
-                    {session.user.username}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <div className="flex items-center cursor-pointer space-x-2 bg-[#dee4f0] rounded-full px-2 py-1">
+                    <div className="w-8 h-8 bg-blue-700 text-white flex items-center justify-center rounded-full">
+                      {session.user.username[0].toUpperCase()}
+                    </div>
+                    <div className="text-[#204d9c] font-medium overflow-hidden overflow-ellipsis whitespace-nowrap max-w-[100px]">
+                      {session.user.username}
+                    </div>
                   </div>
-                </div>
-                <ul
-                  tabIndex={0}
-                  className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52"
-                >
-                  <li>
-                    <Link href={"/#"}>ข้อมูลส่วนตัว</Link>
-                  </li>
-                  {session && session.user.role === "admin" ? (
-                    <li>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                  <DropdownMenuItem>
+                    <Link href="/#">ข้อมูลส่วนตัว</Link>
+                  </DropdownMenuItem>
+                  {session.user.role === "admin" && (
+                    <DropdownMenuItem>
                       <Link href="/admin-dashboard/dashboard">ระบบจัดการ</Link>
-                    </li>
-                  ) : null}
-
-                  <li>
-                    <button
-                      onClick={() => signOut()}
-                      className=" text-red-500 btn-sm"
-                    >
+                    </DropdownMenuItem>
+                  )}
+                  <DropdownMenuItem>
+                    <button onClick={() => signOut()} className="text-red-500">
                       ออกจากระบบ
                     </button>
-                  </li>
-                </ul>
-              </div>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           ) : (
             <div className="flex items-center space-x-4">
@@ -127,20 +112,16 @@ const Navbar = () => {
                 <span className="text-[#204d9c] font-bold">Login</span>
               </Link>
               <Link href="/register">
-                <span className="bg-[#204d9c] text-white py-2 px-4 rounded-lg font-bold">
-                  Register
-                </span>
+                <span className="bg-[#204d9c] text-white py-2 px-4 rounded-lg font-bold">Register</span>
               </Link>
             </div>
           )}
         </div>
 
-        {/* Mobile Menu */}
         {menuOpen && (
           <div className="md:hidden">
             <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-              {/* Mobile Search Input */}
-              <div className="md:hidden  px-4 py-2">
+              <div className="px-4 py-2">
                 <form className="flex">
                   <input
                     type="search"
@@ -152,28 +133,18 @@ const Navbar = () => {
                   </button>
                 </form>
               </div>
-
-              <Link href="/login">
-                <span className="block px-3 py-2 rounded-md text-base font-medium text-[#204d9c] hover:bg-gray-100">
-                  เข้าสู่ระบบ
-                </span>
-              </Link>
-              <Link href="/register">
-                <span className="space-x-2 flex px-3 py-2 rounded-md text-base font-medium text-[#204d9c] hover:bg-gray-100">
-                  สมัครสมาชิก
-                </span>
-              </Link>
-
-              <Link href="/about">
-                <span className="block px-3 py-2 rounded-md text-base font-medium text-[#204d9c] hover:bg-gray-100">
-                  เกี่ยวกับเรา
-                </span>
-              </Link>
+              <div className="text-[#204d9c] font-bold px-3 py-2">หมวดหมู่</div>
+              {cate.map((category) => (
+                <Link href={`category/${category.nameSlug}`} key={category.categoryId}>
+                  <span className="block px-3 py-2 rounded-md text-base font-medium text-[#204d9c] hover:bg-gray-100">
+                    {category.name}
+                  </span>
+                </Link>
+              ))}
             </div>
           </div>
         )}
       </nav>
-      {/* End navigation */}
     </>
   );
 };

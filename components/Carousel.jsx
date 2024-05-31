@@ -3,7 +3,6 @@ import React from "react";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-
 import Image from "next/image";
 
 const importAll = (r) => r.keys().map(r);
@@ -24,7 +23,7 @@ const Carousel = () => {
   };
 
   return (
-    <div className="w-full mx-auto rounded-lg overflow-hidden p-10 ">
+    <div className="w-full mx-auto rounded-lg overflow-hidden p-2 sm:p-4 md:p-6 lg:p-8 xl:p-10">
       <Slider {...settings}>
         {images.map((image, index) => (
           <div
@@ -34,8 +33,8 @@ const Carousel = () => {
             <Image
               src={image.default.src}
               alt={`Slide ${index + 1}`}
-              layout="fill"
-              objectFit="cover"
+              fill
+              style={{ objectFit: "cover" }}
               className="rounded-lg"
             />
           </div>

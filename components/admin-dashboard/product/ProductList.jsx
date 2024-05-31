@@ -1,14 +1,35 @@
 "use client";
 import { useState, useEffect } from "react";
 import axios from "axios";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Pencil, Trash } from "lucide-react";
 import Spinner from "../../spinner/Spinner";
 import ModalAddProduct from "./ModalAddProduct";
 import ModalEditProduct from "./ModalEditProduct";
-import Pagination from "./Pagination-PD";
+import Pagination from "../../Pagination";
 import Image from "next/image";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 const ProductList = () => {
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
@@ -16,12 +37,16 @@ const ProductList = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedProduct, setSelectedProduct] = useState(null);
 
+  useEffect(() => {
+    const page = parseInt(searchParams.get("page")) || 1;
+    setCurrentPage(page);
+  }, [searchParams]);
+
   const fetchProducts = async () => {
     try {
       const res = await axios.get(
         `${process.env.NEXT_PUBLIC_API_URL}/api/products`
       );
-
       setProducts(res.data);
     } catch (error) {
       console.log("Error fetching products:", error);
@@ -49,6 +74,10 @@ const ProductList = () => {
     setSelectedProduct(product);
   };
 
+  useEffect(() => {
+    setCurrentPage(1); // Reset page to 1 whenever searchTerm changes
+  }, [searchTerm]);
+
   // Logic for displaying products
   const indexOfLastProduct = currentPage * productsPerPage;
   const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
@@ -64,8 +93,13 @@ const ProductList = () => {
     indexOfLastProduct
   );
 
+  const totalPages = Math.ceil(filteredProducts.length / productsPerPage);
+
   // Change page
-  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+  const paginate = (pageNumber) => {
+    setCurrentPage(pageNumber);
+    router.push(`?page=${pageNumber}`);
+  };
 
   return (
     <>
@@ -74,35 +108,50 @@ const ProductList = () => {
           <Spinner />
         </div>
       ) : (
-        <div className="card bg-base-100 shadow-xl">
-          <div className="card-body">
-            <div className="overflow-x-auto">
-              <div className="mb-2 flex justify-between">
-                <input
-                  className="input input-bordered"
+        <Card className="bg-base-100 shadow-xl">
+          <CardHeader>
+            <CardTitle>รายการผลิตภัณฑ์</CardTitle>
+            <div className="flex items-center justify-between">
+              <CardDescription>ค้นหาและจัดการผลิตภัณฑ์ในระบบ</CardDescription>
+              <ModalAddProduct onProductAdded={fetchProducts} />
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="mb-2 flex justify-between">
+            
+                <Input
+                  className="w-full"
                   placeholder="ค้นหาผลิตภัณฑ์"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
-                <ModalAddProduct onProductAdded={fetchProducts} />
+             
+              <div>
+                <Pagination
+                  totalPages={totalPages}
+                  currentPage={currentPage}
+                  onPageChange={paginate}
+                />
               </div>
-              <table className="table">
-                <thead>
-                  <tr>
-                    <th>#ID</th>
-                    <th>รูปภาพ</th>
-                    <th>ชื่อผลิตภัณฑ์</th>
-                    <th>รายละเอียด</th>
-                    <th>ราคา</th>
+            </div>
 
-                    <th>จัดการ</th>
-                  </tr>
-                </thead>
-                <tbody>
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>#ID</TableHead>
+                    <TableHead>รูปภาพ</TableHead>
+                    <TableHead>ชื่อผลิตภัณฑ์</TableHead>
+                    <TableHead>รายละเอียด</TableHead>
+                    <TableHead>ราคา</TableHead>
+                    <TableHead>จัดการ</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
                   {currentProducts.map((product) => (
-                    <tr key={product.productId}>
-                      <td>{product.productId}</td>
-                      <td>
+                    <TableRow key={product.productId}>
+                      <TableCell>{product.productId}</TableCell>
+                      <TableCell>
                         {product.imageUrl ? (
                           <Image
                             src={product.imageUrl}
@@ -113,49 +162,31 @@ const ProductList = () => {
                         ) : (
                           <span>No Image</span>
                         )}
-                      </td>
-                      <td>{product.name}</td>
-                      <td>{product.description}</td>
-                      <td>{product.price.toFixed(2)} บาท</td>
-
-                      <td>
-                        <button
+                      </TableCell>
+                      <TableCell>{product.name}</TableCell>
+                      <TableCell>{product.description}</TableCell>
+                      <TableCell>{product.price.toFixed(2)} บาท</TableCell>
+                      <TableCell>
+                        <Button
+                          variant="link"
                           onClick={() => handleEditClick(product)}
-                          className="text-blue-500"
                         >
-                          <Pencil />
-                        </button>
-                        <button
+                          <Pencil className="text-blue-500" />
+                        </Button>
+                        <Button
+                          variant="link"
                           onClick={() => handleDelete(product.productId)}
-                          className="text-red-500"
                         >
-                          <Trash />
-                        </button>
-                      </td>
-                    </tr>
+                          <Trash className="text-red-500" />
+                        </Button>
+                      </TableCell>
+                    </TableRow>
                   ))}
-                </tbody>
-                <tfoot>
-                  <tr>
-                    <th>#ID</th>
-                    <th>รูปภาพ</th>
-                    <th>ชื่อผลิตภัณฑ์</th>
-                    <th>รายละเอียด</th>
-                    <th>ราคา</th>
-                    <th>จำนวนสินค้า</th>
-                    <th>จัดการ</th>
-                  </tr>
-                </tfoot>
-              </table>
-              <Pagination
-                itemsPerPage={productsPerPage}
-                totalItems={filteredProducts.length}
-                paginate={paginate}
-                currentPage={currentPage}
-              />
+                </TableBody>
+              </Table>
             </div>
-          </div>
-        </div>
+          </CardContent>
+        </Card>
       )}
       {selectedProduct && (
         <ModalEditProduct

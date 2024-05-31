@@ -30,7 +30,7 @@ export async function POST(req) {
     const price = formData.get("price");
     const categoryId = formData.get("categoryId");
     const image = formData.get("image");
-    // console.log({ name, description, price, categoryId, image });
+    console.log({ name, description, price, categoryId, image });
     if (
       !name ||
       !description ||

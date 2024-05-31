@@ -1,21 +1,54 @@
 "use client";
 import { useState, useEffect } from "react";
 import axios from "axios";
-
+import { useRouter, useSearchParams } from "next/navigation";
 import { Pencil, Trash } from "lucide-react";
 import Spinner from "../../spinner/Spinner";
 import ModalAddUser from "./ModalAddUser";
 import ModalEditUser from "./ModalEditUser";
-
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import Pagination from "../../Pagination"; // นำเข้า Pagination component
 
 const UserList = () => {
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [usersPerPage] = useState(5);
   const [searchTerm, setSearchTerm] = useState("");
-  const [filterRole, setFilterRole] = useState("");
+  const [filterRole, setFilterRole] = useState("all");
   const [selectedUser, setSelectedUser] = useState(null);
+
+  useEffect(() => {
+    const page = parseInt(searchParams.get("page")) || 1;
+    setCurrentPage(page);
+  }, [searchParams]);
 
   const fetchUsers = async () => {
     try {
@@ -51,22 +84,30 @@ const UserList = () => {
     setSelectedUser(user);
   };
 
+  useEffect(() => {
+    setCurrentPage(1); // Reset page to 1 whenever searchTerm or filterRole changes
+  }, [searchTerm, filterRole]);
+
   // Logic for displaying users
   const indexOfLastUser = currentPage * usersPerPage;
   const indexOfFirstUser = indexOfLastUser - usersPerPage;
 
   const filteredUsers = users.filter((user) => {
     return (
-      (filterRole ? user.roles === filterRole : true) &&
+      (filterRole === "all" ? true : user.roles === filterRole) &&
       (user.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
         user.email.toLowerCase().includes(searchTerm.toLowerCase()))
     );
   });
 
   const currentUsers = filteredUsers.slice(indexOfFirstUser, indexOfLastUser);
+  const totalPages = Math.ceil(filteredUsers.length / usersPerPage);
 
   // Change page
-  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+  const paginate = (pageNumber) => {
+    setCurrentPage(pageNumber);
+    router.push(`?page=${pageNumber}`);
+  };
 
   return (
     <>
@@ -75,93 +116,106 @@ const UserList = () => {
           <Spinner />
         </div>
       ) : (
-        <div className="card bg-base-100 shadow-xl">
-          <div className="card-body">
-            <div className="overflow-x-auto">
-              <div className="mb-2 flex justify-between">
-                <div className="join">
-                  <input
-                    className="input input-bordered join-item"
-                    placeholder="ค้นหา"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                  />
-                  <select
-                    className="select select-bordered join-item"
-                    value={filterRole}
-                    onChange={(e) => setFilterRole(e.target.value)}
-                  >
-                    <option value="">กรอง</option>
-                    <option value="admin">Admin</option>
-                    <option value="user">User</option>
-                  </select>
-                  <div className="indicator">
-                    <button className="btn bg-[#204d9c] text-white join-item">
-                      ค้นหา
-                    </button>
-                  </div>
-                </div>
-                <div>
-                  <ModalAddUser onUserAdded={fetchUsers} />
-                </div>
+        <Card>
+          <CardHeader>
+              <CardTitle>รายชื่อผู้ใช้</CardTitle>
+            <div className="flex items-center justify-between">
+              <CardDescription>ค้นหาและจัดการผู้ใช้ในระบบ</CardDescription>
+              <div className="flex justify-end">
+                <ModalAddUser onUserAdded={fetchUsers} />
               </div>
-              <table className="table">
-                <thead>
-                  <tr>
-                    <th>#ID</th>
-                    <th>ชื่อผู้ใช้</th>
-                    <th>อีเมล</th>
-                    <th>สิทธิ์การใช้งาน</th>
-                    <th>จัดการ</th>
-                  </tr>
-                </thead>
-                <tbody>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="mb-2 flex justify-between items-center">
+              <div className="flex space-x-2">
+                <Input
+                  placeholder="ค้นหา"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+                <Select
+                  value={filterRole}
+                  onValueChange={(value) => setFilterRole(value)}
+                >
+                  <SelectTrigger className="w-[180px]">
+                    <SelectValue placeholder="กรอง" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">ทั้งหมด</SelectItem>
+                    <SelectItem value="admin">Admin</SelectItem>
+                    <SelectItem value="user">User</SelectItem>
+                  </SelectContent>
+                </Select>
+                <Button
+                  className="bg-[#204d9c] text-white"
+                  onClick={() => router.push(`?page=1`)}
+                >
+                  ค้นหา
+                </Button>
+              </div>
+              <div className="">
+                <Pagination
+                  totalPages={totalPages}
+                  currentPage={currentPage}
+                  onPageChange={paginate}
+                />
+              </div>
+            </div>
+            <div className="overflow-x-auto">
+              <Table>
+                <TableCaption>รายชื่อผู้ใช้ในระบบ</TableCaption>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>#ID</TableHead>
+                    <TableHead>ชื่อผู้ใช้</TableHead>
+                    <TableHead>อีเมล</TableHead>
+                    <TableHead>สิทธิ์การใช้งาน</TableHead>
+                    <TableHead>จัดการ</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
                   {Array.isArray(currentUsers) && currentUsers.length > 0 ? (
                     currentUsers.map((user) => (
-                      <tr className="hover" key={user.userId}>
-                        <th>{user.userId}</th>
-                        <td>{user.username}</td>
-                        <td>{user.email}</td>
-                        <td>{user.roles}</td>
-                        <td>
-                          <button onClick={() => handleEditClick(user)} className="text-blue-500">
+                      <TableRow key={user.userId}>
+                        <TableCell>{user.userId}</TableCell>
+                        <TableCell>{user.username}</TableCell>
+                        <TableCell>{user.email}</TableCell>
+                        <TableCell>{user.roles}</TableCell>
+                        <TableCell>
+                          <Button
+                            onClick={() => handleEditClick(user)}
+                            variant="link"
+                            className="text-blue-500"
+                          >
                             <Pencil />
-                          </button>
-                          <button
+                          </Button>
+                          <Button
                             onClick={() => handleDelete(user.userId)}
+                            variant="link"
                             className="text-red-500"
                           >
                             <Trash />
-                          </button>
-                        </td>
-                      </tr>
+                          </Button>
+                        </TableCell>
+                      </TableRow>
                     ))
                   ) : (
-                    <tr>
-                      <td colSpan="5" className="text-center">
-                        No users found
-                      </td>
-                    </tr>
+                    <TableRow>
+                      <TableCell colSpan="5" className="text-center">
+                        ไม่พบผู้ใช้
+                      </TableCell>
+                    </TableRow>
                   )}
-                </tbody>
-                <tfoot>
-                  <tr>
-                    <th>#ID</th>
-                    <th>ชื่อผู้ใช้</th>
-                    <th>อีเมล</th>
-                    <th>สิทธิ์การใช้งาน</th>
-                    <th>จัดการ</th>
-                  </tr>
-                </tfoot>
-              </table>
-              <div className="flex justify-center mt-4">
-               
-              </div>
+                </TableBody>
+              </Table>
             </div>
-          </div>
-        </div>
+          </CardContent>
+        </Card>
       )}
-      {selectedUser && <ModalEditUser user={selectedUser} onUserUpdated={fetchUsers} />}
+      {selectedUser && (
+        <ModalEditUser user={selectedUser} onUserUpdated={fetchUsers} />
+      )}
     </>
   );
 };

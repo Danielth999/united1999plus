@@ -21,7 +21,7 @@ export const authOptions = {
 
         if (!user) {
           console.error("User not found");
-          throw new Error("User not found");
+          throw new Error("ไม่พบอีเมลนี้ในระบบ");
         }
 
         const isPasswordValid = await bcrypt.compare(

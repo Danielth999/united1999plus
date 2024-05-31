@@ -5,19 +5,23 @@ import Navbar from "@/components/nav/Navbar";
 import Footer from "@/components/Footer";
 import Link from "next/link";
 import axios from "axios";
+import { useToast } from "@/components/ui/use-toast";
 
 const RegisterPage = () => {
   const [username, setUserName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
   const router = useRouter();
+  const { toast } = useToast();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!username || !email || !password) {
-      setError("All fields are required.");
+      toast({
+        title: "เกิดข้อผิดพลาด!",
+        description: "กรุณากรอกข้อมูลให้ครบทุกช่อง",
+        variant: "destructive",
+      });
       return;
     }
 
@@ -32,18 +36,29 @@ const RegisterPage = () => {
       );
 
       if (res.status === 200) {
-        setSuccess("Successfully registered. Please login.");
-        setError("");
+        toast({
+          title: "สำเร็จ!",
+          description: "สมัครสมาชิกสำเร็จ โปรดเข้าสู่ระบบ",
+          variant: "success",
+        });
         setUserName("");
         setEmail("");
         setPassword("");
         router.push("/login");
       } else {
-        setError("Something went wrong. Please try again.");
+        toast({
+          title: "เกิดข้อผิดพลาด!",
+          description: "Something went wrong. Please try again.",
+          variant: "destructive",
+        });
       }
     } catch (error) {
       console.log(error);
-      setError("มีบางอย่างผิดพลาดหรืออีเมลซ้ำ");
+      toast({
+        title: "เกิดข้อผิดพลาด!",
+        description: "มีบางอย่างผิดพลาดหรืออีเมลซ้ำ",
+        variant: "destructive",
+      });
     }
   };
 
@@ -52,22 +67,6 @@ const RegisterPage = () => {
       <Navbar />
       <div className="flex justify-center mt-10">
         <div className="max-w-md w-full bg-white shadow-lg rounded-md p-8">
-          {success && (
-            <div
-              className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4"
-              role="alert"
-            >
-              <strong className="font-bold">สำเร็จ!{success}</strong>
-            </div>
-          )}
-          {error && (
-            <div
-              className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4"
-              role="alert"
-            >
-              <strong className="font-bold">เกิดข้อผิดพลาด!{error}</strong>
-            </div>
-          )}
           <h2 className="text-3xl font-bold mb-6 text-center">สมัครสมาชิก</h2>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>

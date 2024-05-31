@@ -5,6 +5,25 @@ import { Pencil, Trash } from "lucide-react";
 import Spinner from "../../spinner/Spinner";
 import ModalAddCategory from "./ModalAddCategory";
 import ModalEditCategory from "./ModalEditCategory";
+import Pagination from "../../Pagination";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 const CategoryList = () => {
   const [categories, setCategories] = useState([]);
@@ -13,11 +32,12 @@ const CategoryList = () => {
   const [categoriesPerPage] = useState(5);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState(null);
+  const [sortOrder, setSortOrder] = useState("asc");
 
   const fetchCategories = async () => {
     try {
       const res = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/category`
+        `${process.env.NEXT_PUBLIC_API_URL}/api/category?sort=${sortOrder}`
       );
 
       if (res.data && Array.isArray(res.data)) {
@@ -34,7 +54,7 @@ const CategoryList = () => {
 
   useEffect(() => {
     fetchCategories();
-  }, []);
+  }, [sortOrder]);
 
   const handleDelete = async (id) => {
     try {
@@ -49,6 +69,10 @@ const CategoryList = () => {
 
   const handleEditClick = (category) => {
     setSelectedCategory(category);
+  };
+
+  const handleSort = () => {
+    setSortOrder((prevOrder) => (prevOrder === "asc" ? "desc" : "asc"));
   };
 
   // Logic for displaying categories
@@ -74,103 +98,89 @@ const CategoryList = () => {
           <Spinner />
         </div>
       ) : (
-        <div className="card bg-base-100 shadow-xl mb-4">
-          <div className="card-body">
-            <div className="overflow-x-auto">
-              <div className="mb-2 flex justify-between">
-                <div className="join">
-                  <input
-                    className="input input-bordered join-item"
-                    placeholder="ค้นหา"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                  />
-                  <div className="indicator">
-                    <button className="btn bg-[#204d9c] text-white join-item">
-                      ค้นหา
-                    </button>
-                  </div>
-                </div>
+        <Card className="bg-base-100 shadow-xl mb-4">
+          <CardHeader>
+            <CardTitle>รายการหมวดหมู่</CardTitle>
+            <div className="flex items-center justify-between">
+              <CardDescription>ค้นหาและจัดการหมวดหมู่ในระบบ</CardDescription>
+              <div>
+                <ModalAddCategory onCategoryAdded={fetchCategories} />
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="mb-2 flex justify-between">
+              <div className="flex items-center">
+                <Input
+                  placeholder="ค้นหาหมวดหมู่"
+                  className="w-96"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
                 <div>
-                  <ModalAddCategory onCategoryAdded={fetchCategories} />
+                  <Button variatn="blue" onClick={handleSort}>
+                    {sortOrder === "asc"
+                      ? "เรียงลำดับตาม ID (น้อยไปมาก)"
+                      : "เรียงลำดับตาม ID (มากไปน้อย)"}
+                  </Button>
                 </div>
               </div>
-              <table className="table">
-                <thead>
-                  <tr>
-                    <th>#ID</th>
-                    <th>ชื่อหมวดหมู่</th>
-                    <th>ชื่อหมวดหมู่ภาษาอังกฤษ</th>
-                    <th>จัดการ</th>
-                  </tr>
-                </thead>
-                <tbody>
+              <div>
+                <Pagination
+                  totalPages={Math.ceil(
+                    filteredCategories.length / categoriesPerPage
+                  )}
+                  currentPage={currentPage}
+                  onPageChange={paginate}
+                />
+              </div>
+            </div>
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>#ID</TableHead>
+                    <TableHead>ชื่อหมวดหมู่</TableHead>
+                    <TableHead>ชื่อหมวดหมู่ภาษาอังกฤษ</TableHead>
+                    <TableHead>จัดการ</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
                   {Array.isArray(currentCategories) &&
                   currentCategories.length > 0 ? (
                     currentCategories.map((category) => (
-                      <tr className="hover" key={category.categoryId}>
-                        <th>{category.categoryId}</th>
-                        <td>{category.name}</td>
-                        <td>{category.nameSlug}</td>
-                        <td>
-                          <button
+                      <TableRow key={category.categoryId}>
+                        <TableCell>{category.categoryId}</TableCell>
+                        <TableCell>{category.name}</TableCell>
+                        <TableCell>{category.nameSlug}</TableCell>
+                        <TableCell>
+                          <Button
+                            variant="link"
                             onClick={() => handleEditClick(category)}
-                            className="text-blue-500"
                           >
-                            <Pencil />
-                          </button>
-                          <button
+                            <Pencil className="text-blue-500" />
+                          </Button>
+                          <Button
+                            variant="link"
                             onClick={() => handleDelete(category.categoryId)}
-                            className="text-red-500"
                           >
-                            <Trash />
-                          </button>
-                        </td>
-                      </tr>
+                            <Trash className="text-red-500" />
+                          </Button>
+                        </TableCell>
+                      </TableRow>
                     ))
                   ) : (
-                    <tr>
-                      <td colSpan="4" className="text-center">
+                    <TableRow>
+                      <TableCell colSpan="4" className="text-center">
                         No categories found
-                      </td>
-                    </tr>
+                      </TableCell>
+                    </TableRow>
                   )}
-                </tbody>
-                <tfoot>
-                  <tr>
-                    <th>#ID</th>
-                    <th>ชื่อหมวดหมู่</th>
-                    <th>หมวดหมู่ย่อย</th>
-                    <th>จัดการ</th>
-                  </tr>
-                </tfoot>
-              </table>
-              <div className="flex justify-center mt-4">
-                <nav>
-                  <ul className="pagination">
-                    {Array.from(
-                      {
-                        length: Math.ceil(
-                          filteredCategories.length / categoriesPerPage
-                        ),
-                      },
-                      (_, i) => (
-                        <li key={i} className="page-item">
-                          <button
-                            onClick={() => paginate(i + 1)}
-                            className="page-link"
-                          >
-                            {i + 1}
-                          </button>
-                        </li>
-                      )
-                    )}
-                  </ul>
-                </nav>
-              </div>
+                </TableBody>
+              </Table>
             </div>
-          </div>
-        </div>
+          </CardContent>
+        </Card>
       )}
       {selectedCategory && (
         <ModalEditCategory

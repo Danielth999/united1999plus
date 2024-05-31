@@ -5,8 +5,6 @@ import Link from "next/link";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-import Image from "next/image";
-// image zone
 
 const Category = () => {
   const settings = {
@@ -38,12 +36,12 @@ const Category = () => {
 
   return (
     <>
-      <div className="mt-10 md:mt-5">
-        <h1 className="font-bold text-white text-center">ผลิตภัณฑ์ของเรา</h1>
+      <div className="mt-10 md:mt-5 text-center">
+        <h1 className="font-bold text-black">ผลิตภัณฑ์ของเรา</h1>
       </div>
       <div className="md:mt-5">
         {/* Carousel for small screens */}
-        <div className="block sm:hidden">
+        <div className="block sm:hidden mx-auto w-full max-w-md">
           <Slider {...settings}>
             {category.map((cateItem) => (
               <div key={cateItem.categoryId} className="p-4">
@@ -60,17 +58,19 @@ const Category = () => {
           </Slider>
         </div>
         {/* Grid for medium and larger screens */}
-        <div className="hidden sm:grid    grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4 ">
-          {category.map((item) => (
-            <div
-              key={item.categoryId}
-              className="bg-[#f1f0ed] p-10 text-center rounded-md font-medium hover:shadow-2xl delay-100 transition-all ease-in-out duration-100"
-            >
-              <Link href={`/category/${item.nameSlug}`} className="font-bold">
-                {item.name}
-              </Link>
-            </div>
-          ))}
+        <div className="hidden sm:flex justify-center">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-12 xl:grid-cols-4 gap-4">
+            {category.map((item) => (
+              <div
+                key={item.categoryId}
+                className="bg-[#f1f0ed] p-10 text-center rounded-md font-medium hover:shadow-2xl transition-all ease-in-out duration-300"
+              >
+                <Link href={`/category/${item.nameSlug}`} className="font-bold">
+                  {item.name}
+                </Link>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </>

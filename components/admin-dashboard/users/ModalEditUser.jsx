@@ -1,5 +1,15 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const ModalEditUser = ({ user, onUserUpdated }) => {
   const [editUser, setEditUser] = useState({
@@ -8,6 +18,8 @@ const ModalEditUser = ({ user, onUserUpdated }) => {
     roles: "",
   });
 
+  const [open, setOpen] = useState(false);
+
   useEffect(() => {
     if (user) {
       setEditUser({
@@ -15,7 +27,7 @@ const ModalEditUser = ({ user, onUserUpdated }) => {
         username: user.username,
         roles: user.roles,
       });
-      document.getElementById("edit_user_modal").showModal();
+      setOpen(true); // Open the dialog
     }
   }, [user]);
 
@@ -28,89 +40,76 @@ const ModalEditUser = ({ user, onUserUpdated }) => {
     try {
       await axios.put(`${process.env.NEXT_PUBLIC_API_URL}/api/users/${user.userId}`, editUser);
       onUserUpdated(); // Fetch users again to update the list
-      document.getElementById("edit_user_modal").close(); // Close the modal
+      setOpen(false); // Close the dialog
     } catch (error) {
       console.log("Error updating user:", error);
     }
   };
 
   return (
-    <dialog id="edit_user_modal" className="modal modal-bottom sm:modal-middle">
-      <div className="modal-box">
-        <h3 className="font-bold text-lg">แก้ไขข้อมูลผู้ใช้</h3>
-        <div className="modal-action block justify-center">
-          <form onSubmit={handleSubmit}>
-            <div className="mb-4">
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>แก้ไขข้อมูลผู้ใช้</DialogTitle>
+          <DialogDescription>กรุณากรอกข้อมูลเพื่อแก้ไขผู้ใช้</DialogDescription>
+        </DialogHeader>
+        <form onSubmit={handleSubmit}>
+          <div className="space-y-4">
+            <div>
               <label htmlFor="email" className="block text-gray-700 text-sm font-bold mb-2">
                 อีเมล
               </label>
-              <input
+              <Input
                 type="text"
                 name="email"
                 id="email"
                 value={editUser.email}
                 onChange={handleChange}
-                className="input input-bordered w-full"
                 placeholder="Email"
                 required
               />
             </div>
-            <div className="mb-4">
+            <div>
               <label htmlFor="username" className="block text-gray-700 text-sm font-bold mb-2">
                 ชื่อผู้ใช้
               </label>
-              <input
+              <Input
                 type="text"
                 name="username"
                 id="username"
                 value={editUser.username}
                 onChange={handleChange}
-                className="input input-bordered w-full"
                 placeholder="Username"
                 required
               />
             </div>
-            <div className="mb-4">
+            <div>
               <label htmlFor="roles" className="block text-gray-700 text-sm font-bold mb-2">
                 สิทธิ์การใช้งาน
               </label>
-              <select
+              <Select
                 name="roles"
-                id="roles"
                 value={editUser.roles}
-                onChange={handleChange}
-                className="select select-bordered w-full"
+                onValueChange={(value) => setEditUser((prevData) => ({ ...prevData, roles: value }))}
                 required
               >
-                {editUser.roles === "admin" ? (
-                  <>
-                    <option value="admin">admin</option>
-                    <option value="user">user</option>
-                  </>
-                ) : (
-                  <>
-                    <option value="user">user</option>
-                    <option value="admin">admin</option>
-                  </>
-                )}
-              </select>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="เลือกสิทธิ์การใช้งาน" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="admin">admin</SelectItem>
+                  <SelectItem value="user">user</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
-            <div className="flex justify-center">
-              <button type="submit" className="btn text-white bg-[#204d9c] mr-2">
-                บันทึก
-              </button>
-              <button
-                type="button"
-                className="btn btn-error text-white"
-                onClick={() => document.getElementById("edit_user_modal").close()}
-              >
-                ยกเลิก
-              </button>
-            </div>
-          </form>
-        </div>
-      </div>
-    </dialog>
+          </div>
+          <div className="flex justify-center space-x-2 mt-4">
+            <Button type="submit" className="bg-[#204d9c] text-white">บันทึก</Button>
+            <Button type="button" variant="destructive" onClick={() => setOpen(false)}>ยกเลิก</Button>
+          </div>
+        </form>
+      </DialogContent>
+    </Dialog>
   );
 };
 
