@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect, Suspense } from "react";
 import axios from "axios";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { Pencil, Trash } from "lucide-react";
 import Spinner from "../../spinner/Spinner";
 import ModalAddProduct from "./ModalAddProduct";
@@ -29,7 +29,6 @@ import { Button } from "@/components/ui/button";
 
 const ProductListContent = () => {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
@@ -38,9 +37,10 @@ const ProductListContent = () => {
   const [selectedProduct, setSelectedProduct] = useState(null);
 
   useEffect(() => {
-    const page = parseInt(searchParams.get("page")) || 1;
+    const params = new URLSearchParams(window.location.search);
+    const page = parseInt(params.get("page")) || 1;
     setCurrentPage(page);
-  }, [searchParams]);
+  }, []);
 
   const fetchProducts = async () => {
     try {
@@ -169,7 +169,9 @@ const ProductListContent = () => {
           </CardContent>
           <CardFooter className="flex justify-center mt-4">
             <Pagination
-              totalPages={Math.ceil(filteredProducts.length / productsPerPage)}
+              totalPages={Math.ceil(
+                filteredProducts.length / productsPerPage
+              )}
               currentPage={currentPage}
               onPageChange={paginate}
             />
