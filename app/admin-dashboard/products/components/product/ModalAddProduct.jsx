@@ -14,6 +14,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import Spinner from "@/components/spinner/Spinner";
 import {
   Select,
   SelectContent,
@@ -26,6 +27,7 @@ import Image from "next/image";
 
 const ModalAddProduct = ({ onProductAdded }) => {
   const [categories, setCategories] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [formData, setFormData] = useState({
     name: "",
     description: "",
@@ -87,9 +89,20 @@ const ModalAddProduct = ({ onProductAdded }) => {
           },
         }
       );
-      onProductAdded(response.data);
-      setOpen(false); // Close the dialog
-      setPreviewImage(null); // Clear preview image
+      if (response.status === 201) {
+        onProductAdded(response.data);
+        setOpen(false); // Close the dialog
+        setPreviewImage(null); // Clear preview image
+        setFormData({
+          name: "",
+          description: "",
+          price: "",
+          categoryId: "",
+          image: null,
+        });
+        
+        setLoading(false);
+      }
     } catch (error) {
       console.error("Error uploading product:", error);
     }
@@ -152,9 +165,10 @@ const ModalAddProduct = ({ onProductAdded }) => {
                   <SelectTrigger className="w-full">
                     <SelectValue placeholder="เลือกหมวดหมู่" />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent >
                     {categories.map((category) => (
                       <SelectItem
+                      
                         key={category.categoryId}
                         value={category.categoryId}
                       >

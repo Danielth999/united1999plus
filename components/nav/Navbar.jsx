@@ -8,7 +8,12 @@ import { useRouter } from "next/navigation";
 import axios from "axios";
 import { Search, Menu, X, LayoutGrid } from "lucide-react";
 import Header from "./Header";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -18,7 +23,9 @@ const Navbar = () => {
 
   const fetchCategory = async () => {
     try {
-      const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/category`);
+      const res = await axios.get(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/category`
+      );
       setCate(res.data);
     } catch (error) {
       console.log("error is", error);
@@ -36,12 +43,21 @@ const Navbar = () => {
         <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between h-[80px] px-4 md:px-6">
           <div className="flex items-center space-x-4">
             <div className="flex md:hidden items-center">
-              <button onClick={() => setMenuOpen(!menuOpen)} className="text-[#204d9c]">
+              <button
+                onClick={() => setMenuOpen(!menuOpen)}
+                className="text-[#204d9c]"
+              >
                 {menuOpen ? <X /> : <Menu />}
               </button>
             </div>
             <Link href="/">
-              <Image src={logo} width={50} height={50} alt="logo" className="w-auto h-auto" />
+              <Image
+                src={logo}
+                width={50}
+                height={50}
+                alt="logo"
+                className="w-auto h-auto"
+              />
             </Link>
             <div className="hidden md:flex items-center space-x-4">
               <DropdownMenu>
@@ -60,6 +76,13 @@ const Navbar = () => {
                       </Link>
                     </DropdownMenuItem>
                   ))}
+                  <DropdownMenuItem>
+                    <Link href="/products">
+                      <span className="flex justify-between w-full px-4 py-2 text-left text-black hover:bg-gray-100">
+                        สินค้าทั้งหมด
+                      </span>
+                    </Link>
+                  </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
@@ -112,7 +135,9 @@ const Navbar = () => {
                 <span className="text-[#204d9c] font-bold">Login</span>
               </Link>
               <Link href="/register">
-                <span className="bg-[#204d9c] text-white py-2 px-4 rounded-lg font-bold">Register</span>
+                <span className="bg-[#204d9c] text-white py-2 px-4 rounded-lg font-bold">
+                  Register
+                </span>
               </Link>
             </div>
           )}
@@ -135,7 +160,10 @@ const Navbar = () => {
               </div>
               <div className="text-[#204d9c] font-bold px-3 py-2">หมวดหมู่</div>
               {cate.map((category) => (
-                <Link href={`category/${category.nameSlug}`} key={category.categoryId}>
+                <Link
+                  href={`category/${category.nameSlug}`}
+                  key={category.categoryId}
+                >
                   <span className="block px-3 py-2 rounded-md text-base font-medium text-[#204d9c] hover:bg-gray-100">
                     {category.name}
                   </span>

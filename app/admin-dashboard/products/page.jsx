@@ -1,5 +1,5 @@
 import React from "react";
-import ProductList from "../../../components/admin-dashboard/product/ProductList";
+import ProductList from "./components/product/ProductList";
 const Product = () => {
   return (
     <>

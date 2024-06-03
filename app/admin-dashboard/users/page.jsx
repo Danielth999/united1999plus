@@ -1,5 +1,5 @@
 'use client';
-import UserList from "@/components/admin-dashboard/users/UserList";
+import UserList from "./components/users/UserList";
 // import { useSession, status } from "next-auth/react";
 // import { useRouter } from "next/navigation";
 const Users = () => {

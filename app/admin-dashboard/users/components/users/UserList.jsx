@@ -3,7 +3,7 @@ import { useState, useEffect, Suspense } from 'react';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import { Pencil, Trash } from 'lucide-react';
-import Spinner from '../../spinner/Spinner';
+import Spinner from '@/components/spinner/Spinner';
 import ModalAddUser from './ModalAddUser';
 import ModalEditUser from './ModalEditUser';
 import {
@@ -32,7 +32,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import Pagination from '../../Pagination'; // นำเข้า Pagination component
+import Pagination from '@/components/Pagination'; // นำเข้า Pagination component
 
 const UserListContent = () => {
   const router = useRouter();
@@ -60,7 +60,7 @@ const UserListContent = () => {
       } else {
         throw new Error('Fetched data is not in the expected format');
       }
-    } catch (error) {
+    } catch (error) { 
       console.log('Error fetching users:', error);
     } finally {
       setLoading(false);

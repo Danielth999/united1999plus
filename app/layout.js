@@ -1,9 +1,14 @@
-import { Inter } from "next/font/google";
+import { Prompt } from "next/font/google";
 import "./globals.css";
-import { getServerSession } from "next-auth";
 import SessionProvider from "../components/SessionProvider";
-import { Toaster } from "@/components/ui/toaster"
-const inter = Inter({ subsets: ["latin"] });
+
+import { Toaster } from "@/components/ui/toaster";
+
+const prompt = Prompt({
+  subsets: ["latin"],
+  weight: ["400", "700"],
+  display: "swap",
+});
 
 export const metadata = {
   title: "UNITED 1999 PLUS",
@@ -13,7 +18,7 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body className={inter.className}>
+      <body className={prompt.className}>
         <SessionProvider>{children}</SessionProvider>
         <Toaster />
       </body>

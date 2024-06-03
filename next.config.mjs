@@ -1,9 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-     reactStrictMode: true,
-     images: {
-          domains: ['res.cloudinary.com'], // เพิ่ม hostname ของ Cloudinary ที่นี่
-        },
-};   
+  reactStrictMode: true,
+  images: {
+    domains: ["umlwdospvvdauxzulbnu.supabase.co"],
+  },
+};
 
 export default nextConfig;

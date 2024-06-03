@@ -1,192 +1,102 @@
+"use client";
 import React from "react";
 import Navbar from "@/components/nav/Navbar";
-import Image from "next/image";
 import Footer from "@/components/Footer";
+import Image from "next/image";
+import { useState, useEffect } from "react";
+import axios from "axios";
+import Spinner from "@/components/spinner/Spinner";
+import Pagination from "@/components/Pagination";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 
 const ProductPage = () => {
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const fetchProducts = async () => {
+    try {
+      const res = await axios.get(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/products`
+      );
+
+      if (res.data && Array.isArray(res.data)) {
+        setData(res.data);
+        setLoading(false);
+      }
+
+      setLoading(false);
+    } catch (error) {
+      console.log("Error fetching products:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchProducts();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="grid place-items-center items-center h-screen">
+        <Spinner />
+      </div>
+    );
+  }
   return (
     <>
       <Navbar />
-      <div className="max-w-6xl mx-auto">
+      <div className="max-w-7xl mx-auto p-5">
         <div className="mt-2">
           <small>หน้าหลัก / สินค้าทั้งหมด</small>
         </div>
         <div className="mt-2">
           <h1 className="text-3xl">สินค้าทั้งหมด</h1>
         </div>
-        <section className="text-gray-400 body-font">
-          <div className=" px-5 py-4 mx-auto">
-            <div className="flex flex-wrap -m-4">
-              <div className="lg:w-1/4 md:w-1/2 p-4 w-full">
-                <a className="block relative h-48 rounded overflow-hidden">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 mt-5">
+          {data.map((item) => (
+            <Card
+              key={item.productId}
+              className="hover:shadow-xl border flex flex-col"
+            >
+              <CardHeader className="border-b">
+                <div className="relative w-full h-48 overflow-hidden">
                   <Image
-                    width={100}
-                    height={100}
-                    alt="ecommerce"
-                    className="object-cover object-center w-full h-full block"
-                    src="https://dummyimage.com/420x260"
+                    src={item.imageUrl}
+                    alt={item.name}
+                    fill
+                    style={{ objectFit: "contain" }}
+                    className="max-h-full"
                   />
-                </a>
-                <div className="mt-4">
-                  <h3 className="text-gray-500 text-xs tracking-widest title-font mb-1">
-                    CATEGORY
-                  </h3>
-                  <h2 className="text-white title-font text-lg font-medium">
-                    The Catalyzer
-                  </h2>
-                  <p className="mt-1">$16.00</p>
                 </div>
-              </div>
-              <div className="lg:w-1/4 md:w-1/2 p-4 w-full">
-                <a className="block relative h-48 rounded overflow-hidden">
-                  <Image
-                    width={100}
-                    height={100}
-                    alt="ecommerce"
-                    className="object-cover object-center w-full h-full block"
-                    src="https://dummyimage.com/421x261"
-                  />
-                </a>
-                <div className="mt-4">
-                  <h3 className="text-gray-500 text-xs tracking-widest title-font mb-1">
-                    CATEGORY
-                  </h3>
-                  <h2 className="text-white title-font text-lg font-medium">
-                    Shooting Stars
-                  </h2>
-                  <p className="mt-1">$21.15</p>
-                </div>
-              </div>
-              <div className="lg:w-1/4 md:w-1/2 p-4 w-full">
-                <a className="block relative h-48 rounded overflow-hidden">
-                  <Image
-                    width={100}
-                    height={100}
-                    alt="ecommerce"
-                    className="object-cover object-center w-full h-full block"
-                    src="https://dummyimage.com/422x262"
-                  />
-                </a>
-                <div className="mt-4">
-                  <h3 className="text-gray-500 text-xs tracking-widest title-font mb-1">
-                    CATEGORY
-                  </h3>
-                  <h2 className="text-white title-font text-lg font-medium">
-                    Neptune
-                  </h2>
-                  <p className="mt-1">$12.00</p>
-                </div>
-              </div>
-              <div className="lg:w-1/4 md:w-1/2 p-4 w-full">
-                <a className="block relative h-48 rounded overflow-hidden">
-                  <Image
-                    width={100}
-                    height={100}
-                    alt="ecommerce"
-                    className="object-cover object-center w-full h-full block"
-                    src="https://dummyimage.com/423x263"
-                  />
-                </a>
-                <div className="mt-4">
-                  <h3 className="text-gray-500 text-xs tracking-widest title-font mb-1">
-                    CATEGORY
-                  </h3>
-                  <h2 className="text-white title-font text-lg font-medium">
-                    The 400 Blows
-                  </h2>
-                  <p className="mt-1">$18.40</p>
-                </div>
-              </div>
-              <div className="lg:w-1/4 md:w-1/2 p-4 w-full">
-                <a className="block relative h-48 rounded overflow-hidden">
-                  <Image
-                    width={100}
-                    height={100}
-                    alt="ecommerce"
-                    className="object-cover object-center w-full h-full block"
-                    src="https://dummyimage.com/424x264"
-                  />
-                </a>
-                <div className="mt-4">
-                  <h3 className="text-gray-500 text-xs tracking-widest title-font mb-1">
-                    CATEGORY
-                  </h3>
-                  <h2 className="text-white title-font text-lg font-medium">
-                    The Catalyzer
-                  </h2>
-                  <p className="mt-1">$16.00</p>
-                </div>
-              </div>
-              <div className="lg:w-1/4 md:w-1/2 p-4 w-full">
-                <a className="block relative h-48 rounded overflow-hidden">
-                  <Image
-                    width={100}
-                    height={100}
-                    alt="ecommerce"
-                    className="object-cover object-center w-full h-full block"
-                    src="https://dummyimage.com/425x265"
-                  />
-                </a>
-                <div className="mt-4">
-                  <h3 className="text-gray-500 text-xs tracking-widest title-font mb-1">
-                    CATEGORY
-                  </h3>
-                  <h2 className="text-white title-font text-lg font-medium">
-                    Shooting Stars
-                  </h2>
-                  <p className="mt-1">$21.15</p>
-                </div>
-              </div>
-              <div className="lg:w-1/4 md:w-1/2 p-4 w-full">
-                <a className="block relative h-48 rounded overflow-hidden">
-                  <Image
-                    width={100}
-                    height={100}
-                    alt="ecommerce"
-                    className="object-cover object-center w-full h-full block"
-                    src="https://dummyimage.com/427x267"
-                  />
-                </a>
-                <div className="mt-4">
-                  <h3 className="text-gray-500 text-xs tracking-widest title-font mb-1">
-                    CATEGORY
-                  </h3>
-                  <h2 className="text-white title-font text-lg font-medium">
-                    Neptune
-                  </h2>
-                  <p className="mt-1">$12.00</p>
-                </div>
-              </div>
-              <div className="lg:w-1/4 md:w-1/2 p-4 w-full">
-                <a className="block relative h-48 rounded overflow-hidden">
-                  <Image
-                    width={100}
-                    height={100}
-                    alt="ecommerce"
-                    className="object-cover object-center w-full h-full block"
-                    src="https://dummyimage.com/428x268"
-                  />
-                </a>
-                <div className="mt-4">
-                  <h3 className="text-gray-500 text-xs tracking-widest title-font mb-1">
-                    CATEGORY
-                  </h3>
-                  <h2 className="text-white title-font text-lg font-medium">
-                    The 400 Blows
-                  </h2>
-                  <p className="mt-1">$18.40</p>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div className="flex justify-center  mt-10 ">
-            <div className="join">
-              <button className="join-item btn">«</button>
-              <button className="join-item btn">Page 22</button>
-              <button className="join-item btn">»</button>
-            </div>
-          </div>
-        </section>
+              </CardHeader>
+              <CardContent className="flex-grow">
+                <CardTitle className="line-clamp-2">{item.name}</CardTitle>
+              </CardContent>
+              <CardFooter className="flex justify-between mt-auto">
+                <Badge
+                  variant="customPrimary"
+                  className="font-bold min-w-[40px] text-center"
+                >
+                  {item.price}฿
+                </Badge>
+                <Badge
+                  variant="customSecondary"
+                  className="min-w-[120px] text-center line-clamp-1"
+                >
+                  {item.Category.name}
+                </Badge>
+              </CardFooter>
+            </Card>
+          ))}
+        </div>
+        <div className="flex justify-center">
+          <Pagination />
+        </div>
       </div>
       <Footer />
     </>

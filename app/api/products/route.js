@@ -1,8 +1,15 @@
 import { PrismaClient } from "@prisma/client";
-import { NextResponse } from "next/server";
 import cloudinary from "@/lib/cloudinary";
-
+import { NextResponse } from "next/server";
+import { createClient } from "@supabase/supabase-js";
+import { v4 as uuidv4 } from "uuid";
+import sharp from "sharp";
 const prisma = new PrismaClient();
+
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+export const supabase = createClient(supabaseUrl, supabaseKey);
 
 export const GET = async (req) => {
   try {
@@ -11,13 +18,25 @@ export const GET = async (req) => {
         Category: true,
       },
     });
-    return NextResponse.json(products, { status: 200 });
+
+    // ตรวจสอบว่าผลลัพธ์เป็นอาเรย์หรือไม่
+    if (Array.isArray(products)) {
+      return NextResponse.json(products, { status: 200 });
+    } else {
+      console.error("Expected an array but received", products);
+      return NextResponse.json(
+        { message: "Error fetching products" },
+        { status: 500 }
+      );
+    }
   } catch (error) {
     console.error("Error fetching products:", error);
     return NextResponse.json(
       { message: "Error fetching products" },
       { status: 500 }
     );
+  } finally {
+    await prisma.$disconnect();
   }
 };
 
@@ -38,41 +57,48 @@ export async function POST(req) {
       );
     }
 
-    // Convert image to buffer
     const imageBuffer = Buffer.from(await image.arrayBuffer());
+    const compressedImageBuffer = await sharp(imageBuffer)
+      .resize(800, 600) // Resize image to 800x600
+      .png({ quality: 80 }) // Compress image with quality of 80
+      .toBuffer();
+    const fileName = `${uuidv4()}.png`;
 
-    // Upload image to Cloudinary
-    const uploadResult = await new Promise((resolve, reject) => {
-      const uploadStream = cloudinary.uploader.upload_stream(
-        { folder: "products" },
-        (error, result) => {
-          if (error) {
-            reject(error);
-          } else {
-            resolve(result);
-          }
-        }
+    const { data, error } = await supabase.storage
+      .from("products")
+      .upload(fileName, compressedImageBuffer, {
+        contentType: "image/png",
+      });
+
+    if (error) {
+      console.error("Error uploading image:", error);
+      return NextResponse.json(
+        { error: "Failed to upload image" },
+        { status: 500 }
       );
-      uploadStream.end(imageBuffer);
-    });
+    }
 
-    const product = await prisma.product.create({
+    const productUrl = supabase.storage.from("products").getPublicUrl(fileName);
+
+    const products = await prisma.product.create({
       data: {
         name,
         description,
         price: parseFloat(price),
         categoryId: parseInt(categoryId, 10),
-        imageUrl: uploadResult.secure_url,
+        imageUrl: productUrl.data.publicUrl,
       },
     });
 
-    return NextResponse.json(product, { status: 201 });
+    return NextResponse.json(products, { status: 201 });
   } catch (error) {
     console.error("Error creating product:", error);
     return NextResponse.json(
       { error: "Failed to create product" },
       { status: 500 }
     );
+  } finally {
+    await prisma.$disconnect();
   }
 }
 

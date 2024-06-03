@@ -3,10 +3,10 @@ import { useState, useEffect, Suspense } from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { Pencil, Trash } from "lucide-react";
-import Spinner from "../../spinner/Spinner";
+import Spinner from "@/components/spinner/Spinner";
 import ModalAddProduct from "./ModalAddProduct";
 import ModalEditProduct from "./ModalEditProduct";
-import Pagination from "../../Pagination";
+import Pagination from "@/components/Pagination";
 import Image from "next/image";
 import {
   Card,

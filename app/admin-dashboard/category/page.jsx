@@ -1,5 +1,5 @@
 import React from "react";
-import CategoryList from "@/components/admin-dashboard/category/CategoryList";
+import CategoryList from "@/app/admin-dashboard/category/components/category/CategoryList";
 
 const CategoryAdmin = () => {
   return (

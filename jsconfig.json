@@ -1,7 +1,13 @@
 {
   "compilerOptions": {
     "paths": {
-      "@/*": ["./*"]
+      "@/*": ["./*"],
+      "@/components/admin-dashboard/AdminBar": [
+        "./components/admin-dashboard/AdminBar.jsx"
+      ],
+      "@/components/admin-dashboard/Sidebar": [
+        "./components/admin-dashboard/Sidebar.jsx"
+      ]
     }
   }
 }

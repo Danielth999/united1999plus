@@ -1,5 +1,7 @@
-"use client";
-import { useState, useEffect } from "react";
+// pages/index.js
+'use client';
+
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import {
   Card,
@@ -12,36 +14,32 @@ import { Badge } from "@/components/ui/badge";
 import Loading from "@/components/spinner/Spinner";
 
 const Packaging = () => {
-  const [product, setProduct] = useState([]);
+  const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const fetchProduct = async () => {
-    try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/products`
-      );
-      const data = await res.json();
-      if (Array.isArray(data)) {
-        setProduct(data);
-      } else {
-        console.error("Data received from API is not an array", data);
-      }
-      setLoading(false);
-    } catch (error) {
-      console.log("error", error);
-    }
-  };
-
   useEffect(() => {
-    fetchProduct();
+    const fetchProducts = async () => {
+      try {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/products`);
+        if (!res.ok) {
+          throw new Error('Failed to fetch');
+        }
+        const data = await res.json();
+        setProducts(data);
+        setLoading(false);
+      } catch (error) {
+        console.error('Error fetching products:', error);
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
   }, []);
 
   return (
     <>
       <div className="mt-10">
-        <h1 className="font-bold text-xl text-black ">
-        บรรจุภัณฑ์เฟสท์
-        </h1>
+        <h1 className="font-bold text-xl text-black">บรรจุภัณฑ์เฟสท์</h1>
       </div>
       {loading ? (
         <div className="flex justify-center mt-10">
@@ -50,7 +48,7 @@ const Packaging = () => {
       ) : (
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 mt-5">
-            {product.map((item) => (
+            {products.map((item) => (
               <Card
                 key={item.productId}
                 className="hover:shadow-xl border flex flex-col"
@@ -61,7 +59,7 @@ const Packaging = () => {
                       src={item.imageUrl}
                       alt={item.name}
                       fill
-                      style={{ objectFit: 'contain' }}
+                      style={{ objectFit: "contain" }}
                       className="max-h-full"
                     />
                   </div>

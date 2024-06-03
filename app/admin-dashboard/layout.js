@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
-import Sidebar from "../../components/admin-dashboard/Sidebar";
-import Navbar from "../../components/admin-dashboard/AdminBar";
+import Sidebar from "./components/Sidebar";
+import Navbar from "./components/AdminBar";
 
 const AdminLayout = ({ children }) => {
   const [isSidebarExpanded, setIsSidebarExpanded] = useState(true);

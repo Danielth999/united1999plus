@@ -2,10 +2,10 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { Pencil, Trash } from "lucide-react";
-import Spinner from "../../spinner/Spinner";
+import Spinner from "@/components/spinner/Spinner";
 import ModalAddCategory from "./ModalAddCategory";
 import ModalEditCategory from "./ModalEditCategory";
-import Pagination from "../../Pagination";
+import Pagination from "@/components/Pagination";
 import {
   Card,
   CardContent,
