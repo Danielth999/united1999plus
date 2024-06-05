@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import Loading from "@/components/spinner/Spinner";
+import Link from "next/link";
 
 const Packaging = () => {
   const [products, setProducts] = useState([]);
@@ -55,17 +56,21 @@ const Packaging = () => {
               >
                 <CardHeader className="border-b">
                   <div className="relative w-full h-48 overflow-hidden">
-                    <Image
-                      src={item.imageUrl}
-                      alt={item.name}
-                      fill
-                      style={{ objectFit: "contain" }}
-                      className="max-h-full"
-                    />
+                    <Link href={`/products/${item.productId}`}>
+                      <Image
+                        src={item.imageUrl}
+                        alt={item.name}
+                        fill
+                        style={{ objectFit: "contain" }}
+                        className="max-h-full"
+                      />
+                    </Link>
                   </div>
                 </CardHeader>
                 <CardContent className="flex-grow">
-                  <CardTitle className="line-clamp-2">{item.name}</CardTitle>
+                  <CardTitle className="line-clamp-2">
+                    <Link href={`/products/${item.productId}`}>{item.name}</Link>
+                  </CardTitle>
                 </CardContent>
                 <CardFooter className="flex justify-between mt-auto">
                   <Badge

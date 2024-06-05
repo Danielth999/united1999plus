@@ -2,7 +2,6 @@
 
 import axios from "axios";
 import { useState, useEffect } from "react";
-import { CldImage } from "next-cloudinary";
 import {
   Dialog,
   DialogContent,
@@ -18,7 +17,9 @@ import Spinner from "@/components/spinner/Spinner";
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
+  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
@@ -100,7 +101,7 @@ const ModalAddProduct = ({ onProductAdded }) => {
           categoryId: "",
           image: null,
         });
-        
+
         setLoading(false);
       }
     } catch (error) {
@@ -152,8 +153,6 @@ const ModalAddProduct = ({ onProductAdded }) => {
                   required
                 />
                 <Select
-                  name="categoryId"
-                  value={formData.categoryId}
                   onValueChange={(value) =>
                     setFormData((prevData) => ({
                       ...prevData,
@@ -165,16 +164,18 @@ const ModalAddProduct = ({ onProductAdded }) => {
                   <SelectTrigger className="w-full">
                     <SelectValue placeholder="เลือกหมวดหมู่" />
                   </SelectTrigger>
-                  <SelectContent >
-                    {categories.map((category) => (
-                      <SelectItem
-                      
-                        key={category.categoryId}
-                        value={category.categoryId}
-                      >
-                        {category.name}
-                      </SelectItem>
-                    ))}
+                  <SelectContent>
+                    <SelectGroup>
+                      <SelectLabel>หมวดหมู่</SelectLabel>
+                      {categories.map((category) => (
+                        <SelectItem
+                          key={category.categoryId}
+                          value={category.categoryId}
+                        >
+                          <span>{category.name}</span>
+                        </SelectItem>
+                      ))}
+                    </SelectGroup>
                   </SelectContent>
                 </Select>
               </div>

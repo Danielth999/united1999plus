@@ -1,10 +1,13 @@
 import { PrismaClient } from "@prisma/client";
-import cloudinary from "@/lib/cloudinary";
+
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { v4 as uuidv4 } from "uuid";
-import sharp from "sharp";
+
+import { Mutex } from "async-mutex";
+
 const prisma = new PrismaClient();
+const mutex = new Mutex();
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -19,16 +22,7 @@ export const GET = async (req) => {
       },
     });
 
-    // ตรวจสอบว่าผลลัพธ์เป็นอาเรย์หรือไม่
-    if (Array.isArray(products)) {
-      return NextResponse.json(products, { status: 200 });
-    } else {
-      console.error("Expected an array but received", products);
-      return NextResponse.json(
-        { message: "Error fetching products" },
-        { status: 500 }
-      );
-    }
+    return NextResponse.json(products, { status: 200 });
   } catch (error) {
     console.error("Error fetching products:", error);
     return NextResponse.json(
@@ -41,6 +35,8 @@ export const GET = async (req) => {
 };
 
 export async function POST(req) {
+  const release = await mutex.acquire();
+
   try {
     const formData = await req.formData();
     const name = formData.get("name");
@@ -58,15 +54,11 @@ export async function POST(req) {
     }
 
     const imageBuffer = Buffer.from(await image.arrayBuffer());
-    const compressedImageBuffer = await sharp(imageBuffer)
-      .resize(800, 600) // Resize image to 800x600
-      .png({ quality: 80 }) // Compress image with quality of 80
-      .toBuffer();
     const fileName = `${uuidv4()}.png`;
 
     const { data, error } = await supabase.storage
       .from("products")
-      .upload(fileName, compressedImageBuffer, {
+      .upload(fileName, imageBuffer, {
         contentType: "image/png",
       });
 
@@ -80,7 +72,7 @@ export async function POST(req) {
 
     const productUrl = supabase.storage.from("products").getPublicUrl(fileName);
 
-    const products = await prisma.product.create({
+    const product = await prisma.product.create({
       data: {
         name,
         description,
@@ -90,7 +82,7 @@ export async function POST(req) {
       },
     });
 
-    return NextResponse.json(products, { status: 201 });
+    return NextResponse.json(product, { status: 201 });
   } catch (error) {
     console.error("Error creating product:", error);
     return NextResponse.json(
@@ -98,6 +90,7 @@ export async function POST(req) {
       { status: 500 }
     );
   } finally {
+    release();
     await prisma.$disconnect();
   }
 }

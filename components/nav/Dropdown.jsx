@@ -39,7 +39,7 @@ const Dropdown = () => {
         <DropdownMenuContent className="rounded-lg">
           {categories.map((category) => (
             <DropdownMenuItem className="flex justify-between" key={category.categoryId}>
-              <Link href={`category/${category.nameSlug}`}>
+              <Link href={`category/${category.categoryId}`}>
                 <span className=" w-full   text-black hover:bg-gray-100">
                   {category.name}
                 </span>

@@ -14,7 +14,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-
+//components for Navbar
+import SearchProduct from "./SearchProduct";
 const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [cate, setCate] = useState([]);
@@ -69,36 +70,27 @@ const Navbar = () => {
                 <DropdownMenuContent>
                   {cate.map((category) => (
                     <DropdownMenuItem key={category.categoryId}>
-                      <Link href={`category/${category.nameSlug}`}>
-                        <span className="flex justify-between w-full px-4 py-2 text-left text-black hover:bg-gray-100">
-                          {category.name}
-                        </span>
+                      <Link
+                        href={`category/${category.categoryId}`}
+                        className="flex justify-between w-full px-4 py-2 text-left text-black hover:bg-gray-100"
+                      >
+                        {category.name}
                       </Link>
                     </DropdownMenuItem>
                   ))}
                   <DropdownMenuItem>
-                    <Link href="/products">
-                      <span className="flex justify-between w-full px-4 py-2 text-left text-black hover:bg-gray-100">
-                        สินค้าทั้งหมด
-                      </span>
+                    <Link
+                      href="/products"
+                      className="flex justify-between w-full px-4 py-2 text-left text-black hover:bg-gray-100"
+                    >
+                      สินค้าทั้งหมด
                     </Link>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
           </div>
-
-          <div className="hidden md:flex md:mx-4 items-center h-[70px] flex-1 justify-center">
-            <input
-              type="search"
-              className="w-full max-w-md border outline-none rounded-l-md p-2"
-              placeholder="ค้นหาชื่อสิ้นค้าหรือเลขรหัส SKU"
-            />
-            <button className="bg-red-500 p-2 flex justify-center items-center rounded-r-md">
-              <Search className="text-white" />
-            </button>
-          </div>
-
+          <SearchProduct />
           {status === "authenticated" && session ? (
             <div className="flex items-center space-x-4">
               <DropdownMenu>

@@ -3,6 +3,7 @@ import React from "react";
 import Navbar from "@/components/nav/Navbar";
 import Footer from "@/components/Footer";
 import Image from "next/image";
+import Link from "next/link";
 import { useState, useEffect } from "react";
 import axios from "axios";
 import Spinner from "@/components/spinner/Spinner";
@@ -15,6 +16,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+
 
 const ProductPage = () => {
   const [data, setData] = useState([]);
@@ -65,17 +67,19 @@ const ProductPage = () => {
             >
               <CardHeader className="border-b">
                 <div className="relative w-full h-48 overflow-hidden">
-                  <Image
-                    src={item.imageUrl}
-                    alt={item.name}
-                    fill
-                    style={{ objectFit: "contain" }}
-                    className="max-h-full"
-                  />
+                  <Link href={`/products/${item.productId}`}>
+                    <Image
+                      src={item.imageUrl}
+                      alt={item.name}
+                      fill
+                      style={{ objectFit: "contain" }}
+                      className="max-h-full"
+                    />
+                  </Link>
                 </div>
               </CardHeader>
               <CardContent className="flex-grow">
-                <CardTitle className="line-clamp-2">{item.name}</CardTitle>
+                <CardTitle className="line-clamp-2"><Link href={`/products/${item.productId}`}>{item.name}</Link></CardTitle>
               </CardContent>
               <CardFooter className="flex justify-between mt-auto">
                 <Badge

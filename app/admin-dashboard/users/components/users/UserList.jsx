@@ -156,10 +156,12 @@ const UserListContent = () => {
             </div>
             <div className="overflow-x-auto">
               <Table>
-                <TableCaption>รายชื่อผู้ใช้ในระบบ</TableCaption>
+                <TableCaption>รายชื่อผู้ใช้ในระบบ
+
+                </TableCaption>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>#ID</TableHead>
+                    <TableHead>#</TableHead>
                     <TableHead>ชื่อผู้ใช้</TableHead>
                     <TableHead>อีเมล</TableHead>
                     <TableHead>สิทธิ์การใช้งาน</TableHead>
@@ -170,7 +172,9 @@ const UserListContent = () => {
                   {Array.isArray(currentUsers) && currentUsers.length > 0 ? (
                     currentUsers.map((user) => (
                       <TableRow key={user.userId}>
-                        <TableCell>{user.userId}</TableCell>
+                        <TableCell>
+                          {filteredUsers.indexOf(user) + 1}
+                        </TableCell>
                         <TableCell>{user.username}</TableCell>
                         <TableCell>{user.email}</TableCell>
                         <TableCell>{user.roles}</TableCell>
@@ -203,15 +207,7 @@ const UserListContent = () => {
               </Table>
             </div>
           </CardContent>
-          <CardFooter>
-            <div className="flex justify-center mt-4">
-              <Pagination
-                totalPages={totalPages}
-                currentPage={currentPage}
-                onPageChange={paginate}
-              />
-            </div>
-          </CardFooter>
+         
         </Card>
       )}
       {selectedUser && (

@@ -27,10 +27,10 @@ export default function Home() {
           <Packaging />
         </section>
         <section>
-          {/* <OfficeSupplies /> */}
+          <OfficeSupplies />
         </section>
         <section>
-          {/* <CleaningProducts /> */}
+          <CleaningProducts />
         </section>
       </div>
       <footer>

@@ -6,7 +6,7 @@ const Footer = () => {
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {/* Section 1 */}
-          <div>
+          <div className="text-center md:text-left">
             <h2 className="text-xl font-bold mb-4">เกี่ยวกับเรา</h2>
             <p>
               บริษัทของเรามุ่งมั่นที่จะให้บริการที่ดีที่สุดและผลิตภัณฑ์คุณภาพสูงสุดแก่ลูกค้าของเรา
@@ -15,28 +15,12 @@ const Footer = () => {
           </div>
           {/* Section 2 */}
           <div className="text-center md:text-left">
-            <h2 className="text-xl font-bold mb-4">ลิงก์ที่มีประโยชน์</h2>
+            <h2 className="text-xl font-bold mb-4">ผลิตภัณฑ์</h2>
             <ul>
-              <li>
-                <a href="#" className="hover:underline">
-                  หน้าแรก
-                </a>
-              </li>
-              <li>
-                <a href="#" className="hover:underline">
-                  สินค้า
-                </a>
-              </li>
-              <li>
-                <a href="#" className="hover:underline">
-                  เกี่ยวกับเรา
-                </a>
-              </li>
-              <li>
-                <a href="#" className="hover:underline">
-                  ติดต่อเรา
-                </a>
-              </li>
+              <li>บรรจุภัณฑ์เฟสท์</li>
+              <li>อุปกรณ์สำนักงาน</li>
+              <li>ผลิตภัณฑ์ทำความสะอาด</li>
+              
             </ul>
           </div>
           {/* Section 3 */}
