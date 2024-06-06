@@ -2,7 +2,7 @@
 import { useState } from "react";
 import Sidebar from "./components/Sidebar";
 import Navbar from "./components/AdminBar";
-
+import { Toaster } from "@/components/ui/toaster";
 const AdminLayout = ({ children }) => {
   const [isSidebarExpanded, setIsSidebarExpanded] = useState(true);
 
@@ -17,6 +17,7 @@ const AdminLayout = ({ children }) => {
         <Navbar toggleSidebar={toggleSidebar} />
         <main className="p-4">
           {children}
+          <Toaster />
         </main>
       </div>
     </div>

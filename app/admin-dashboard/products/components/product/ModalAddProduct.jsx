@@ -1,5 +1,5 @@
 "use client";
-
+import { useToast } from "@/components/ui/use-toast";
 import axios from "axios";
 import { useState, useEffect } from "react";
 import {
@@ -14,19 +14,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Spinner from "@/components/spinner/Spinner";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import Image from "next/image";
 
 const ModalAddProduct = ({ onProductAdded }) => {
+  const { toast } = useToast();
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [formData, setFormData] = useState({
@@ -45,8 +37,10 @@ const ModalAddProduct = ({ onProductAdded }) => {
         process.env.NEXT_PUBLIC_API_URL + "/api/category"
       );
       setCategories(response.data);
+      setLoading(false);
     } catch (error) {
       console.error(error);
+      setLoading(false);
     }
   };
 
@@ -73,12 +67,28 @@ const ModalAddProduct = ({ onProductAdded }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Check if all fields are filled
+    if (!formData.name || !formData.description || !formData.price || !formData.categoryId || !formData.image) {
+      toast({
+        title: "Error",
+        description: "กรุณากรอกข้อมูลให้ครบทุกช่อง",
+        status: "error",
+        variant: "destructive",
+      
+        isClosable: true,
+      });
+      return;
+    }
+
     const data = new FormData();
     data.append("name", formData.name);
     data.append("description", formData.description);
     data.append("price", formData.price);
     data.append("categoryId", formData.categoryId);
-    data.append("image", formData.image);
+    if (formData.image) {
+      data.append("image", formData.image);
+    }
 
     try {
       const response = await axios.post(
@@ -91,6 +101,14 @@ const ModalAddProduct = ({ onProductAdded }) => {
         }
       );
       if (response.status === 201) {
+        toast({
+          title: "Success",
+          description: "เพิ่มสินค้าสำเร็จ",
+          status: "success",
+          variant: "success",
+        
+          isClosable: true,
+        });
         onProductAdded(response.data);
         setOpen(false); // Close the dialog
         setPreviewImage(null); // Clear preview image
@@ -101,11 +119,17 @@ const ModalAddProduct = ({ onProductAdded }) => {
           categoryId: "",
           image: null,
         });
-
-        setLoading(false);
       }
     } catch (error) {
       console.error("Error uploading product:", error);
+      toast({
+        title: "Error",
+        description: "เกิดข้อผิดพลาดในการเพิ่มสินค้า",
+        status: "error",
+        variant: "destructive",
+      
+        isClosable: true,
+      });
     }
   };
 
@@ -135,14 +159,14 @@ const ModalAddProduct = ({ onProductAdded }) => {
                   value={formData.name}
                   onChange={handleChange}
                   placeholder="ชื่อผลิตภัณฑ์"
-                  required
+                 
                 />
                 <Textarea
                   name="description"
                   value={formData.description}
                   onChange={handleChange}
                   placeholder="รายละเอียด"
-                  required
+                 
                 />
                 <Input
                   type="number"
@@ -150,34 +174,27 @@ const ModalAddProduct = ({ onProductAdded }) => {
                   value={formData.price}
                   onChange={handleChange}
                   placeholder="ราคา"
-                  required
+                 
                 />
-                <Select
-                  onValueChange={(value) =>
-                    setFormData((prevData) => ({
-                      ...prevData,
-                      categoryId: value,
-                    }))
-                  }
-                  required
+                <select
+                  name="categoryId"
+                  value={formData.categoryId}
+                  onChange={handleChange}
+                 
+                  className="w-full border rounded p-2"
                 >
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="เลือกหมวดหมู่" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectGroup>
-                      <SelectLabel>หมวดหมู่</SelectLabel>
-                      {categories.map((category) => (
-                        <SelectItem
-                          key={category.categoryId}
-                          value={category.categoryId}
-                        >
-                          <span>{category.name}</span>
-                        </SelectItem>
-                      ))}
-                    </SelectGroup>
-                  </SelectContent>
-                </Select>
+                  <option value="" disabled>
+                    เลือกหมวดหมู่
+                  </option>
+                  {categories.map((category) => (
+                    <option
+                      key={category.categoryId}
+                      value={category.categoryId.toString()}
+                    >
+                      {category.name}
+                    </option>
+                  ))}
+                </select>
               </div>
             </TabsContent>
             <TabsContent value="upload">
@@ -186,7 +203,7 @@ const ModalAddProduct = ({ onProductAdded }) => {
                   type="file"
                   name="image"
                   onChange={handleFileChange}
-                  required
+                 
                 />
                 {previewImage && (
                   <div className="flex justify-center">

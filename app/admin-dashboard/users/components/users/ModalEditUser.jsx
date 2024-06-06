@@ -1,3 +1,5 @@
+"use client";
+import { useToast } from "@/components/ui/use-toast";
 import { useState, useEffect } from "react";
 import axios from "axios";
 import {
@@ -12,6 +14,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const ModalEditUser = ({ user, onUserUpdated }) => {
+  const { toast } = useToast();
   const [editUser, setEditUser] = useState({
     email: "",
     username: "",
@@ -37,12 +40,39 @@ const ModalEditUser = ({ user, onUserUpdated }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Check if all fields are filled
+    if (!editUser.email || !editUser.username || !editUser.roles) {
+      toast({
+        title: "Error",
+        description: "กรุณากรอกข้อมูลให้ครบทุกช่อง",
+        status: "error",
+        variant: "destructive",
+        isClosable: true,
+      });
+      return;
+    }
+
     try {
       await axios.put(`${process.env.NEXT_PUBLIC_API_URL}/api/users/${user.userId}`, editUser);
       onUserUpdated(); // Fetch users again to update the list
       setOpen(false); // Close the dialog
+      toast({
+        title: "Success",
+        description: "แก้ไขข้อมูลผู้ใช้สำเร็จ",
+        status: "success",
+        variant:"success",
+        isClosable: true,
+      });
     } catch (error) {
-      console.log("Error updating user:", error);
+      console.error("Error updating user:", error);
+      toast({
+        title: "Error",
+        description: "เกิดข้อผิดพลาดในการแก้ไขข้อมูลผู้ใช้",
+        status: "error",
+        variant: "destructive",
+        isClosable: true,
+      });
     }
   };
 
@@ -66,7 +96,7 @@ const ModalEditUser = ({ user, onUserUpdated }) => {
                 value={editUser.email}
                 onChange={handleChange}
                 placeholder="Email"
-                required
+                
               />
             </div>
             <div>
@@ -80,7 +110,7 @@ const ModalEditUser = ({ user, onUserUpdated }) => {
                 value={editUser.username}
                 onChange={handleChange}
                 placeholder="Username"
-                required
+                
               />
             </div>
             <div>
@@ -91,7 +121,7 @@ const ModalEditUser = ({ user, onUserUpdated }) => {
                 name="roles"
                 value={editUser.roles}
                 onValueChange={(value) => setEditUser((prevData) => ({ ...prevData, roles: value }))}
-                required
+                
               >
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder="เลือกสิทธิ์การใช้งาน" />

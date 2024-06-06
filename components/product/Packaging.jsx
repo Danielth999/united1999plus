@@ -14,7 +14,7 @@ import Loading from "@/components/spinner/Spinner";
 import Link from "next/link";
 import fetcher from "@/lib/fetcher";
 
-const Packaging = () => {
+const OfficeSupplies = () => {
   const {
     data: category,
     error,
@@ -43,29 +43,24 @@ const Packaging = () => {
   return (
     <>
       <div className="mt-10">
-        <h1 className="font-bold text-xl text-black">บรรจุภัณฑ์เฟสท์</h1>
+        <h1 className="font-bold text-xl text-black">บรรจุภัณฑ์เฟสต์</h1>
       </div>
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 mt-5">
           {products.map((item) => (
-            <Card
-              key={item.productId}
-              className="hover:shadow-xl border flex flex-col"
-            >
-              <CardHeader className="border-b">
-                <div className="relative w-full h-48 overflow-hidden">
-                  <Link href={`/products/${item.productId}`}>
-                    <Image
-                      src={item.imageUrl}
-                      alt={item.name}
-                      fill
-                      style={{ objectFit: "contain" }}
-                      className="max-h-full"
-                    />
-                  </Link>
-                </div>
-              </CardHeader>
-              <CardContent className="flex-grow">
+            <Card key={item.productId} className="hover:shadow-xl border overflow-hidden ">
+              <Link href={`/products/${item.productId}`}>
+                <CardHeader className="border-b w-full h-60 relative">
+                  <Image
+                    src={item.imageUrl}
+                    alt={item.name}
+                    fill
+                    sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                    style={{ objectFit: "cover", objectPosition: "center" }}
+                  />
+                </CardHeader>
+              </Link>
+              <CardContent className="">
                 <CardTitle className="line-clamp-2">
                   <Link href={`/products/${item.productId}`}>{item.name}</Link>
                 </CardTitle>
@@ -92,4 +87,4 @@ const Packaging = () => {
   );
 };
 
-export default Packaging;
+export default OfficeSupplies;

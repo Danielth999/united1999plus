@@ -1,10 +1,12 @@
 "use client";
-import axios from "axios";
-import { useState, useEffect } from "react";
+import useSWR from "swr";
+import fetcher from "@/lib/fetcher";
 import Link from "next/link";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
+import { useToast } from "@/components/ui/use-toast";
+import Spinner from "./spinner/Spinner";
 
 const Category = () => {
   const settings = {
@@ -16,8 +18,26 @@ const Category = () => {
     autoplay: true,
     autoplaySpeed: 3000,
   };
+  const { toast } = useToast();
 
-  const [category, setCategory] = useState([]);
+  const { data: category, error } = useSWR(
+    `${process.env.NEXT_PUBLIC_API_URL}/api/category`,
+    fetcher,
+    {
+      revalidateOnFocus: true,
+      refreshInterval: 30000, // อัปเดตข้อมูลทุกๆ 30 วินาที
+      dedupingInterval: 60000, // อนุญาตให้รีเฟรชข้อมูลใหม่ทุกๆ 60 วินาที
+    }
+  );
+  if (error)
+    return toast({
+      title: "เกิดข้อผิดพลาด",
+      description: result.error,
+      status: "error",
+      variant: "destructive",
+    });
+
+    if(!category) return ( <div className="flex justify-center"><Spinner /></div>)
 
   const fetchCategory = async () => {
     try {
@@ -30,9 +50,6 @@ const Category = () => {
     }
   };
 
-  useEffect(() => {
-    fetchCategory();
-  }, []);
 
   return (
     <>

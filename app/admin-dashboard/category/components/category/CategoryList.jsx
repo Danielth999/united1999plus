@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import axios from "axios";
+import useSWR, { mutate } from "swr";
 import { Pencil, Trash } from "lucide-react";
 import Spinner from "@/components/spinner/Spinner";
 import ModalAddCategory from "./ModalAddCategory";
@@ -24,46 +25,44 @@ import {
 } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { useToast } from "@/components/ui/use-toast";
+
+const fetcher = (url) => axios.get(url).then(res => res.data);
 
 const CategoryList = () => {
-  const [categories, setCategories] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
+  const { data, error, mutate } = useSWR(
+    `${process.env.NEXT_PUBLIC_API_URL}/api/category`,
+    fetcher
+  );
   const [currentPage, setCurrentPage] = useState(1);
   const [categoriesPerPage] = useState(5);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [sortOrder, setSortOrder] = useState("asc");
 
-  const fetchCategories = async () => {
-    try {
-      const res = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/category?sort=${sortOrder}`
-      );
-
-      if (res.data && Array.isArray(res.data)) {
-        setCategories(res.data);
-      } else {
-        throw new Error("Fetched data is not in the expected format");
-      }
-    } catch (error) {
-      console.log("Error fetching categories:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
-    fetchCategories();
+    mutate(); // Fetch categories again whenever sortOrder changes
   }, [sortOrder]);
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/category/${id}`
-      );
-      fetchCategories(); // Fetch categories again to update the list
+      await axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/api/category/${id}`);
+      mutate(); // Refresh the category list
+      toast({
+        title: "Success",
+        description: "ลบหมวดหมู่สำเร็จ",
+        status: "success",
+        isClosable: true,
+      });
     } catch (error) {
       console.error("Error deleting category:", error);
+      toast({
+        title: "Error",
+        description: "เกิดข้อผิดพลาดในการลบหมวดหมู่",
+        status: "error",
+        isClosable: true,
+      });
     }
   };
 
@@ -79,7 +78,7 @@ const CategoryList = () => {
   const indexOfLastCategory = currentPage * categoriesPerPage;
   const indexOfFirstCategory = indexOfLastCategory - categoriesPerPage;
 
-  const filteredCategories = categories.filter((category) => {
+  const filteredCategories = (data || []).filter((category) => {
     return category.name.toLowerCase().includes(searchTerm.toLowerCase());
   });
 
@@ -91,9 +90,13 @@ const CategoryList = () => {
   // Change page
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
+  if (error) {
+    return <div>Error fetching categories</div>;
+  }
+
   return (
     <>
-      {loading ? (
+      {!data ? (
         <div className="flex justify-center items-center h-screen">
           <Spinner />
         </div>
@@ -104,7 +107,7 @@ const CategoryList = () => {
             <div className="flex items-center justify-between">
               <CardDescription>ค้นหาและจัดการหมวดหมู่ในระบบ</CardDescription>
               <div>
-                <ModalAddCategory onCategoryAdded={fetchCategories} />
+                <ModalAddCategory onCategoryAdded={mutate} />
               </div>
             </div>
           </CardHeader>
@@ -118,7 +121,7 @@ const CategoryList = () => {
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
                 <div>
-                  <Button variatn="blue" onClick={handleSort}>
+                  <Button variant="blue" onClick={handleSort}>
                     {sortOrder === "asc"
                       ? "เรียงลำดับตาม ID (น้อยไปมาก)"
                       : "เรียงลำดับตาม ID (มากไปน้อย)"}
@@ -185,7 +188,7 @@ const CategoryList = () => {
       {selectedCategory && (
         <ModalEditCategory
           category={selectedCategory}
-          onCategoryUpdated={fetchCategories}
+          onCategoryUpdated={mutate}
         />
       )}
     </>

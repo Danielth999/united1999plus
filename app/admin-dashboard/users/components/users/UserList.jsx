@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect, Suspense } from 'react';
 import axios from 'axios';
+import useSWR, { mutate } from 'swr';
 import { useRouter } from 'next/navigation';
 import { Pencil, Trash } from 'lucide-react';
 import Spinner from '@/components/spinner/Spinner';
@@ -33,11 +34,14 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import Pagination from '@/components/Pagination'; // นำเข้า Pagination component
+import { useToast } from '@/components/ui/use-toast';
+
+const fetcher = (url) => axios.get(url).then(res => res.data);
 
 const UserListContent = () => {
   const router = useRouter();
-  const [users, setUsers] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
+  const { data, error, mutate } = useSWR(`${process.env.NEXT_PUBLIC_API_URL}/api/users`, fetcher);
   const [currentPage, setCurrentPage] = useState(1);
   const [usersPerPage] = useState(5);
   const [searchTerm, setSearchTerm] = useState('');
@@ -50,33 +54,24 @@ const UserListContent = () => {
     setCurrentPage(page);
   }, []);
 
-  const fetchUsers = async () => {
-    try {
-      const res = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/users`
-      );
-      if (res.data && Array.isArray(res.data.users)) {
-        setUsers(res.data.users);
-      } else {
-        throw new Error('Fetched data is not in the expected format');
-      }
-    } catch (error) { 
-      console.log('Error fetching users:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchUsers();
-  }, []);
-
   const handleDelete = async (id) => {
     try {
       await axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/api/users/${id}`);
-      fetchUsers(); // Fetch users again to update the list
+      mutate(); // Refresh the user list
+      toast({
+        title: "Success",
+        description: "ลบผู้ใช้สำเร็จ",
+        status: "success",
+        isClosable: true,
+      });
     } catch (error) {
       console.error('Error deleting user:', error);
+      toast({
+        title: "Error",
+        description: "เกิดข้อผิดพลาดในการลบผู้ใช้",
+        status: "error",
+        isClosable: true,
+      });
     }
   };
 
@@ -88,7 +83,7 @@ const UserListContent = () => {
   const indexOfLastUser = currentPage * usersPerPage;
   const indexOfFirstUser = indexOfLastUser - usersPerPage;
 
-  const filteredUsers = users.filter((user) => {
+  const filteredUsers = (data?.users || []).filter((user) => {
     return (
       (filterRole === 'all' ? true : user.roles === filterRole) &&
       (user.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -105,9 +100,13 @@ const UserListContent = () => {
     router.push(`?page=${pageNumber}`);
   };
 
+  if (error) {
+    return <div>Error fetching users</div>;
+  }
+
   return (
     <>
-      {loading ? (
+      {!data ? (
         <div className="flex justify-center items-center h-screen">
           <Spinner />
         </div>
@@ -118,7 +117,7 @@ const UserListContent = () => {
             <div className="flex items-center justify-between">
               <CardDescription>ค้นหาและจัดการผู้ใช้ในระบบ</CardDescription>
               <div className="flex justify-end">
-                <ModalAddUser onUserAdded={fetchUsers} />
+                <ModalAddUser onUserAdded={mutate} />
               </div>
             </div>
           </CardHeader>
@@ -156,9 +155,7 @@ const UserListContent = () => {
             </div>
             <div className="overflow-x-auto">
               <Table>
-                <TableCaption>รายชื่อผู้ใช้ในระบบ
-
-                </TableCaption>
+                <TableCaption>รายชื่อผู้ใช้ในระบบ</TableCaption>
                 <TableHeader>
                   <TableRow>
                     <TableHead>#</TableHead>
@@ -172,9 +169,7 @@ const UserListContent = () => {
                   {Array.isArray(currentUsers) && currentUsers.length > 0 ? (
                     currentUsers.map((user) => (
                       <TableRow key={user.userId}>
-                        <TableCell>
-                          {filteredUsers.indexOf(user) + 1}
-                        </TableCell>
+                        <TableCell>{filteredUsers.indexOf(user) + 1}</TableCell>
                         <TableCell>{user.username}</TableCell>
                         <TableCell>{user.email}</TableCell>
                         <TableCell>{user.roles}</TableCell>
@@ -207,11 +202,10 @@ const UserListContent = () => {
               </Table>
             </div>
           </CardContent>
-         
         </Card>
       )}
       {selectedUser && (
-        <ModalEditUser user={selectedUser} onUserUpdated={fetchUsers} />
+        <ModalEditUser user={selectedUser} onUserUpdated={mutate} />
       )}
     </>
   );
@@ -226,3 +220,4 @@ const UserList = () => {
 };
 
 export default UserList;
+  

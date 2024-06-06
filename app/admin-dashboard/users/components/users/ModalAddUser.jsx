@@ -1,3 +1,5 @@
+"use client";
+import { useToast } from "@/components/ui/use-toast";
 import { useState } from "react";
 import axios from "axios";
 import {
@@ -19,6 +21,7 @@ import {
 } from "@/components/ui/select";
 
 const ModalAddUser = ({ onUserAdded }) => {
+  const { toast } = useToast();
   const [newUser, setNewUser] = useState({
     email: "",
     username: "",
@@ -34,13 +37,37 @@ const ModalAddUser = ({ onUserAdded }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Check if all fields are filled
+    if (!newUser.email || !newUser.username || !newUser.password || !newUser.role) {
+      toast({
+        title: "Error",
+        description: "กรุณากรอกข้อมูลให้ครบทุกช่อง",
+        status: "error",
+        isClosable: true,
+      });
+      return;
+    }
+
     try {
       await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/api/users`, newUser);
       onUserAdded(); // Fetch users again to update the list
       setNewUser({ email: "", username: "", password: "", role: "user" }); // Reset form
       setOpen(false); // Close the dialog
+      toast({
+        title: "Success",
+        description: "เพิ่มผู้ใช้ใหม่สำเร็จ",
+        status: "success",
+        isClosable: true,
+      });
     } catch (error) {
       console.log("Error adding user:", error);
+      toast({
+        title: "Error",
+        description: "เกิดข้อผิดพลาดในการเพิ่มผู้ใช้ใหม่",
+        status: "error",
+        isClosable: true,
+      });
     }
   };
 
@@ -62,7 +89,7 @@ const ModalAddUser = ({ onUserAdded }) => {
               value={newUser.email}
               onChange={handleChange}
               placeholder="Email"
-              required
+              
             />
             <Input
               type="text"
@@ -70,7 +97,7 @@ const ModalAddUser = ({ onUserAdded }) => {
               value={newUser.username}
               onChange={handleChange}
               placeholder="Username"
-              required
+              
             />
             <Input
               type="password"
@@ -78,13 +105,13 @@ const ModalAddUser = ({ onUserAdded }) => {
               value={newUser.password}
               onChange={handleChange}
               placeholder="Password"
-              required
+              
             />
             <Select
               name="role"
               value={newUser.role}
               onValueChange={(value) => setNewUser({ ...newUser, role: value })}
-              required
+              
             >
               <SelectTrigger className="w-full">
                 <SelectValue placeholder="สิทธิ์การใช้งาน" />

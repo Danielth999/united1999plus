@@ -34,6 +34,7 @@ const Carousel = () => {
               src={image.default.src}
               alt={`Slide ${index + 1}`}
               fill
+              sizes="100%"
               style={{ objectFit: "cover" }}
               className="rounded-lg"
             />

@@ -1,4 +1,5 @@
 "use client";
+import { useToast } from "@/components/ui/use-toast";
 import axios from "axios";
 import { useState, useEffect } from "react";
 import {
@@ -12,18 +13,11 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import Spinner from "@/components/spinner/Spinner";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import Image from "next/image";
 
 const ModalEditProduct = ({ product, onProductUpdated }) => {
+  const { toast } = useToast();
   const [editProduct, setEditProduct] = useState({
     name: "",
     description: "",
@@ -41,7 +35,7 @@ const ModalEditProduct = ({ product, onProductUpdated }) => {
         name: product.name,
         description: product.description,
         price: product.price,
-        categoryId: product.categoryId || "",
+        categoryId: product.categoryId ? product.categoryId.toString() : "",
         image: null,
       });
       setPreviewImage(product.imageUrl || null);
@@ -83,6 +77,19 @@ const ModalEditProduct = ({ product, onProductUpdated }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Check if all fields are filled
+    if (!editProduct.name || !editProduct.description || !editProduct.price || !editProduct.categoryId) {
+      toast({
+        title: "Error",
+        description: "กรุณากรอกข้อมูลให้ครบทุกช่อง",
+        status: "error",
+        variant: "destructive",
+        isClosable: true,
+      });
+      return;
+    }
+
     const formData = new FormData();
     formData.append("name", editProduct.name);
     formData.append("description", editProduct.description);
@@ -103,12 +110,26 @@ const ModalEditProduct = ({ product, onProductUpdated }) => {
         }
       );
       if (response.status === 200) {
+        toast({
+          title: "Success",
+          description: "แก้ไขสินค้าสำเร็จ",
+          status: "success",
+          variant: "success",
+          isClosable: true,
+        });
         onProductUpdated(response.data);
         setOpen(false); // Close the dialog
         setPreviewImage(null); // Clear preview image
       }
     } catch (error) {
       console.error("Error updating product:", error);
+      toast({
+        title: "Error",
+        description: "เกิดข้อผิดพลาดในการแก้ไขสินค้า",
+        status: "error",
+        variant: "destructive",
+        isClosable: true,
+      });
     }
   };
 
@@ -136,14 +157,14 @@ const ModalEditProduct = ({ product, onProductUpdated }) => {
                   value={editProduct.name}
                   onChange={handleChange}
                   placeholder="ชื่อผลิตภัณฑ์"
-                  required
+                  
                 />
                 <Textarea
                   name="description"
                   value={editProduct.description}
                   onChange={handleChange}
                   placeholder="รายละเอียด"
-                  required
+                  
                 />
                 <Input
                   type="number"
@@ -151,42 +172,32 @@ const ModalEditProduct = ({ product, onProductUpdated }) => {
                   value={editProduct.price}
                   onChange={handleChange}
                   placeholder="ราคา"
-                  required
+                  
                 />
-                <Select
+                <select
                   name="categoryId"
                   value={editProduct.categoryId}
-                  onValueChange={(value) =>
-                    setEditProduct((prevData) => ({
-                      ...prevData,
-                      categoryId: value,
-                    }))
-                  }
-                  required
+                  onChange={handleChange}
+                  
+                  className="w-full border rounded p-2"
                 >
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="เลือกหมวดหมู่" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {categories.map((category) => (
-                      <SelectItem
-                        key={category.categoryId}
-                        value={category.categoryId}
-                      >
-                        {category.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                  <option value="" disabled>
+                    เลือกหมวดหมู่
+                  </option>
+                  {categories.map((category) => (
+                    <option
+                      key={category.categoryId}
+                      value={category.categoryId.toString()}
+                    >
+                      {category.name}
+                    </option>
+                  ))}
+                </select>
               </div>
             </TabsContent>
             <TabsContent value="upload">
               <div className="space-y-4">
-                <Input
-                  type="file"
-                  name="image"
-                  onChange={handleFileChange}
-                />
+                <Input type="file" name="image" onChange={handleFileChange} />
                 {previewImage && (
                   <div className="flex justify-center">
                     <Image

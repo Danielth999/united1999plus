@@ -52,19 +52,17 @@ const OfficeSupplies = () => {
               key={item.productId}
               className="hover:shadow-xl border flex flex-col"
             >
-              <CardHeader className="border-b">
-                <div className="relative w-full h-48 overflow-hidden">
-                  <Link href={`/products/${item.productId}`}>
-                    <Image
-                      src={item.imageUrl}
-                      alt={item.name}
-                      fill
-                      style={{ objectFit: "contain" }}
-                      className="max-h-full"
-                    />
-                  </Link>
-                </div>
-              </CardHeader>
+              <Link href={`/products/${item.productId}`}>
+                <CardHeader className="border-b w-full h-60 relative">
+                  <Image
+                    src={item.imageUrl}
+                    alt={item.name}
+                    fill
+                    sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                    style={{ objectFit: "cover", objectPosition: "center" }}
+                  />
+                </CardHeader>
+              </Link>
               <CardContent className="flex-grow">
                 <CardTitle className="line-clamp-2">
                   <Link href={`/products/${item.productId}`}>{item.name}</Link>
