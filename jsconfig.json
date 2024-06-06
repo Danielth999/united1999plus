@@ -7,6 +7,9 @@
       ],
       "@/components/admin-dashboard/Sidebar": [
         "./components/admin-dashboard/Sidebar.jsx"
+      ],
+      "@/api/category/[nameSlug]/route": [
+        "./app/api/category/[nameSlug]/route.js"
       ]
     }
   }

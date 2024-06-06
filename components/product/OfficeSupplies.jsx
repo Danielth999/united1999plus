@@ -1,5 +1,6 @@
-"use client";
-import { useState, useEffect } from "react";
+'use client';
+
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import {
   Card,
@@ -11,38 +12,36 @@ import {
 import { Badge } from "@/components/ui/badge";
 import Loading from "@/components/spinner/Spinner";
 import Link from "next/link";
+import Navbar from "@/components/nav/Navbar";
 
 const OfficeSupplies = () => {
-  const [products, setProduct] = useState([]);
+  const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const fetchProduct = async () => {
-    try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/products`
-      );
-      const data = await res.json();
-      if (Array.isArray(data)) {
-        setProduct(data);
-      } else {
-        console.error("Data received from API is not an array", data);
-      }
-      setLoading(false);
-    } catch (error) {
-      console.log("error", error);
-    }
-  };
-
   useEffect(() => {
-    fetchProduct();
+    const fetchProducts = async () => {
+      try {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/category/filter/office-supplies`);
+        if (!res.ok) {
+          throw new Error('Failed to fetch');
+        }
+        const data = await res.json();
+        setProducts(data.Product || []);
+        setLoading(false);
+      } catch (error) {
+        console.error('Error fetching products:', error);
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
   }, []);
 
   return (
     <>
+   
       <div className="mt-10">
-        <h1 className="font-bold text-xl text-black ">
-        อุปกรณ์สำนักงาน
-        </h1>
+        <h1 className="font-bold text-xl text-black">อุปกรณ์สำนักงาน</h1>
       </div>
       {loading ? (
         <div className="flex justify-center mt-10">
@@ -85,7 +84,7 @@ const OfficeSupplies = () => {
                     variant="customSecondary"
                     className="min-w-[120px] text-center line-clamp-1"
                   >
-                    {item.Category.name}
+                    {products.name}
                   </Badge>
                 </CardFooter>
               </Card>

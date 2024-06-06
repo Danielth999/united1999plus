@@ -1,4 +1,3 @@
-// pages/index.js
 'use client';
 
 import { useEffect, useState } from "react";
@@ -13,6 +12,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import Loading from "@/components/spinner/Spinner";
 import Link from "next/link";
+import Navbar from "@/components/nav/Navbar";
 
 const Packaging = () => {
   const [products, setProducts] = useState([]);
@@ -21,12 +21,12 @@ const Packaging = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/products`);
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/category/filter/packaging`);
         if (!res.ok) {
           throw new Error('Failed to fetch');
         }
         const data = await res.json();
-        setProducts(data);
+        setProducts(data.Product || []);
         setLoading(false);
       } catch (error) {
         console.error('Error fetching products:', error);
@@ -39,6 +39,7 @@ const Packaging = () => {
 
   return (
     <>
+   
       <div className="mt-10">
         <h1 className="font-bold text-xl text-black">บรรจุภัณฑ์เฟสท์</h1>
       </div>
@@ -83,7 +84,7 @@ const Packaging = () => {
                     variant="customSecondary"
                     className="min-w-[120px] text-center line-clamp-1"
                   >
-                    {item.Category.name}
+                    {products.name}
                   </Badge>
                 </CardFooter>
               </Card>

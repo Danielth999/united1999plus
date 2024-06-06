@@ -71,7 +71,7 @@ const Navbar = () => {
                   {cate.map((category) => (
                     <DropdownMenuItem key={category.categoryId}>
                       <Link
-                        href={`category/${category.categoryId}`}
+                        href={`/category/${category.nameSlug}`}
                         className="flex justify-between w-full px-4 py-2 text-left text-black hover:bg-gray-100"
                       >
                         {category.name}
@@ -105,9 +105,9 @@ const Navbar = () => {
                   </div>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>
-                  <DropdownMenuItem>
+                  {/* <DropdownMenuItem>
                     <Link href="/#">ข้อมูลส่วนตัว</Link>
-                  </DropdownMenuItem>
+                  </DropdownMenuItem> */} 
                   {session.user.role === "admin" && (
                     <DropdownMenuItem>
                       <Link href="/admin-dashboard/dashboard">ระบบจัดการ</Link>
