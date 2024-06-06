@@ -38,12 +38,16 @@ const Dropdown = () => {
         </DropdownMenuTrigger>
         <DropdownMenuContent className="rounded-lg">
           {categories.map((category) => (
-            <DropdownMenuItem className="flex justify-between" key={category.categoryId}>
-              <Link href={`category/${category.categoryId}`}>
+            <DropdownMenuItem
+              className="flex justify-between"
+              key={category.categoryId}
+            >
+              <Link href={`/category/${category.nameSlug}`}>
                 <span className=" w-full   text-black hover:bg-gray-100">
                   {category.name}
                 </span>
               </Link>
+
               <div>
                 <ChevronRight />
               </div>
