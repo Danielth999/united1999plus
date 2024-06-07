@@ -41,7 +41,7 @@ const CategoryList = () => {
     isLoading,
     mutate,
   } = useSWR(
-    `${process.env.NEXT_PUBLIC_API_URL}/api/category?sort=asc`,
+    `${process.env.NEXT_PUBLIC_API_URL}/api/category`,
     fetcher
   );
 
