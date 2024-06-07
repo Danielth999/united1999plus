@@ -15,12 +15,14 @@ import Link from "next/link";
 import fetcher from "@/lib/fetcher";
 
 const OfficeSupplies = () => {
+ 
+
   const {
     data: category,
     error,
     isValidating,
   } = useSWR(
-    `${process.env.NEXT_PUBLIC_API_URL}/api/category/filter/office-supplies`,
+    `${process.env.NEXT_PUBLIC_API_URL}/api/category/filter/office-supplies?limit=10`,
     fetcher,
     {
       revalidateOnFocus: true,

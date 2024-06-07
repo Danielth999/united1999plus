@@ -2,12 +2,12 @@
 import { useState, Suspense } from "react";
 import axios from "axios";
 import useSWR from "swr";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Pencil, Trash } from "lucide-react";
 import Spinner from "@/components/spinner/Spinner";
 import ModalAddProduct from "./ModalAddProduct";
 import ModalEditProduct from "./ModalEditProduct";
-import Pagination from "@/components/Pagination";
+import PaginationComponent from "@/components/Pagination";
 import Image from "next/image";
 import {
   Card,
@@ -28,12 +28,15 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import DeleteConfirmationDialog from "@/components/DeleteConfirmationDialog";
-
-const fetcher = (url) => axios.get(url).then((res) => res.data);
+import fetcher from "@/lib/fetcher";
 
 const ProductListContent = () => {
   const router = useRouter();
-  const [currentPage, setCurrentPage] = useState(1);
+  const searchParams = useSearchParams();
+  const pageParam = searchParams.get("page");
+  const initialPage = pageParam ? parseInt(pageParam, 10) : 1;
+
+  const [currentPage, setCurrentPage] = useState(initialPage);
   const [productsPerPage] = useState(5);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedProduct, setSelectedProduct] = useState(null);
@@ -57,7 +60,6 @@ const ProductListContent = () => {
     );
   }
 
-  // ตรวจสอบว่า products เป็น array หรือไม่
   const productList = Array.isArray(products) ? products : [];
 
   const handleDelete = async () => {
@@ -67,7 +69,7 @@ const ProductListContent = () => {
         `${process.env.NEXT_PUBLIC_API_URL}/api/products/${deleteProduct.productId}`
       );
       mutate(); // Refresh the product list
-      setDeleteProduct(null); // Clear the delete product stateF
+      setDeleteProduct(null); // Clear the delete product state
     } catch (error) {
       console.error("Error deleting product:", error);
     }
@@ -81,7 +83,6 @@ const ProductListContent = () => {
     setDeleteProduct(product);
   };
 
-  // Logic for displaying products
   const indexOfLastProduct = currentPage * productsPerPage;
   const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
 
@@ -96,7 +97,6 @@ const ProductListContent = () => {
     indexOfLastProduct
   );
 
-  // Change page
   const paginate = (pageNumber) => {
     setCurrentPage(pageNumber);
     router.push(`?page=${pageNumber}`);
@@ -121,7 +121,7 @@ const ProductListContent = () => {
               className="w-full "
             />
             <div>
-              <Pagination
+              <PaginationComponent
                 totalPages={Math.ceil(
                   filteredProducts.length / productsPerPage
                 )}

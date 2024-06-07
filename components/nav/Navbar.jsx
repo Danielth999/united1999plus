@@ -1,11 +1,11 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import logo from "../../public/logo/logo-real-no-bg.png";
 import { useSession, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import axios from "axios";
+import useSWR from "swr";
 import { Search, Menu, X, LayoutGrid } from "lucide-react";
 import Header from "./Header";
 import {
@@ -14,28 +14,23 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-//components for Navbar
 import SearchProduct from "./SearchProduct";
+import fetcher from "@/lib/fetcher";
+
 const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [cate, setCate] = useState([]);
   const { data: session, status } = useSession();
   const router = useRouter();
 
-  const fetchCategory = async () => {
-    try {
-      const res = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/category`
-      );
-      setCate(res.data);
-    } catch (error) {
-      console.log("error is", error);
-    }
-  };
+  // ใช้ SWR สำหรับการ fetch ข้อมูลหมวดหมู่
+  const { data: cate, error } = useSWR(
+    `${process.env.NEXT_PUBLIC_API_URL}/api/category`,
+    fetcher
+  );
 
-  useEffect(() => {
-    fetchCategory();
-  }, []);
+  if (error) {
+    console.log("Error fetching categories:", error);
+  }
 
   return (
     <>
@@ -68,16 +63,17 @@ const Navbar = () => {
                   </button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>
-                  {cate.map((category) => (
-                    <DropdownMenuItem key={category.categoryId}>
-                      <Link
-                        href={`/category/${category.nameSlug}`}
-                        className="flex justify-between w-full px-4 py-2 text-left text-black hover:bg-gray-100"
-                      >
-                        {category.name}
-                      </Link>
-                    </DropdownMenuItem>
-                  ))}
+                  {cate &&
+                    cate.map((category) => (
+                      <DropdownMenuItem key={category.categoryId}>
+                        <Link
+                          href={`/category/${category.nameSlug}`}
+                          className="flex justify-between w-full px-4 py-2 text-left text-black hover:bg-gray-100"
+                        >
+                          {category.name}
+                        </Link>
+                      </DropdownMenuItem>
+                    ))}
                   <DropdownMenuItem>
                     <Link
                       href="/products"
@@ -105,9 +101,6 @@ const Navbar = () => {
                   </div>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>
-                  {/* <DropdownMenuItem>
-                    <Link href="/#">ข้อมูลส่วนตัว</Link>
-                  </DropdownMenuItem> */} 
                   {session.user.role === "admin" && (
                     <DropdownMenuItem>
                       <Link href="/admin-dashboard/dashboard">ระบบจัดการ</Link>
@@ -151,16 +144,17 @@ const Navbar = () => {
                 </form>
               </div>
               <div className="text-[#204d9c] font-bold px-3 py-2">หมวดหมู่</div>
-              {cate.map((category) => (
-                <Link
-                  href={`category/${category.nameSlug}`}
-                  key={category.categoryId}
-                >
-                  <span className="block px-3 py-2 rounded-md text-base font-medium text-[#204d9c] hover:bg-gray-100">
-                    {category.name}
-                  </span>
-                </Link>
-              ))}
+              {cate &&
+                cate.map((category) => (
+                  <Link
+                    href={`category/${category.nameSlug}`}
+                    key={category.categoryId}
+                  >
+                    <span className="block px-3 py-2 rounded-md text-base font-medium text-[#204d9c] hover:bg-gray-100">
+                      {category.name}
+                    </span>
+                  </Link>
+                ))}
             </div>
           </div>
         )}

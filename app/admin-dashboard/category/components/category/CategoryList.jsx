@@ -1,13 +1,14 @@
-// CategoryList.js
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import useSWR from "swr";
 import axios from "axios";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Pencil, Trash } from "lucide-react";
 import Spinner from "@/components/spinner/Spinner";
 import ModalAddCategory from "./ModalAddCategory";
 import ModalEditCategory from "./ModalEditCategory";
-import Pagination from "@/components/Pagination";
+import PaginationComponent from "@/components/Pagination";
+import Image from "next/image";
 import {
   Card,
   CardContent,
@@ -26,32 +27,63 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
+import DeleteConfirmationDialog from "@/components/DeleteConfirmationDialog";
 
-const fetcher = (url) => axios.get(url).then(res => res.data);
+const fetcher = (url) => axios.get(url).then((res) => res.data);
 
 const CategoryList = () => {
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const { toast } = useToast();
-  const { data: categories, error, isLoading, mutate } = useSWR(
+
+  const pageParam = searchParams.get("page");
+  const initialPage = pageParam ? parseInt(pageParam, 10) : 1;
+
+  const {
+    data: categories,
+    error,
+    isLoading,
+    mutate,
+  } = useSWR(
     `${process.env.NEXT_PUBLIC_API_URL}/api/category?sort=asc`,
     fetcher
   );
-  const [currentPage, setCurrentPage] = useState(1);
+
+  const [currentPage, setCurrentPage] = useState(initialPage);
   const [categoriesPerPage] = useState(5);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState(null);
-  const [sortOrder, setSortOrder] = useState("asc");
+  const [deleteCategory, setDeleteCategory] = useState(null);
+  const [isAlertOpen, setIsAlertOpen] = useState(false);
 
-  if (isLoading) return <Spinner />;
+  useEffect(() => {
+    if (pageParam) {
+      setCurrentPage(parseInt(pageParam, 10));
+    }
+  }, [pageParam]);
+
+  if (isLoading)
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <Spinner />
+      </div>
+    );
   if (error) return <div>Error loading categories</div>;
 
-  const handleDelete = async (id) => {
+  const handleDelete = async () => {
+    if (!deleteCategory) return;
     try {
-      await axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/api/category/${id}`);
+      await axios.delete(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/category/${deleteCategory.categoryId}`
+      );
       mutate(); // Refresh the category list
+      setDeleteCategory(null); // Clear the delete category state
+      setIsAlertOpen(false); // Close the alert dialog
       toast({
         title: "Success",
         description: "ลบหมวดหมู่สำเร็จ",
         status: "success",
+        variant: "success",
         isClosable: true,
       });
     } catch (error) {
@@ -60,6 +92,7 @@ const CategoryList = () => {
         title: "Error",
         description: "เกิดข้อผิดพลาดในการลบหมวดหมู่",
         status: "error",
+        variant: "destructive",
         isClosable: true,
       });
     }
@@ -69,8 +102,9 @@ const CategoryList = () => {
     setSelectedCategory(category);
   };
 
-  const handleSort = () => {
-    setSortOrder((prevOrder) => (prevOrder === "asc" ? "desc" : "asc"));
+  const handleDeleteClick = (category) => {
+    setDeleteCategory(category);
+    setIsAlertOpen(true); // Open the alert dialog
   };
 
   // Logic for displaying categories
@@ -87,7 +121,10 @@ const CategoryList = () => {
   );
 
   // Change page
-  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+  const paginate = (pageNumber) => {
+    setCurrentPage(pageNumber);
+    router.push(`?page=${pageNumber}`);
+  };
 
   return (
     <Card className="bg-base-100 shadow-xl mb-4">
@@ -109,16 +146,9 @@ const CategoryList = () => {
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
-            <div>
-              <Button variant="blue" onClick={handleSort}>
-                {sortOrder === "asc"
-                  ? "เรียงลำดับตาม ID (น้อยไปมาก)"
-                  : "เรียงลำดับตาม ID (มากไปน้อย)"}
-              </Button>
-            </div>
           </div>
           <div>
-            <Pagination
+            <PaginationComponent
               totalPages={Math.ceil(
                 filteredCategories.length / categoriesPerPage
               )}
@@ -132,6 +162,7 @@ const CategoryList = () => {
             <TableHeader>
               <TableRow>
                 <TableHead>#ID</TableHead>
+                <TableHead>รูปภาพ</TableHead>
                 <TableHead>ชื่อหมวดหมู่</TableHead>
                 <TableHead>ชื่อหมวดหมู่ภาษาอังกฤษ</TableHead>
                 <TableHead>จัดการ</TableHead>
@@ -143,6 +174,19 @@ const CategoryList = () => {
                 currentCategories.map((category) => (
                   <TableRow key={category.categoryId}>
                     <TableCell>{category.categoryId}</TableCell>
+                    <TableCell>
+                      {category.cateImg ? (
+                        <Image
+                          src={category.cateImg}
+                          width={100}
+                          height={100}
+                          alt={category.cateImg}
+                          style={{ objectFit: "contain" }}
+                        />
+                      ) : (
+                        <span>No Image</span>
+                      )}
+                    </TableCell>
                     <TableCell>{category.name}</TableCell>
                     <TableCell>{category.nameSlug}</TableCell>
                     <TableCell>
@@ -154,7 +198,7 @@ const CategoryList = () => {
                       </Button>
                       <Button
                         variant="link"
-                        onClick={() => handleDelete(category.categoryId)}
+                        onClick={() => handleDeleteClick(category)}
                       >
                         <Trash className="text-red-500" />
                       </Button>
@@ -163,7 +207,7 @@ const CategoryList = () => {
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan="4" className="text-center">
+                  <TableCell colSpan="5" className="text-center">
                     No categories found
                   </TableCell>
                 </TableRow>
@@ -172,6 +216,17 @@ const CategoryList = () => {
           </Table>
         </div>
       </CardContent>
+      {selectedCategory && (
+        <ModalEditCategory
+          category={selectedCategory}
+          onCategoryUpdated={mutate}
+        />
+      )}
+      <DeleteConfirmationDialog
+        open={isAlertOpen}
+        onClose={() => setIsAlertOpen(false)}
+        onConfirm={handleDelete}
+      />
     </Card>
   );
 };

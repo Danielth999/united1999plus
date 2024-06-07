@@ -1,6 +1,6 @@
-import React from "react";
+// components/ui/Pagination.js
 import {
-  Pagination as ShadPagination,
+  Pagination,
   PaginationContent,
   PaginationEllipsis,
   PaginationItem,
@@ -8,79 +8,178 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
-import { useRouter } from "next/navigation";
-import { cn } from "@/lib/utils"; // Helper function to handle conditional class names
 
-const Pagination = ({ totalPages, currentPage, onPageChange }) => {
-  const router = useRouter();
-  const pages = [];
-
-  const handlePageChange = (page) => {
-    onPageChange(page);
-    router.push(`?page=${page}`);
+const PaginationComponent = ({ totalPages, currentPage, onPageChange }) => {
+  const handleClick = (page) => {
+    if (page >= 1 && page <= totalPages) {
+      onPageChange(page);
+    }
   };
 
-  for (let i = 1; i <= totalPages; i++) {
-    pages.push(
-      <PaginationItem key={i}>
-        <PaginationLink
-          href="#"
-          onClick={() => handlePageChange(i)}
-          className={cn({ "bg-blue-500 text-white": i === currentPage })}
-        >
-          {i}
-        </PaginationLink>
-      </PaginationItem>
-    );
-  }
+  const renderPageNumbers = () => {
+    const pageNumbers = [];
+    const ellipsis = <PaginationEllipsis key="ellipsis" />;
+    const maxPagesToShow = 5;
+    const pageBuffer = 2;
+
+    if (totalPages <= maxPagesToShow) {
+      for (let i = 1; i <= totalPages; i++) {
+        pageNumbers.push(
+          <PaginationItem key={i}>
+            <PaginationLink
+              onClick={() => handleClick(i)}
+              className={
+                i === currentPage
+                  ? "bg-blue-500 text-white"
+                  : "bg-white text-blue-500"
+              }
+            >
+              {i}
+            </PaginationLink>
+          </PaginationItem>
+        );
+      }
+    } else {
+      if (currentPage <= pageBuffer + 1) {
+        for (let i = 1; i <= pageBuffer * 2 + 1; i++) {
+          pageNumbers.push(
+            <PaginationItem key={i}>
+              <PaginationLink
+                onClick={() => handleClick(i)}
+                className={
+                  i === currentPage
+                    ? "bg-blue-500 text-white"
+                    : "bg-white text-blue-500"
+                }
+              >
+                {i}
+              </PaginationLink>
+            </PaginationItem>
+          );
+        }
+        pageNumbers.push(ellipsis);
+        pageNumbers.push(
+          <PaginationItem key={totalPages}>
+            <PaginationLink
+              onClick={() => handleClick(totalPages)}
+              className={
+                totalPages === currentPage
+                  ? "bg-blue-500 text-white"
+                  : "bg-white text-blue-500"
+              }
+            >
+              {totalPages}
+            </PaginationLink>
+          </PaginationItem>
+        );
+      } else if (currentPage >= totalPages - pageBuffer) {
+        pageNumbers.push(
+          <PaginationItem key={1}>
+            <PaginationLink
+              onClick={() => handleClick(1)}
+              className={
+                1 === currentPage
+                  ? "bg-blue-500 text-white"
+                  : "bg-white text-blue-500"
+              }
+            >
+              1
+            </PaginationLink>
+          </PaginationItem>
+        );
+        pageNumbers.push(ellipsis);
+        for (let i = totalPages - pageBuffer * 2; i <= totalPages; i++) {
+          pageNumbers.push(
+            <PaginationItem key={i}>
+              <PaginationLink
+                onClick={() => handleClick(i)}
+                className={
+                  i === currentPage
+                    ? "bg-blue-500 text-white"
+                    : "bg-white text-blue-500"
+                }
+              >
+                {i}
+              </PaginationLink>
+            </PaginationItem>
+          );
+        }
+      } else {
+        pageNumbers.push(
+          <PaginationItem key={1}>
+            <PaginationLink
+              onClick={() => handleClick(1)}
+              className={
+                1 === currentPage
+                  ? "bg-blue-500 text-white"
+                  : "bg-white text-blue-500"
+              }
+            >
+              1
+            </PaginationLink>
+          </PaginationItem>
+        );
+        pageNumbers.push(ellipsis);
+        for (
+          let i = currentPage - pageBuffer;
+          i <= currentPage + pageBuffer;
+          i++
+        ) {
+          pageNumbers.push(
+            <PaginationItem key={i}>
+              <PaginationLink
+                onClick={() => handleClick(i)}
+                className={
+                  i === currentPage
+                    ? "bg-blue-500 text-white"
+                    : "bg-white text-blue-500"
+                }
+              >
+                {i}
+              </PaginationLink>
+            </PaginationItem>
+          );
+        }
+        pageNumbers.push(ellipsis);
+        pageNumbers.push(
+          <PaginationItem key={totalPages}>
+            <PaginationLink
+              onClick={() => handleClick(totalPages)}
+              className={
+                totalPages === currentPage
+                  ? "bg-blue-500 text-white"
+                  : "bg-white text-blue-500"
+              }
+            >
+              {totalPages}
+            </PaginationLink>
+          </PaginationItem>
+        );
+      }
+    }
+
+    return pageNumbers;
+  };
 
   return (
-    <ShadPagination>
+    <Pagination>
       <PaginationContent>
         <PaginationItem>
           <PaginationPrevious
-            href="#"
-            onClick={() => handlePageChange(currentPage > 1 ? currentPage - 1 : 1)}
+            onClick={() => handleClick(currentPage - 1)}
             disabled={currentPage === 1}
           />
         </PaginationItem>
-        {pages.length > 7 && currentPage > 4 && (
-          <>
-            <PaginationItem>
-              <PaginationLink href="#" onClick={() => handlePageChange(1)}>
-                1
-              </PaginationLink>
-            </PaginationItem>
-            <PaginationEllipsis />
-          </>
-        )}
-        {pages.slice(
-          currentPage > 4 ? currentPage - 4 : 0,
-          currentPage > 4 ? currentPage + 3 : 7
-        )}
-        {pages.length > 7 && currentPage < totalPages - 3 && (
-          <>
-            <PaginationEllipsis />
-            <PaginationItem>
-              <PaginationLink
-                href="#"
-                onClick={() => handlePageChange(totalPages)}
-              >
-                {totalPages}
-              </PaginationLink>
-            </PaginationItem>
-          </>
-        )}
+        {renderPageNumbers()}
         <PaginationItem>
           <PaginationNext
-            href="#"
-            onClick={() => handlePageChange(currentPage < totalPages ? currentPage + 1 : totalPages)}
+            onClick={() => handleClick(currentPage + 1)}
             disabled={currentPage === totalPages}
           />
         </PaginationItem>
       </PaginationContent>
-    </ShadPagination>
+    </Pagination>
   );
 };
 
-export default Pagination;
+export default PaginationComponent;

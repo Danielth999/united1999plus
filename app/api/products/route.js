@@ -38,6 +38,7 @@ export async function POST(req) {
   const release = await mutex.acquire();
 
   try {
+    // รับข้อมูลจาก form data
     const formData = await req.formData();
     const name = formData.get("name");
     const description = formData.get("description");
@@ -45,6 +46,7 @@ export async function POST(req) {
     const categoryId = formData.get("categoryId");
     const image = formData.get("image");
 
+    // ตรวจสอบว่าข้อมูลที่ส่งมาครบหรือไม่
     if (!name || !description || !price || !categoryId || !image) {
       console.error("Validation error: Missing required fields");
       return NextResponse.json(
@@ -52,26 +54,30 @@ export async function POST(req) {
         { status: 400 }
       );
     }
-
+    // ทำการbuffer รูปภาพและสร้างชื่อไฟล์ใหม่
     const imageBuffer = Buffer.from(await image.arrayBuffer());
     const fileName = `${uuidv4()}.png`;
 
-    const { data, error } = await supabase.storage
+    // อัพโหลดรูปภาพไปยัง Supabase Storage
+    const uploadPromise = supabase.storage
       .from("products")
       .upload(fileName, imageBuffer, {
         contentType: "image/png",
       });
+    const uploadResult = await uploadPromise;
 
-    if (error) {
-      console.error("Error uploading image:", error);
+    // ตรวจสอบว่าอัพโหลดรูปภาพสำเร็จหรือไม่
+    if (uploadResult.error) {
+      console.error("Error uploading image:", uploadResult.error);
       return NextResponse.json(
         { error: "Failed to upload image" },
         { status: 500 }
       );
     }
-
+    // ดึง URL ของรูปภาพที่อัพโหลดจาก Supabase Storage
     const productUrl = supabase.storage.from("products").getPublicUrl(fileName);
 
+    // สร้างข้อมูลสินค้าใหม่ในฐานข้อมูล
     const product = await prisma.product.create({
       data: {
         name,

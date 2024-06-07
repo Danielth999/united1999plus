@@ -1,11 +1,10 @@
 "use client";
-import React from "react";
-import Navbar from "@/components/nav/Navbar";
-import Footer from "@/components/Footer";
+import React, { useState } from "react";
+import useSWR from "swr";
 import Image from "next/image";
 import Link from "next/link";
-import { useState, useEffect } from "react";
-import axios from "axios";
+import Navbar from "@/components/nav/Navbar";
+import Footer from "@/components/Footer";
 import Spinner from "@/components/spinner/Spinner";
 import Pagination from "@/components/Pagination";
 import {
@@ -17,38 +16,42 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 
+const fetcher = (url) => fetch(url).then((res) => res.json());
 
 const ProductPage = () => {
-  const [data, setData] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const fetchProducts = async () => {
-    try {
-      const res = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/products`
-      );
+  const [currentPage, setCurrentPage] = useState(1);
+  const productsPerPage = 10;
 
-      if (res.data && Array.isArray(res.data)) {
-        setData(res.data);
-        setLoading(false);
-      }
-
-      setLoading(false);
-    } catch (error) {
-      console.log("Error fetching products:", error);
+  const { data, error, isValidating } = useSWR(
+    `${process.env.NEXT_PUBLIC_API_URL}/api/products`,
+    fetcher,
+    {
+      revalidateOnFocus: true,
+      refreshInterval: 30000, // อัปเดตข้อมูลทุกๆ 30 วินาที
+      dedupingInterval: 60000,
     }
-  };
+  );
 
-  useEffect(() => {
-    fetchProducts();
-  }, []);
-
-  if (loading) {
+  if (isValidating) {
     return (
       <div className="grid place-items-center items-center h-screen">
         <Spinner />
       </div>
     );
   }
+
+  if (error) {
+    return <div>Error loading products.</div>;
+  }
+
+  const products = data?.products || [];
+  const totalProducts = data?.totalProducts || 0;
+  const totalPages = Math.ceil(totalProducts / productsPerPage);
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+  };
+
   return (
     <>
       <Navbar />
@@ -60,7 +63,7 @@ const ProductPage = () => {
           <h1 className="text-3xl">สินค้าทั้งหมด</h1>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 mt-5">
-          {data.map((item) => (
+          {products.map((item) => (
             <Card
               key={item.productId}
               className="hover:shadow-xl border flex flex-col"
@@ -79,7 +82,9 @@ const ProductPage = () => {
                 </div>
               </CardHeader>
               <CardContent className="flex-grow">
-                <CardTitle className="line-clamp-2"><Link href={`/products/${item.productId}`}>{item.name}</Link></CardTitle>
+                <CardTitle className="line-clamp-2">
+                  <Link href={`/products/${item.productId}`}>{item.name}</Link>
+                </CardTitle>
               </CardContent>
               <CardFooter className="flex justify-between mt-auto">
                 <Badge
@@ -98,8 +103,12 @@ const ProductPage = () => {
             </Card>
           ))}
         </div>
-        <div className="flex justify-center">
-          <Pagination />
+        <div className="flex justify-center mt-5">
+          <Pagination
+            totalPages={totalPages}
+            currentPage={currentPage}
+            onPageChange={handlePageChange}
+          />
         </div>
       </div>
       <Footer />

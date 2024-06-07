@@ -1,37 +1,32 @@
 "use client";
-import React, { useEffect, useState } from "react";
-import axios from "axios";
+import React from "react";
+import useSWR from "swr";
 import Link from "next/link";
 import { LayoutGrid, ChevronRight } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import fetcher from "@/lib/fetcher";  
 
 const Dropdown = () => {
-  const [categories, setCategories] = useState([]);
+  const { data: categories, error } = useSWR("/api/category", fetcher);
 
-  const fetchData = async () => {
-    try {
-      const result = await axios.get("/api/category");
-      setCategories(result.data);
-    } catch (error) {
-      console.error("Error fetching categories:", error);
-    }
-  };
+  if (error) {
+    console.error("Error fetching categories:", error);
+    return <div>Failed to load categories</div>;
+  }
 
-  useEffect(() => {
-    fetchData();
-  }, []);
+  if (!categories) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <>
       <DropdownMenu>
-        <DropdownMenuTrigger>
+        <DropdownMenuTrigger >
           <div className="flex space-x-2">
             <LayoutGrid className="text-[#204d9c]" /> หมวดหมู่
           </div>
@@ -43,11 +38,10 @@ const Dropdown = () => {
               key={category.categoryId}
             >
               <Link href={`/category/${category.nameSlug}`}>
-                <span className=" w-full   text-black hover:bg-gray-100">
+                <span className="w-full text-black hover:bg-gray-100">
                   {category.name}
                 </span>
               </Link>
-
               <div>
                 <ChevronRight />
               </div>

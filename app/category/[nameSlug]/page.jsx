@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import useSWR from "swr";
 import { useParams } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
@@ -15,41 +16,25 @@ import {
 import { Badge } from "@/components/ui/badge";
 import Loading from "@/components/spinner/Spinner";
 
+const fetcher = (url) => fetch(url).then((res) => res.json());
+
 const CategoryPage = () => {
   const { nameSlug } = useParams();
-  const [category, setCategory] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const { data: category, error } = useSWR(
+    `${process.env.NEXT_PUBLIC_API_URL}/api/category/filter/${nameSlug}`,
+    fetcher
+  );
 
-  useEffect(() => {
-    const fetchCategory = async () => {
-      try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/category/filter/${nameSlug}`);
-        if (!res.ok) {
-          throw new Error("Failed to fetch");
-        }
-        const data = await res.json();
-        console.log("Fetched category:", data); // ตรวจสอบข้อมูลที่ได้จาก API
-        setCategory(data);
-        setLoading(false);
-      } catch (error) {
-        console.error("Error fetching category:", error);
-        setLoading(false);
-      }
-    };
+  if (error) {
+    return <div>Error fetching category</div>;
+  }
 
-    fetchCategory();
-  }, [nameSlug]);
-
-  if (loading) {
+  if (!category) {
     return (
       <div className="flex justify-center items-center h-screen mt-10">
         <Loading />
       </div>
     );
-  }
-
-  if (!category) {
-    return <div>Category not found</div>;
   }
 
   if (!category.Product || category.Product.length === 0) {

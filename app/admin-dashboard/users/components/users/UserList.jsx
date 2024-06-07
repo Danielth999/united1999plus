@@ -1,8 +1,8 @@
 "use client";
 import { useState, useEffect, Suspense } from 'react';
 import axios from 'axios';
-import useSWR, { mutate } from 'swr';
-import { useRouter } from 'next/navigation';
+import useSWR from 'swr';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Pencil, Trash } from 'lucide-react';
 import Spinner from '@/components/spinner/Spinner';
 import ModalAddUser from './ModalAddUser';
@@ -22,7 +22,6 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
@@ -35,6 +34,7 @@ import {
 } from '@/components/ui/select';
 import Pagination from '@/components/Pagination'; // นำเข้า Pagination component
 import { useToast } from '@/components/ui/use-toast';
+import DeleteConfirmationDialog from '@/components/DeleteConfirmationDialog'; // นำเข้า DeleteConfirmationDialog
 
 const fetcher = (url) => axios.get(url).then(res => res.data);
 
@@ -47,6 +47,8 @@ const UserListContent = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterRole, setFilterRole] = useState('all');
   const [selectedUser, setSelectedUser] = useState(null);
+  const [deleteUser, setDeleteUser] = useState(null);
+  const [isAlertOpen, setIsAlertOpen] = useState(false);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -54,14 +56,18 @@ const UserListContent = () => {
     setCurrentPage(page);
   }, []);
 
-  const handleDelete = async (id) => {
+  const handleDelete = async () => {
+    if (!deleteUser) return;
     try {
-      await axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/api/users/${id}`);
+      await axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/api/users/${deleteUser.userId}`);
       mutate(); // Refresh the user list
+      setDeleteUser(null); // Clear the delete user state
+      setIsAlertOpen(false); // Close the alert dialog
       toast({
         title: "Success",
         description: "ลบผู้ใช้สำเร็จ",
         status: "success",
+        variant: "success",
         isClosable: true,
       });
     } catch (error) {
@@ -77,6 +83,11 @@ const UserListContent = () => {
 
   const handleEditClick = (user) => {
     setSelectedUser(user);
+  };
+
+  const handleDeleteClick = (user) => {
+    setDeleteUser(user);
+    setIsAlertOpen(true); // Open the alert dialog
   };
 
   // Logic for displaying users
@@ -182,7 +193,7 @@ const UserListContent = () => {
                             <Pencil />
                           </Button>
                           <Button
-                            onClick={() => handleDelete(user.userId)}
+                            onClick={() => handleDeleteClick(user)}
                             variant="link"
                             className="text-red-500"
                           >
@@ -207,6 +218,11 @@ const UserListContent = () => {
       {selectedUser && (
         <ModalEditUser user={selectedUser} onUserUpdated={mutate} />
       )}
+      <DeleteConfirmationDialog
+        open={isAlertOpen}
+        onClose={() => setIsAlertOpen(false)}
+        onConfirm={handleDelete}
+      />
     </>
   );
 };
@@ -220,4 +236,3 @@ const UserList = () => {
 };
 
 export default UserList;
-  
