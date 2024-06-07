@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import useSWR from "swr";
 import axios from "axios";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { Pencil, Trash } from "lucide-react";
 import Spinner from "@/components/spinner/Spinner";
 import ModalAddCategory from "./ModalAddCategory";
@@ -33,11 +33,7 @@ const fetcher = (url) => axios.get(url).then((res) => res.data);
 
 const CategoryList = () => {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const { toast } = useToast();
-
-  const pageParam = searchParams.get("page");
-  const initialPage = pageParam ? parseInt(pageParam, 10) : 1;
 
   const {
     data: categories,
@@ -49,7 +45,7 @@ const CategoryList = () => {
     fetcher
   );
 
-  const [currentPage, setCurrentPage] = useState(initialPage);
+  const [currentPage, setCurrentPage] = useState(1);
   const [categoriesPerPage] = useState(5);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState(null);
@@ -57,10 +53,10 @@ const CategoryList = () => {
   const [isAlertOpen, setIsAlertOpen] = useState(false);
 
   useEffect(() => {
-    if (pageParam) {
-      setCurrentPage(parseInt(pageParam, 10));
-    }
-  }, [pageParam]);
+    const params = new URLSearchParams(window.location.search);
+    const page = parseInt(params.get("page")) || 1;
+    setCurrentPage(page);
+  }, []);
 
   if (isLoading)
     return (
