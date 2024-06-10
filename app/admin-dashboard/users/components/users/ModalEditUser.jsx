@@ -53,17 +53,19 @@ const ModalEditUser = ({ user, onUserUpdated }) => {
       return;
     }
 
+    // Optimistic UI update
+    onUserUpdated({ ...editUser, userId: user.userId });
+    setOpen(false); // Close the dialog
+    toast({
+      title: "Success",
+      description: "แก้ไขข้อมูลผู้ใช้สำเร็จ",
+      status: "success",
+      variant: "success",
+      isClosable: true,
+    });
+
     try {
       await axios.put(`${process.env.NEXT_PUBLIC_API_URL}/api/users/${user.userId}`, editUser);
-      onUserUpdated(); // Fetch users again to update the list
-      setOpen(false); // Close the dialog
-      toast({
-        title: "Success",
-        description: "แก้ไขข้อมูลผู้ใช้สำเร็จ",
-        status: "success",
-        variant:"success",
-        isClosable: true,
-      });
     } catch (error) {
       console.error("Error updating user:", error);
       toast({
@@ -86,9 +88,6 @@ const ModalEditUser = ({ user, onUserUpdated }) => {
         <form onSubmit={handleSubmit}>
           <div className="space-y-4">
             <div>
-              <label htmlFor="email" className="block text-gray-700 text-sm font-bold mb-2">
-                อีเมล
-              </label>
               <Input
                 type="text"
                 name="email"
@@ -96,13 +95,9 @@ const ModalEditUser = ({ user, onUserUpdated }) => {
                 value={editUser.email}
                 onChange={handleChange}
                 placeholder="Email"
-                
               />
             </div>
             <div>
-              <label htmlFor="username" className="block text-gray-700 text-sm font-bold mb-2">
-                ชื่อผู้ใช้
-              </label>
               <Input
                 type="text"
                 name="username"
@@ -110,18 +105,13 @@ const ModalEditUser = ({ user, onUserUpdated }) => {
                 value={editUser.username}
                 onChange={handleChange}
                 placeholder="Username"
-                
               />
             </div>
             <div>
-              <label htmlFor="roles" className="block text-gray-700 text-sm font-bold mb-2">
-                สิทธิ์การใช้งาน
-              </label>
               <Select
                 name="roles"
                 value={editUser.roles}
                 onValueChange={(value) => setEditUser((prevData) => ({ ...prevData, roles: value }))}
-                
               >
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder="เลือกสิทธิ์การใช้งาน" />

@@ -1,6 +1,8 @@
 // File: app/api/users/[id]/route.js
 
 import { PrismaClient } from "@prisma/client";
+import { NextResponse } from "next/server";
+import redis from "@/lib/redis";
 
 const prisma = new PrismaClient();
 
@@ -16,19 +18,18 @@ export const GET = async (request, { params }) => {
     });
 
     if (!user) {
-      return Response.json({ message: "User not found" }, { status: 404 });
+      return NextResponse.json({ message: "User not found" }, { status: 404 });
     }
 
-    return Response.json(user, { status: 200 });
+    return NextResponse.json(user, { status: 200 });
   } catch (error) {
     console.error("Error fetching user:", error);
-    return Response.json({ error: "Failed to fetch data" }, { status: 500 });
+    return NextResponse.json({ error: "Failed to fetch data" }, { status: 500 });
+  } finally {
+    await prisma.$disconnect();
   }
 };
 
-// File: app/api/users/[id]/route.js (continued)
-
-//update user
 export const PUT = async (request, { params }) => {
   const id = params.id;
   const userID = parseInt(id);
@@ -44,29 +45,49 @@ export const PUT = async (request, { params }) => {
       },
     });
 
-    return Response.json(user, { status: 200 });
+    await redis.del("users");
+    return NextResponse.json(user, { status: 200 });
   } catch (error) {
     console.error("Error updating user:", error);
-    return Response.json({ error: "Failed to update user" }, { status: 500 });
+    return NextResponse.json({ error: "Failed to update user" }, { status: 500 });
+  } finally {
+    await prisma.$disconnect();
   }
 };
-
-//delete user
 
 export const DELETE = async (request, { params }) => {
   const id = params.id;
   const userID = parseInt(id);
 
   try {
-    const user = await prisma.user.delete({
+    const user = await prisma.user.findUnique({
       where: {
         userId: userID,
       },
     });
 
-    return Response.json(user, { status: 200 });
+    if (!user) {
+      return NextResponse.json(
+        { message: "User not found" },
+        { status: 404 }
+      );
+    }
+
+    await prisma.user.delete({
+      where: {
+        userId: userID,
+      },
+    });
+
+    await redis.del("users");
+    return NextResponse.json(
+      { message: "User deleted successfully" },
+      { status: 200 }
+    );
   } catch (error) {
     console.error("Error deleting user:", error);
-    return Response.json({ error: "Failed to delete user" }, { status: 500 });
+    return NextResponse.json({ error: "Failed to delete user" }, { status: 500 });
+  } finally {
+    await prisma.$disconnect();
   }
 };

@@ -4,7 +4,7 @@ import { useSession, signOut } from "next-auth/react";
 const AdminBar = ({ toggleSidebar }) => {
   const { data: session } = useSession();
   return (
-    <div className="flex items-center justify-between p-4 bg-white shadow-md">
+    <div className="flex items-center justify-between p-2 bg-white shadow-md">
       <div className="flex items-center">
         <button onClick={toggleSidebar}>
           <Menu className="text-gray-800" />

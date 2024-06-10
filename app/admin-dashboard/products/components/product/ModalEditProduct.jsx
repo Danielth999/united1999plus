@@ -15,6 +15,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import Image from "next/image";
+import { Checkbox } from "@/components/ui/checkbox";
 
 const ModalEditProduct = ({ product, onProductUpdated }) => {
   const { toast } = useToast();
@@ -22,6 +23,10 @@ const ModalEditProduct = ({ product, onProductUpdated }) => {
     name: "",
     description: "",
     price: "",
+    stock: "",
+    color: "",
+    size: "",
+    isPublished: false,
     categoryId: "",
     image: null,
   });
@@ -35,6 +40,10 @@ const ModalEditProduct = ({ product, onProductUpdated }) => {
         name: product.name,
         description: product.description,
         price: product.price,
+        stock: product.stock,
+        color: product.color,
+        size: product.size,
+        isPublished: product.isPublished,
         categoryId: product.categoryId ? product.categoryId.toString() : "",
         image: null,
       });
@@ -59,10 +68,10 @@ const ModalEditProduct = ({ product, onProductUpdated }) => {
   }, []);
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
+    const { name, value, type, checked } = e.target;
     setEditProduct((prevData) => ({
       ...prevData,
-      [name]: value,
+      [name]: type === "checkbox" ? checked : value,
     }));
   };
 
@@ -90,17 +99,27 @@ const ModalEditProduct = ({ product, onProductUpdated }) => {
       return;
     }
 
+    // Optimistic UI Update
+    const updatedProduct = { ...product, ...editProduct };
+    onProductUpdated(updatedProduct);
+    setOpen(false);
+    setPreviewImage(null);
+
     const formData = new FormData();
     formData.append("name", editProduct.name);
     formData.append("description", editProduct.description);
     formData.append("price", editProduct.price);
+    formData.append("stock", editProduct.stock);
+    formData.append("color", editProduct.color);
+    formData.append("size", editProduct.size);
+    formData.append("isPublished", editProduct.isPublished);
     formData.append("categoryId", editProduct.categoryId);
     if (editProduct.image) {
       formData.append("image", editProduct.image);
     }
 
     try {
-      const response = await axios.put(
+      await axios.put(
         `${process.env.NEXT_PUBLIC_API_URL}/api/products/${product.productId}`,
         formData,
         {
@@ -109,18 +128,13 @@ const ModalEditProduct = ({ product, onProductUpdated }) => {
           },
         }
       );
-      if (response.status === 200) {
-        toast({
-          title: "Success",
-          description: "แก้ไขสินค้าสำเร็จ",
-          status: "success",
-          variant: "success",
-          isClosable: true,
-        });
-        onProductUpdated(response.data);
-        setOpen(false); // Close the dialog
-        setPreviewImage(null); // Clear preview image
-      }
+      toast({
+        title: "Success",
+        description: "แก้ไขสินค้าสำเร็จ",
+        status: "success",
+        variant: "success",
+        isClosable: true,
+      });
     } catch (error) {
       console.error("Error updating product:", error);
       toast({
@@ -130,6 +144,8 @@ const ModalEditProduct = ({ product, onProductUpdated }) => {
         variant: "destructive",
         isClosable: true,
       });
+      // Revert Optimistic Update on Error
+      onProductUpdated(product);
     }
   };
 
@@ -150,21 +166,13 @@ const ModalEditProduct = ({ product, onProductUpdated }) => {
           </TabsList>
           <form onSubmit={handleSubmit} encType="multipart/form-data">
             <TabsContent value="info">
-              <div className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <Input
                   type="text"
                   name="name"
                   value={editProduct.name}
                   onChange={handleChange}
                   placeholder="ชื่อผลิตภัณฑ์"
-                  
-                />
-                <Textarea
-                  name="description"
-                  value={editProduct.description}
-                  onChange={handleChange}
-                  placeholder="รายละเอียด"
-                  
                 />
                 <Input
                   type="number"
@@ -172,13 +180,32 @@ const ModalEditProduct = ({ product, onProductUpdated }) => {
                   value={editProduct.price}
                   onChange={handleChange}
                   placeholder="ราคา"
-                  
+                />
+                <Input
+                  type="text"
+                  name="stock"
+                  value={editProduct.stock}
+                  onChange={handleChange}
+                  placeholder="จำนวน"
+                />
+                <Input
+                  type="text"
+                  name="color"
+                  value={editProduct.color}
+                  onChange={handleChange}
+                  placeholder="สี"
+                />
+                <Input
+                  type="text"
+                  name="size"
+                  value={editProduct.size}
+                  onChange={handleChange}
+                  placeholder="ขนาด"
                 />
                 <select
                   name="categoryId"
                   value={editProduct.categoryId}
                   onChange={handleChange}
-                  
                   className="w-full border rounded p-2"
                 >
                   <option value="" disabled>
@@ -193,6 +220,26 @@ const ModalEditProduct = ({ product, onProductUpdated }) => {
                     </option>
                   ))}
                 </select>
+                <Textarea
+                  name="description"
+                  value={editProduct.description}
+                  onChange={handleChange}
+                  placeholder="รายละเอียด"
+                  className="col-span-2"
+                />
+                <div className="flex items-center space-x-2 col-span-1 md:col-span-2">
+                  <Checkbox
+                    name="isPublished"
+                    checked={editProduct.isPublished}
+                    onCheckedChange={(checked) =>
+                      setEditProduct((prevData) => ({
+                        ...prevData,
+                        isPublished: checked,
+                      }))
+                    }
+                  />
+                  <span>เผยแพร่</span>
+                </div>
               </div>
             </TabsContent>
             <TabsContent value="upload">

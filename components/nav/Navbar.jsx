@@ -5,7 +5,6 @@ import Link from "next/link";
 import logo from "../../public/logo/logo-real-no-bg.png";
 import { useSession, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import useSWR from "swr";
 import { Search, Menu, X, LayoutGrid } from "lucide-react";
 import Header from "./Header";
 import {
@@ -15,21 +14,36 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import SearchProduct from "./SearchProduct";
-import fetcher from "@/lib/fetcher";
+import useSWR from "swr";
+import axios from "axios";
+import { useToast } from "@/components/ui/use-toast";
+
+const fetcher = url => axios.get(url).then(res => res.data);
 
 const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
-  const { data: session, status } = useSession();
-  const router = useRouter();
-
-  // ใช้ SWR สำหรับการ fetch ข้อมูลหมวดหมู่
-  const { data: cate, error } = useSWR(
+  const { toast } = useToast();
+  const { data: categories, error } = useSWR(
     `${process.env.NEXT_PUBLIC_API_URL}/api/category`,
     fetcher
   );
+  const { data: session, status } = useSession();
+  const router = useRouter();
 
   if (error) {
-    console.log("Error fetching categories:", error);
+    toast({
+      title: "เกิดข้อผิดพลาด",
+      description: error.message,
+      status: "error",
+      variant: "destructive",
+    });
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <div className="text-center">
+          <h1 className="font-bold text-2xl text-black">เกิดข้อผิดพลาดในการดึงข้อมูล</h1>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -63,17 +77,16 @@ const Navbar = () => {
                   </button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>
-                  {cate &&
-                    cate.map((category) => (
-                      <DropdownMenuItem key={category.categoryId}>
-                        <Link
-                          href={`/category/${category.nameSlug}`}
-                          className="flex justify-between w-full px-4 py-2 text-left text-black hover:bg-gray-100"
-                        >
-                          {category.name}
-                        </Link>
-                      </DropdownMenuItem>
-                    ))}
+                  {categories?.map((items) => (
+                    <DropdownMenuItem key={items.categoryId}>
+                      <Link
+                        href={`/category/${items.nameSlug}`}
+                        className="flex justify-between w-full px-4 py-2 text-left text-black hover:bg-gray-100"
+                      >
+                        {items.name}
+                      </Link>
+                    </DropdownMenuItem>
+                  ))}
                   <DropdownMenuItem>
                     <Link
                       href="/products"
@@ -144,17 +157,16 @@ const Navbar = () => {
                 </form>
               </div>
               <div className="text-[#204d9c] font-bold px-3 py-2">หมวดหมู่</div>
-              {cate &&
-                cate.map((category) => (
-                  <Link
-                    href={`category/${category.nameSlug}`}
-                    key={category.categoryId}
-                  >
-                    <span className="block px-3 py-2 rounded-md text-base font-medium text-[#204d9c] hover:bg-gray-100">
-                      {category.name}
-                    </span>
-                  </Link>
-                ))}
+              {categories?.map((category) => (
+                <Link
+                  href={`category/${category.nameSlug}`}
+                  key={category.categoryId}
+                >
+                  <span className="block px-3 py-2 rounded-md text-base font-medium text-[#204d9c] hover:bg-gray-100">
+                    {category.name}
+                  </span>
+                </Link>
+              ))}
             </div>
           </div>
         )}

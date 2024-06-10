@@ -5,8 +5,7 @@ const prisma = new PrismaClient();
 
 export async function GET(request, { params }) {
   const { nameSlug } = params;
-  // console.log("nameSlug:", nameSlug);
-  
+
   try {
     const category = await prisma.category.findFirst({
       where: { nameSlug },
@@ -29,5 +28,7 @@ export async function GET(request, { params }) {
       { error: "Failed to fetch category" },
       { status: 500 }
     );
+  } finally {
+    await prisma.$disconnect();
   }
 }

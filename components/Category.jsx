@@ -1,6 +1,5 @@
 "use client";
-import useSWR from "swr";
-import fetcher from "@/lib/fetcher";
+import axios from "axios";
 import Link from "next/link";
 import Image from "next/image";
 import Slider from "react-slick";
@@ -8,6 +7,9 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { useToast } from "@/components/ui/use-toast";
 import Spinner from "./spinner/Spinner";
+import useSWR from 'swr';
+
+const fetcher = url => axios.get(url).then(res => res.data);
 
 const Category = () => {
   const settings = {
@@ -26,20 +28,37 @@ const Category = () => {
     fetcher
   );
 
-  if (error)
-    return toast({
+  if (error) {
+    toast({
       title: "เกิดข้อผิดพลาด",
       description: error.message,
       status: "error",
       variant: "destructive",
     });
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <div className="text-center">
+          <h1 className="font-bold text-2xl text-black">เกิดข้อผิดพลาดในการดึงข้อมูล</h1>
+        </div>
+      </div>
+    );
+  }
 
-  if (!category)
+  if (!category) {
     return (
       <div className="flex justify-center items-center h-screen">
         <Spinner />
       </div>
     );
+  }
+
+  if (!Array.isArray(category)) {
+    return (
+      <div className="text-center mt-10">
+        <h1 className="font-bold text-2xl text-black">ไม่มีหมวดหมู่ที่จะแสดง</h1>
+      </div>
+    );
+  }
 
   return (
     <>
@@ -52,13 +71,13 @@ const Category = () => {
           <Slider {...settings}>
             {category.map((cateItem) => (
               <div key={cateItem.categoryId} className="p-4">
-                <div className="bg-[#f1f0ed] p-6 text-center rounded-md font-medium hover:shadow-2xl transition-all ease-in-out duration-300">
+                <div className="bg-[#f1f0ed] p-6 text-center rounded-md font-medium shadow-lg hover:shadow-2xl transition-all ease-in-out duration-300">
                   <Link
                     href={`/category/${cateItem.nameSlug}`}
                     className="font-bold"
                   >
                     <Image
-                      src={cateItem.cateImg }
+                      src={cateItem.cateImg}
                       alt={cateItem.name}
                       width={100}
                       height={100}
@@ -84,7 +103,7 @@ const Category = () => {
                   className="font-bold flex flex-col items-center"
                 >
                   <Image
-                    src={item.cateImg }
+                    src={item.cateImg}
                     alt={item.name}
                     width={100}
                     height={100}

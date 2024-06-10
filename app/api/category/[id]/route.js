@@ -4,7 +4,7 @@ import { createClient } from "@supabase/supabase-js";
 import { v4 as uuidv4 } from "uuid";
 import { Mutex } from "async-mutex";
 import path from "path";
-
+import redis from "@/lib/redis";
 const prisma = new PrismaClient();
 const mutex = new Mutex();
 
@@ -46,7 +46,9 @@ export const PUT = async (request, { params }) => {
         );
       }
 
-      updateData.cateImg = supabase.storage.from("categories").getPublicUrl(fileName).data.publicUrl;
+      updateData.cateImg = supabase.storage
+        .from("categories")
+        .getPublicUrl(fileName).data.publicUrl;
 
       const oldCategory = await prisma.category.findUnique({
         where: { categoryId: parseInt(id, 10) },
@@ -68,7 +70,7 @@ export const PUT = async (request, { params }) => {
       where: { categoryId: parseInt(id, 10) },
       data: updateData,
     });
-
+    await redis.del("categories");
     return NextResponse.json(updatedCategory, { status: 200 });
   } catch (error) {
     console.error("Error updating category:", error);
@@ -81,7 +83,6 @@ export const PUT = async (request, { params }) => {
     await prisma.$disconnect();
   }
 };
-
 
 export const DELETE = async (request, { params }) => {
   const release = await mutex.acquire();
@@ -118,7 +119,7 @@ export const DELETE = async (request, { params }) => {
         );
       }
     }
-
+    await redis.del("categories");
     return NextResponse.json(
       { message: "Category and image deleted successfully" },
       { status: 200 }
@@ -134,4 +135,3 @@ export const DELETE = async (request, { params }) => {
     await prisma.$disconnect();
   }
 };
-  

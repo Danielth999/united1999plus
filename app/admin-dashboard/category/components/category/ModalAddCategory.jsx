@@ -1,3 +1,4 @@
+"use client";
 import { useState } from "react";
 import axios from "axios";
 import {
@@ -35,6 +36,16 @@ const ModalAddCategory = ({ onCategoryAdded }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    const optimisticCategory = {
+      ...newCategory,
+      categoryId: Date.now(), // temporary ID for UI update
+      cateImg: previewImage,
+    };
+    onCategoryAdded((prevCategories) => [optimisticCategory, ...prevCategories]); // Optimistically update UI
+
+    setOpen(false); // Close the dialog immediately
+
     try {
       const formData = new FormData();
       formData.append("name", newCategory.name);
@@ -43,7 +54,7 @@ const ModalAddCategory = ({ onCategoryAdded }) => {
         formData.append("cateImg", newCategory.cateImg);
       }
 
-      await axios.post(
+      const response = await axios.post(
         `${process.env.NEXT_PUBLIC_API_URL}/api/category`,
         formData,
         {
@@ -52,10 +63,15 @@ const ModalAddCategory = ({ onCategoryAdded }) => {
           },
         }
       );
-      onCategoryAdded(); // Fetch categories again to update the list
-      setOpen(false); // Close the dialog
-      setNewCategory({ name: "", nameSlug: "", cateImg: null }); // Reset form
-      setPreviewImage(null); // Clear preview image
+
+      onCategoryAdded((prevCategories) =>
+        prevCategories.map((cat) =>
+          cat.categoryId === optimisticCategory.categoryId
+            ? { ...cat, categoryId: response.data.categoryId } // Update with real ID
+            : cat
+        )
+      );
+
       toast({
         title: "Success",
         description: "เพิ่มหมวดหมู่สำเร็จ",
@@ -64,6 +80,11 @@ const ModalAddCategory = ({ onCategoryAdded }) => {
         isClosable: true,
       });
     } catch (error) {
+      onCategoryAdded((prevCategories) =>
+        prevCategories.filter(
+          (cat) => cat.categoryId !== optimisticCategory.categoryId
+        )
+      ); // Revert UI change
       console.log("Error adding category:", error);
       toast({
         title: "Error",
@@ -72,6 +93,9 @@ const ModalAddCategory = ({ onCategoryAdded }) => {
         variant: "destructive",
         isClosable: true,
       });
+    } finally {
+      setNewCategory({ name: "", nameSlug: "", cateImg: null }); // Reset form
+      setPreviewImage(null); // Clear preview image
     }
   };
 

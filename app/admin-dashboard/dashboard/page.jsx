@@ -1,4 +1,4 @@
-'use client'
+"use client";
 import React from "react";
 import Dashboard from "./components/dashboard/Dashboard";
 import { useSession } from "next-auth/react";

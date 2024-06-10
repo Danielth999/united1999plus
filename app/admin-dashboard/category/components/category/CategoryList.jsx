@@ -1,6 +1,5 @@
 "use client";
 import { useState, useEffect } from "react";
-import useSWR from "swr";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { Pencil, Trash } from "lucide-react";
@@ -15,6 +14,7 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
+  CardFooter,
 } from "@/components/ui/card";
 import {
   Table,
@@ -29,28 +29,38 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import DeleteConfirmationDialog from "@/components/DeleteConfirmationDialog";
 
-const fetcher = (url) => axios.get(url).then((res) => res.data);
-
 const CategoryList = () => {
   const router = useRouter();
   const { toast } = useToast();
-
-  const {
-    data: categories,
-    error,
-    isLoading,
-    mutate,
-  } = useSWR(
-    `${process.env.NEXT_PUBLIC_API_URL}/api/category`,
-    fetcher
-  );
+  const [categories, setCategories] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   const [currentPage, setCurrentPage] = useState(1);
   const [categoriesPerPage] = useState(5);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [deleteCategory, setDeleteCategory] = useState(null);
+  const [selectedCategories, setSelectedCategories] = useState([]);
   const [isAlertOpen, setIsAlertOpen] = useState(false);
+  const [deleteMultiple, setDeleteMultiple] = useState(false);
+
+  const fetchCategories = async () => {
+    try {
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/category`
+      );
+      setCategories(response.data);
+      setIsLoading(false);
+    } catch (error) {
+      setError(error);
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchCategories();
+  }, []);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -68,20 +78,25 @@ const CategoryList = () => {
 
   const handleDelete = async () => {
     if (!deleteCategory) return;
+
+    const optimisticCategories = categories.filter(
+      (cat) => cat.categoryId !== deleteCategory.categoryId
+    );
+    setCategories(optimisticCategories); // Update UI optimistically
+    setDeleteCategory(null); // Clear the delete category state
+    setIsAlertOpen(false); // Close the alert dialog
+    toast({
+      title: "Success",
+      description: "ลบหมวดหมู่สำเร็จ",
+      status: "success",
+      variant: "success",
+      isClosable: true,
+    });
+
     try {
       await axios.delete(
         `${process.env.NEXT_PUBLIC_API_URL}/api/category/${deleteCategory.categoryId}`
       );
-      mutate(); // Refresh the category list
-      setDeleteCategory(null); // Clear the delete category state
-      setIsAlertOpen(false); // Close the alert dialog
-      toast({
-        title: "Success",
-        description: "ลบหมวดหมู่สำเร็จ",
-        status: "success",
-        variant: "success",
-        isClosable: true,
-      });
     } catch (error) {
       console.error("Error deleting category:", error);
       toast({
@@ -91,6 +106,44 @@ const CategoryList = () => {
         variant: "destructive",
         isClosable: true,
       });
+      // Revert the change in case of an error
+      setCategories(categories);
+    }
+  };
+
+  const handleDeleteSelected = async () => {
+    const optimisticCategories = categories.filter(
+      (cat) => !selectedCategories.includes(cat.categoryId)
+    );
+    setCategories(optimisticCategories); // Update UI optimistically
+    setSelectedCategories([]); // Clear selected categories state
+    setDeleteMultiple(false);
+
+    try {
+      await Promise.all(
+        selectedCategories.map((categoryId) =>
+          axios.delete(
+            `${process.env.NEXT_PUBLIC_API_URL}/api/category/${categoryId}`
+          )
+        )
+      );
+
+      toast({
+        title: "ลบรายการที่เลือกสำเร็จ",
+        description: `ลบรายการที่เลือกสำเร็จ`,
+        variant: "success",
+        status: "success",
+      });
+    } catch (error) {
+      console.error("Error deleting selected categories:", error);
+      toast({
+        title: "ลบรายการที่เลือกไม่สำเร็จ",
+        description: "เกิดข้อผิดพลาดในการลบ",
+        variant: "destructive",
+        status: "error",
+      });
+      // Revert the change in case of an error
+      setCategories(categories);
     }
   };
 
@@ -101,6 +154,16 @@ const CategoryList = () => {
   const handleDeleteClick = (category) => {
     setDeleteCategory(category);
     setIsAlertOpen(true); // Open the alert dialog
+  };
+
+  const handleCheckboxChange = (categoryId) => {
+    setSelectedCategories((prevSelectedCategories) => {
+      if (prevSelectedCategories.includes(categoryId)) {
+        return prevSelectedCategories.filter((id) => id !== categoryId);
+      } else {
+        return [...prevSelectedCategories, categoryId];
+      }
+    });
   };
 
   // Logic for displaying categories
@@ -129,7 +192,7 @@ const CategoryList = () => {
         <div className="flex items-center justify-between">
           <CardDescription>ค้นหาและจัดการหมวดหมู่ในระบบ</CardDescription>
           <div>
-            <ModalAddCategory onCategoryAdded={mutate} />
+            <ModalAddCategory onCategoryAdded={fetchCategories} />
           </div>
         </div>
       </CardHeader>
@@ -157,6 +220,24 @@ const CategoryList = () => {
           <Table>
             <TableHeader>
               <TableRow>
+                <TableHead>
+                  <input
+                    type="checkbox"
+                    onChange={(e) => {
+                      if (e.target.checked) {
+                        setSelectedCategories(
+                          currentCategories.map((c) => c.categoryId)
+                        );
+                      } else {
+                        setSelectedCategories([]);
+                      }
+                    }}
+                    checked={
+                      selectedCategories.length === currentCategories.length &&
+                      currentCategories.length > 0
+                    }
+                  />
+                </TableHead>
                 <TableHead>#ID</TableHead>
                 <TableHead>รูปภาพ</TableHead>
                 <TableHead>ชื่อหมวดหมู่</TableHead>
@@ -169,6 +250,17 @@ const CategoryList = () => {
               currentCategories.length > 0 ? (
                 currentCategories.map((category) => (
                   <TableRow key={category.categoryId}>
+                    <TableCell>
+                      <input
+                        type="checkbox"
+                        onChange={() =>
+                          handleCheckboxChange(category.categoryId)
+                        }
+                        checked={selectedCategories.includes(
+                          category.categoryId
+                        )}
+                      />
+                    </TableCell>
                     <TableCell>{category.categoryId}</TableCell>
                     <TableCell>
                       {category.cateImg ? (
@@ -203,7 +295,7 @@ const CategoryList = () => {
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan="5" className="text-center">
+                  <TableCell colSpan="6" className="text-center">
                     No categories found
                   </TableCell>
                 </TableRow>
@@ -212,16 +304,33 @@ const CategoryList = () => {
           </Table>
         </div>
       </CardContent>
+      {selectedCategories.length > 0 && (
+        <CardFooter className="flex justify-between items-center">
+          <span>{selectedCategories.length} รายการที่เลือก</span>
+          <Button
+            variant="destructive"
+            onClick={() => setDeleteMultiple(true)}
+          >
+            ลบรายการที่เลือก
+          </Button>
+        </CardFooter>
+      )}
       {selectedCategory && (
         <ModalEditCategory
           category={selectedCategory}
-          onCategoryUpdated={mutate}
+          onCategoryUpdated={fetchCategories}
         />
       )}
       <DeleteConfirmationDialog
         open={isAlertOpen}
         onClose={() => setIsAlertOpen(false)}
         onConfirm={handleDelete}
+      />
+      <DeleteConfirmationDialog
+        open={deleteMultiple}
+        onClose={() => setDeleteMultiple(false)}
+        onConfirm={handleDeleteSelected}
+        message={`คุณแน่ใจหรือไม่ว่าต้องการลบ ${selectedCategories.length} รายการนี้?`}
       />
     </Card>
   );

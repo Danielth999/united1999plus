@@ -1,6 +1,5 @@
 "use client";
-import { useEffect } from "react";
-import useSWR from "swr";
+import axios from "axios";
 import Image from "next/image";
 import {
   Card,
@@ -12,33 +11,30 @@ import {
 import { Badge } from "@/components/ui/badge";
 import Loading from "@/components/spinner/Spinner";
 import Link from "next/link";
-import fetcher from "@/lib/fetcher";
+import useSWR from 'swr';
+
+const fetcher = url => axios.get(url).then(res => res.data);
 
 const CleaningProducts = () => {
-  const {
-    data: category,
-    error,
-    isValidating,
-  } = useSWR(
+  const { data: category, error } = useSWR(
     `${process.env.NEXT_PUBLIC_API_URL}/api/category/filter/cleaning-products`,
     fetcher,
     {
-      revalidateOnFocus: true,
-      refreshInterval: 30000, // อัปเดตข้อมูลทุกๆ 30 วินาที
-      dedupingInterval: 60000, // อนุญาตให้รีเฟรชข้อมูลใหม่ทุกๆ 60 วินาที
+  
+      
+      dedupingInterval: 60000, // เ
     }
   );
 
-  const products = category?.Product || [];
-
   if (error) return <div>Failed to load</div>; // ถ้ามี error ให้แสดงข้อความว่า "Failed to load"
-  if (!category)
-    // ถ้าไม่มีข้อมูลให้แสดง spinner
+  if (!category) // ถ้าไม่มีข้อมูลให้แสดง spinner
     return (
       <div className="flex justify-center">
         <Loading />
       </div>
     );
+
+  const products = category?.Product || [];
 
   return (
     <>
@@ -52,7 +48,7 @@ const CleaningProducts = () => {
               key={item.productId}
               className="hover:shadow-xl border flex flex-col"
             >
-             <Link href={`/products/${item.productId}`}>
+              <Link href={`/products/${item.productId}`}>
                 <CardHeader className="border-b w-full h-60 relative">
                   <Image
                     src={item.imageUrl}

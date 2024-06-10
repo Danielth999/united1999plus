@@ -1,12 +1,11 @@
 "use client";
 import React, { useState } from "react";
-import useSWR from "swr";
+import axios from "axios";
 import Image from "next/image";
 import Link from "next/link";
 import Navbar from "@/components/nav/Navbar";
 import Footer from "@/components/Footer";
 import Spinner from "@/components/spinner/Spinner";
-import Pagination from "@/components/Pagination";
 import {
   Card,
   CardContent,
@@ -15,24 +14,24 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import useSWR from "swr";
+import Pagination from "@/components/pagination";
 
-const fetcher = (url) => fetch(url).then((res) => res.json());
+const fetcher = (url) => axios.get(url).then((res) => res.data);
 
 const ProductPage = () => {
-  const [currentPage, setCurrentPage] = useState(1);
-  const productsPerPage = 10;
-
-  const { data, error, isValidating } = useSWR(
+  const { data, error } = useSWR(
     `${process.env.NEXT_PUBLIC_API_URL}/api/products`,
-    fetcher,
-    {
-      revalidateOnFocus: true,
-      refreshInterval: 30000, // อัปเดตข้อมูลทุกๆ 30 วินาที
-      dedupingInterval: 60000,
-    }
+    fetcher
   );
+  const [currentPage, setCurrentPage] = useState(1);
+  const productsPerPage = 20;
 
-  if (isValidating) {
+  if (error) {
+    return <div>Error loading products: {error.message}</div>;
+  }
+
+  if (!data) {
     return (
       <div className="grid place-items-center items-center h-screen">
         <Spinner />
@@ -40,13 +39,20 @@ const ProductPage = () => {
     );
   }
 
-  if (error) {
-    return <div>Error loading products.</div>;
-  }
+  // Debugging: ตรวจสอบข้อมูลที่ได้จาก API
+  console.log("Data from API:", data);
 
-  const products = data?.products || [];
-  const totalProducts = data?.totalProducts || 0;
-  const totalPages = Math.ceil(totalProducts / productsPerPage);
+  // เนื่องจากข้อมูลที่ได้จาก API เป็น array แล้ว
+  const products = data;
+
+  // Logic for displaying current products
+  const indexOfLastProduct = currentPage * productsPerPage;
+  const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
+  const currentProducts = products.slice(
+    indexOfFirstProduct,
+    indexOfLastProduct
+  );
+  const totalPages = Math.ceil(products.length / productsPerPage);
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
@@ -63,7 +69,7 @@ const ProductPage = () => {
           <h1 className="text-3xl">สินค้าทั้งหมด</h1>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 mt-5">
-          {products.map((item) => (
+          {currentProducts.map((item) => (
             <Card
               key={item.productId}
               className="hover:shadow-xl border flex flex-col"
@@ -97,7 +103,7 @@ const ProductPage = () => {
                   variant="customSecondary"
                   className="min-w-[120px] text-center line-clamp-1"
                 >
-                  {item.Category.name}
+                  {item.Category?.name || "Unknown"}
                 </Badge>
               </CardFooter>
             </Card>

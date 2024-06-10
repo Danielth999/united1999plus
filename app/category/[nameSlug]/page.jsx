@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
 import useSWR from "swr";
+import axios from "axios";
 import { useParams } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
@@ -16,10 +16,11 @@ import {
 import { Badge } from "@/components/ui/badge";
 import Loading from "@/components/spinner/Spinner";
 
-const fetcher = (url) => fetch(url).then((res) => res.json());
+const fetcher = url => axios.get(url).then(res => res.data);
 
 const CategoryPage = () => {
   const { nameSlug } = useParams();
+  
   const { data: category, error } = useSWR(
     `${process.env.NEXT_PUBLIC_API_URL}/api/category/filter/${nameSlug}`,
     fetcher

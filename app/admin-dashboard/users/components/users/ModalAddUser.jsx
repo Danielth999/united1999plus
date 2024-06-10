@@ -44,22 +44,27 @@ const ModalAddUser = ({ onUserAdded }) => {
         title: "Error",
         description: "กรุณากรอกข้อมูลให้ครบทุกช่อง",
         status: "error",
+        variant:"success",
         isClosable: true,
       });
       return;
     }
 
+    // Optimistic UI update
+    const newUserOptimistic = { ...newUser, userId: Date.now() }; // ใช้ Date.now() เพื่อให้ได้ ID ชั่วคราว
+    onUserAdded(newUserOptimistic);
+    setNewUser({ email: "", username: "", password: "", role: "user" }); // Reset form
+    setOpen(false); // Close the dialog
+    toast({
+      title: "Success",
+      description: "เพิ่มผู้ใช้ใหม่สำเร็จ",
+      status: "success",
+      variant:"success",
+      isClosable: true,
+    });
+
     try {
       await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/api/users`, newUser);
-      onUserAdded(); // Fetch users again to update the list
-      setNewUser({ email: "", username: "", password: "", role: "user" }); // Reset form
-      setOpen(false); // Close the dialog
-      toast({
-        title: "Success",
-        description: "เพิ่มผู้ใช้ใหม่สำเร็จ",
-        status: "success",
-        isClosable: true,
-      });
     } catch (error) {
       console.log("Error adding user:", error);
       toast({
@@ -89,7 +94,6 @@ const ModalAddUser = ({ onUserAdded }) => {
               value={newUser.email}
               onChange={handleChange}
               placeholder="Email"
-              
             />
             <Input
               type="text"
@@ -97,7 +101,6 @@ const ModalAddUser = ({ onUserAdded }) => {
               value={newUser.username}
               onChange={handleChange}
               placeholder="Username"
-              
             />
             <Input
               type="password"
@@ -105,13 +108,11 @@ const ModalAddUser = ({ onUserAdded }) => {
               value={newUser.password}
               onChange={handleChange}
               placeholder="Password"
-              
             />
             <Select
               name="role"
               value={newUser.role}
               onValueChange={(value) => setNewUser({ ...newUser, role: value })}
-              
             >
               <SelectTrigger className="w-full">
                 <SelectValue placeholder="สิทธิ์การใช้งาน" />

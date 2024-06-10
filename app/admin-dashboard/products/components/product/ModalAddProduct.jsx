@@ -16,6 +16,7 @@ import { Input } from "@/components/ui/input";
 import Spinner from "@/components/spinner/Spinner";
 import { Textarea } from "@/components/ui/textarea";
 import Image from "next/image";
+import { Checkbox } from "@/components/ui/checkbox";
 
 const ModalAddProduct = ({ onProductAdded }) => {
   const { toast } = useToast();
@@ -25,6 +26,10 @@ const ModalAddProduct = ({ onProductAdded }) => {
     name: "",
     description: "",
     price: "",
+    stock: "",
+    color: "",
+    size: "",
+    isPublished: false,
     categoryId: "",
     image: null,
   });
@@ -49,10 +54,10 @@ const ModalAddProduct = ({ onProductAdded }) => {
   }, []);
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
+    const { name, value, type, checked } = e.target;
     setFormData((prevData) => ({
       ...prevData,
-      [name]: value,
+      [name]: type === "checkbox" ? checked : value,
     }));
   };
 
@@ -69,22 +74,56 @@ const ModalAddProduct = ({ onProductAdded }) => {
     e.preventDefault();
 
     // Check if all fields are filled
-    if (!formData.name || !formData.description || !formData.price || !formData.categoryId || !formData.image) {
+    if (
+      !formData.name ||
+      !formData.description ||
+      !formData.price ||
+      !formData.categoryId ||
+      !formData.image ||
+      !formData.stock ||
+      !formData.color ||
+      !formData.size
+    ) {
       toast({
         title: "Error",
         description: "กรุณากรอกข้อมูลให้ครบทุกช่อง",
         status: "error",
         variant: "destructive",
-      
         isClosable: true,
       });
       return;
     }
 
+    const optimisticProduct = {
+      ...formData,
+      productId: Date.now(), // ใช้ timestamp เป็น productId ชั่วคราว
+      imageUrl: previewImage,
+    };
+
+    onProductAdded(optimisticProduct); // อัปเดต UI ทันที
+
+    setOpen(false); // ปิด Dialog
+    setPreviewImage(null); // ล้างภาพตัวอย่าง
+    setFormData({
+      name: "",
+      description: "",
+      price: "",
+      stock: "",
+      color: "",
+      size: "",
+      isPublished: false,
+      categoryId: "",
+      image: null,
+    });
+
     const data = new FormData();
     data.append("name", formData.name);
     data.append("description", formData.description);
     data.append("price", formData.price);
+    data.append("stock", formData.stock);
+    data.append("color", formData.color);
+    data.append("size", formData.size);
+    data.append("isPublished", formData.isPublished);
     data.append("categoryId", formData.categoryId);
     if (formData.image) {
       data.append("image", formData.image);
@@ -106,19 +145,9 @@ const ModalAddProduct = ({ onProductAdded }) => {
           description: "เพิ่มสินค้าสำเร็จ",
           status: "success",
           variant: "success",
-        
           isClosable: true,
         });
-        onProductAdded(response.data);
-        setOpen(false); // Close the dialog
-        setPreviewImage(null); // Clear preview image
-        setFormData({
-          name: "",
-          description: "",
-          price: "",
-          categoryId: "",
-          image: null,
-        });
+        onProductAdded(response.data, optimisticProduct.productId); // อัปเดต UI ด้วย ID ที่ถูกต้อง
       }
     } catch (error) {
       console.error("Error uploading product:", error);
@@ -127,9 +156,10 @@ const ModalAddProduct = ({ onProductAdded }) => {
         description: "เกิดข้อผิดพลาดในการเพิ่มสินค้า",
         status: "error",
         variant: "destructive",
-      
         isClosable: true,
       });
+      // ย้อนกลับการเปลี่ยนแปลงใน UI
+      onProductAdded(null, optimisticProduct.productId);
     }
   };
 
@@ -152,35 +182,47 @@ const ModalAddProduct = ({ onProductAdded }) => {
           </TabsList>
           <form onSubmit={handleSubmit} encType="multipart/form-data">
             <TabsContent value="info">
-              <div className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <Input
                   type="text"
                   name="name"
                   value={formData.name}
                   onChange={handleChange}
                   placeholder="ชื่อผลิตภัณฑ์"
-                 
                 />
-                <Textarea
-                  name="description"
-                  value={formData.description}
-                  onChange={handleChange}
-                  placeholder="รายละเอียด"
-                 
-                />
+
                 <Input
                   type="number"
                   name="price"
                   value={formData.price}
                   onChange={handleChange}
                   placeholder="ราคา"
-                 
+                />
+                <Input
+                  type="text"
+                  name="stock"
+                  value={formData.stock}
+                  onChange={handleChange}
+                  placeholder="จำนวน"
+                />
+                <Input
+                  type="text"
+                  name="color"
+                  value={formData.color}
+                  onChange={handleChange}
+                  placeholder="สี"
+                />
+                <Input
+                  type="text"
+                  name="size"
+                  value={formData.size}
+                  onChange={handleChange}
+                  placeholder="ขนาด"
                 />
                 <select
                   name="categoryId"
                   value={formData.categoryId}
                   onChange={handleChange}
-                 
                   className="w-full border rounded p-2"
                 >
                   <option value="" disabled>
@@ -195,16 +237,31 @@ const ModalAddProduct = ({ onProductAdded }) => {
                     </option>
                   ))}
                 </select>
+                <Textarea
+                  name="description"
+                  value={formData.description}
+                  onChange={handleChange}
+                  placeholder="รายละเอียด"
+                  className="col-span-2"
+                />
+                <div className="flex items-center space-x-2 col-span-1 md:col-span-2">
+                  <Checkbox
+                    name="isPublished"
+                    checked={formData.isPublished}
+                    onCheckedChange={(checked) =>
+                      setFormData((prevData) => ({
+                        ...prevData,
+                        isPublished: checked,
+                      }))
+                    }
+                  />
+                  <label>เผยแพร่</label>
+                </div>
               </div>
             </TabsContent>
             <TabsContent value="upload">
               <div className="space-y-4">
-                <Input
-                  type="file"
-                  name="image"
-                  onChange={handleFileChange}
-                 
-                />
+                <Input type="file" name="image" onChange={handleFileChange} />
                 {previewImage && (
                   <div className="flex justify-center">
                     <Image

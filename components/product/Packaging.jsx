@@ -1,6 +1,6 @@
 "use client";
-import { useEffect } from "react";
-import useSWR from "swr";
+import { useState } from "react";
+import axios from "axios";
 import Image from "next/image";
 import {
   Card,
@@ -12,24 +12,22 @@ import {
 import { Badge } from "@/components/ui/badge";
 import Loading from "@/components/spinner/Spinner";
 import Link from "next/link";
-import fetcher from "@/lib/fetcher";
+import useSWR from "swr";
 
-const OfficeSupplies = () => {
-  const {
-    data: category,
-    error,
-    isValidating,
-  } = useSWR(
+const fetcher = (url) => axios.get(url).then((res) => res.data);
+
+const Packaging = () => {
+  const { data: category, error } = useSWR(
     `${process.env.NEXT_PUBLIC_API_URL}/api/category/filter/packaging`,
     fetcher,
     {
-      revalidateOnFocus: true,
-      refreshInterval: 30000, // อัปเดตข้อมูลทุกๆ 30 วินาที
-      dedupingInterval: 60000, // อนุญาตให้รีเฟรชข้อมูลใหม่ทุกๆ 60 วินาที
+     
+    
+      dedupingInterval: 60000, // เก็บ cache ไว้ใน 60 วินาที เพื่อป้องกันการดึงข้อมูลซ้ำเกินไป
+
+
     }
   );
-
-  const products = category?.Product || [];
 
   if (error) return <div>Failed to load</div>; // ถ้ามี error ให้แสดงข้อความว่า "Failed to load"
   if (!category)
@@ -40,6 +38,8 @@ const OfficeSupplies = () => {
       </div>
     );
 
+  const products = category?.Product || [];
+
   return (
     <>
       <div className="mt-10">
@@ -48,7 +48,10 @@ const OfficeSupplies = () => {
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 mt-5">
           {products.map((item) => (
-            <Card key={item.productId} className="hover:shadow-xl border overflow-hidden ">
+            <Card
+              key={item.productId}
+              className="hover:shadow-xl border overflow-hidden "
+            >
               <Link href={`/products/${item.productId}`}>
                 <CardHeader className="border-b w-full h-60 relative">
                   <Image
@@ -87,4 +90,4 @@ const OfficeSupplies = () => {
   );
 };
 
-export default OfficeSupplies;
+export default Packaging;

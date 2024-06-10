@@ -21,18 +21,20 @@ const Sidebar = ({ isExpanded }) => {
     >
       <div className="p-4">
         <Link href="/">
-          <span className="text-2xl text-center font-bold">United 1999 Plus</span>
+          <span className="text-2xl text-center align-middle   font-bold">
+            United 1999 Plus
+          </span>
         </Link>
       </div>
       <nav className="mt-4 flex-grow">
         <Link href="/admin-dashboard/dashboard">
           <div
-            className={`flex items-center py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700 ${
+            className={`flex  items-center py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700 ${
               pathname === "/admin-dashboard/dashboard" ? "bg-blue-500" : ""
             }`}
           >
             <Home className="mr-3" />
-            {isExpanded && <span>Dashboard</span>}
+            {isExpanded && <span className="text-xl">แดชบอร์ด</span>}
           </div>
         </Link>
         <Link href="/admin-dashboard/users">
@@ -42,7 +44,7 @@ const Sidebar = ({ isExpanded }) => {
             }`}
           >
             <Users className="mr-3" />
-            {isExpanded && <span>Users</span>}
+            {isExpanded && <span className="text-xl">ผู้ใช้</span>}
           </div>
         </Link>
         <Link href="/admin-dashboard/products">
@@ -52,7 +54,7 @@ const Sidebar = ({ isExpanded }) => {
             }`}
           >
             <Package className="mr-3" />
-            {isExpanded && <span>Products</span>}
+            {isExpanded && <span className="text-xl">สินค้า</span>}
           </div>
         </Link>
         <Link href="/admin-dashboard/category">
@@ -62,16 +64,16 @@ const Sidebar = ({ isExpanded }) => {
             }`}
           >
             <Tag className="mr-3" />
-            {isExpanded && <span>Categories</span>}
+            {isExpanded && <span className="text-xl">หมวดหมู่</span>}
           </div>
         </Link>
         {/* signout */}
         <div
           className="flex items-center py-2.5 px-4 text-red-500 rounded transition duration-200 hover:bg-gray-700 cursor-pointer"
-          onClick={() => signOut({ callbackUrl: '/' })}
+          onClick={() => signOut({ callbackUrl: "/" })}
         >
           <SquareArrowOutDownLeft className="mr-3" />
-          {isExpanded && <span>ออกจากระบบ</span>}
+          {isExpanded && <span className="text-xl">ออกจากระบบ</span>}
         </div>
       </nav>
     </div>

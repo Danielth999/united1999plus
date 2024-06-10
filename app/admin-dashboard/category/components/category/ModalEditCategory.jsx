@@ -46,6 +46,17 @@ const ModalEditCategory = ({ category, onCategoryUpdated }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const optimisticCategory = {
+      ...category,
+      ...editCategory,
+      cateImg: previewImage,
+    };
+    onCategoryUpdated((prevCategories) =>
+      prevCategories.map((cat) =>
+        cat.categoryId === category.categoryId ? optimisticCategory : cat
+      )
+    ); // Optimistically update UI
+
     try {
       const formData = new FormData();
       formData.append("name", editCategory.name);
@@ -63,8 +74,7 @@ const ModalEditCategory = ({ category, onCategoryUpdated }) => {
           },
         }
       );
-      onCategoryUpdated(); // Fetch categories again to update the list
-      setOpen(false); // Close the dialog
+
       toast({
         title: "Success",
         description: "แก้ไขหมวดหมู่สำเร็จ",
@@ -73,6 +83,11 @@ const ModalEditCategory = ({ category, onCategoryUpdated }) => {
         isClosable: true,
       });
     } catch (error) {
+      onCategoryUpdated((prevCategories) =>
+        prevCategories.map((cat) =>
+          cat.categoryId === category.categoryId ? category : cat
+        )
+      ); // Revert UI change
       console.log("Error updating category:", error);
       toast({
         title: "Error",
@@ -81,6 +96,8 @@ const ModalEditCategory = ({ category, onCategoryUpdated }) => {
         variant: "destructive",
         isClosable: true,
       });
+    } finally {
+      setOpen(false); // Close the dialog
     }
   };
 
@@ -143,7 +160,7 @@ const ModalEditCategory = ({ category, onCategoryUpdated }) => {
                 onChange={handleFileChange}
               />
               {previewImage && (
-                <div className="mt-2  flex justify-center">
+                <div className="mt-2 flex justify-center">
                   <img
                     src={previewImage}
                     alt="Preview"

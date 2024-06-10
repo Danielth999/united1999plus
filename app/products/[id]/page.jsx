@@ -1,18 +1,34 @@
 "use client";
+import { useState, useEffect } from "react";
+import axios from "axios";
 import Image from "next/image";
 import { useParams } from "next/navigation";
-import useSWR from "swr";
 import Spinner from "@/components/spinner/Spinner";
 import Navbar from "@/components/nav/Navbar";
 import BreadcrumbComponent from "../components/Breadcrumb"; // นำเข้าจากตำแหน่งที่ถูกต้อง
-import fetcher from "@/lib/fetcher"; // ฟังก์ชัน fetcher สำหรับใช้กับ SWR
 
 const ViewProduct = () => {
   const { id } = useParams();
-  const { data: product, error } = useSWR(
-    `${process.env.NEXT_PUBLIC_API_URL}/api/products/${id}`,
-    fetcher
-  );
+  const [product, setProduct] = useState(null);
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchProduct = async () => {
+      try {
+        const response = await axios.get(
+          `${process.env.NEXT_PUBLIC_API_URL}/api/products/${id}`
+        );
+        setProduct(response.data);
+      } catch (err) {
+        setError(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProduct();
+  }, [id]);
 
   if (error)
     return (
@@ -24,7 +40,7 @@ const ViewProduct = () => {
       </>
     );
 
-  if (!product)
+  if (loading)
     return (
       <>
         <Navbar />

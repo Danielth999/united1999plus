@@ -29,9 +29,12 @@ model Product {
   description String
   createdAt   DateTime @default(now())
   price       Float
+  stock       String
+  color       String
+  size        String
+  isPublished Boolean  @default(false)
   productId   Int      @id @default(autoincrement())
-  updatedAt   DateTime @updatedAt
-  imageUrl    String?
+  imageUrl    String
   categoryId  Int
   Category    Category @relation(fields: [categoryId], references: [categoryId])
 }

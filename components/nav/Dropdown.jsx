@@ -1,6 +1,5 @@
 "use client";
 import React from "react";
-import useSWR from "swr";
 import Link from "next/link";
 import { LayoutGrid, ChevronRight } from "lucide-react";
 import {
@@ -9,13 +8,15 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import fetcher from "@/lib/fetcher";  
+import useSWR from 'swr';
+import axios from 'axios';
+
+const fetcher = url => axios.get(url).then(res => res.data);
 
 const Dropdown = () => {
-  const { data: categories, error } = useSWR("/api/category", fetcher);
+  const { data: categories, error } = useSWR('/api/category', fetcher);
 
   if (error) {
-    console.error("Error fetching categories:", error);
     return <div>Failed to load categories</div>;
   }
 
