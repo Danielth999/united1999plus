@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import useSWR from "swr";
-import Pagination from "@/components/Pagination";
+import PaginationComponent from "@/components/Pagination";
 
 const fetcher = (url) => axios.get(url).then((res) => res.data);
 
@@ -110,7 +110,7 @@ const ProductPage = () => {
           ))}
         </div>
         <div className="flex justify-center mt-5">
-          <Pagination
+          <PaginationComponent
             totalPages={totalPages}
             currentPage={currentPage}
             onPageChange={handlePageChange}
