@@ -87,17 +87,18 @@ export async function POST(req) {
       );
     }
 
-    const fileName = `${uuidv4()}.png`;
+    const fileName = `${uuidv4()}.webp`;
 
-    // บีบอัดรูปภาพ
+    // บีบอัดรูปภาพและแปลงเป็น .webp
     const buffer = await sharp(await image.arrayBuffer())
       .resize({ width: 800 }) // ปรับขนาดรูปภาพ
+      .webp() // แปลงเป็น .webp
       .toBuffer();
 
     const { error: uploadError } = await supabase.storage
       .from("products")
       .upload(fileName, buffer, {
-        contentType: "image/png",
+        contentType: "image/webp",
       });
 
     if (uploadError) {
