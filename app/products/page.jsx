@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import useSWR from "swr";
-import Pagination from "@/components/pagination";
+import Pagination from "@/components/Pagination";
 
 const fetcher = (url) => axios.get(url).then((res) => res.data);
 
