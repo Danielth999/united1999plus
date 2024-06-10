@@ -5,11 +5,33 @@ import path from "path";
 import { createClient } from "@supabase/supabase-js";
 import redis from "@/lib/redis";
 import { v4 as uuidv4 } from "uuid";
+import sharp from "sharp";
+
 const prisma = new PrismaClient();
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 const supabase = createClient(supabaseUrl, supabaseKey);
 const mutex = new Mutex();
+const CACHE_EXPIRATION = 60 * 30; // 30 minutes
+
+// Helper function to get or set cache
+async function getOrSetCache(key, cb) {
+  const cachedData = await redis.get(key); // ตรวจสอบว่ามีข้อมูลใน cache หรือไม่
+  if (cachedData) {
+    try {
+      return JSON.parse(cachedData); // ถ้ามีข้อมูลใน cache ให้คืนค่าข้อมูลนั้น
+    } catch (error) {
+      console.error('Error parsing cached data:', error);
+      // ถ้ามีข้อผิดพลาดในการแปลง JSON แสดงว่า cache อาจมีปัญหา
+      await redis.del(key); // ลบข้อมูลใน cache ที่ไม่ถูกต้อง
+    }
+  }
+
+  const freshData = await cb(); // ถ้าไม่มีข้อมูลใน cache ให้เรียกใช้ callback เพื่อดึงข้อมูลใหม่
+  await redis.set(key, JSON.stringify(freshData), 'EX', CACHE_EXPIRATION); // เก็บข้อมูลใหม่ลงใน cache พร้อมตั้งเวลาหมดอายุ
+  return freshData; // คืนค่าข้อมูลใหม่
+}
+
 export async function GET(request, { params }) {
   const { nameSlug } = params;
 
@@ -89,12 +111,17 @@ export const PUT = async (request, { params }) => {
 
       if (image && image.name) {
         const imageBuffer = Buffer.from(await image.arrayBuffer());
-        const fileName = `${uuidv4()}.png`;
+        const fileName = `${uuidv4()}.webp`;
+
+        const buffer = await sharp(imageBuffer)
+          .resize({ width: 800 }) // Resize image
+          .webp() // Convert to webp
+          .toBuffer();
 
         const { data, error: uploadError } = await supabase.storage
           .from("products")
-          .upload(fileName, imageBuffer, {
-            contentType: "image/png",
+          .upload(fileName, buffer, {
+            contentType: "image/webp",
           });
 
         if (uploadError) {
@@ -209,21 +236,3 @@ export const DELETE = async (request, { params }) => {
     await prisma.$disconnect();
   }
 };
-
-// Helper function to get or set cache
-async function getOrSetCache(key, cb) {
-  const cachedData = await redis.get(key); // ตรวจสอบว่ามีข้อมูลใน cache หรือไม่
-  if (cachedData) {
-    try {
-      return JSON.parse(cachedData); // ถ้ามีข้อมูลใน cache ให้คืนค่าข้อมูลนั้น
-    } catch (error) {
-      console.error('Error parsing cached data:', error);
-      // ถ้ามีข้อผิดพลาดในการแปลง JSON แสดงว่า cache อาจมีปัญหา
-      await redis.del(key); // ลบข้อมูลใน cache ที่ไม่ถูกต้อง
-    }
-  }
-
-  const freshData = await cb(); // ถ้าไม่มีข้อมูลใน cache ให้เรียกใช้ callback เพื่อดึงข้อมูลใหม่
-  await redis.set(key, JSON.stringify(freshData), 'EX', CACHE_EXPIRATION); // เก็บข้อมูลใหม่ลงใน cache พร้อมตั้งเวลาหมดอายุ
-  return freshData; // คืนค่าข้อมูลใหม่
-}
