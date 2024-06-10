@@ -93,7 +93,7 @@ export const PUT = async (request, { params }) => {
       const name = formData.get("name");
       const description = formData.get("description");
       const price = parseFloat(formData.get("price"));
-      const stock = parseInt(formData.get("stock"), 10);
+      const stock = formData.get("stock");
       const color = formData.get("color");
       const size = formData.get("size");
       const categoryId = parseInt(formData.get("categoryId"), 10);
