@@ -136,7 +136,7 @@ const ProductPage = () => {
           <h1 className="text-3xl">
             {searchQuery ? (
               <>
-                ผลการค้นหา{' '}
+                ผลการค้นหา{" "}
                 <span className="text-orange-500">
                   '{searchQuery}' ({resultsCount})
                 </span>
@@ -147,7 +147,10 @@ const ProductPage = () => {
           </h1>
         </div>
         <Suspense fallback={<Spinner />}>
-          <ProductList searchQuery={searchQuery} setResultsCount={setResultsCount} />
+          <ProductList
+            searchQuery={searchQuery}
+            setResultsCount={setResultsCount}
+          />
         </Suspense>
       </div>
       <Footer />

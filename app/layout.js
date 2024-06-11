@@ -1,8 +1,9 @@
 import { Prompt } from "next/font/google";
 import "./globals.css";
 import SessionProvider from "../components/SessionProvider";
-
 import { Toaster } from "@/components/ui/toaster";
+import { Suspense } from "react";
+import Spinner from "@/components/spinner/Spinner"; // นำเข้า Spinner เพื่อแสดงระหว่างการโหลด
 
 const prompt = Prompt({
   subsets: ["latin"],
@@ -22,7 +23,11 @@ export default function RootLayout({ children }) {
         <link rel="icon" href="/favicon.ico" />
       </head>
       <body className={prompt.className}>
-        <SessionProvider>{children}</SessionProvider>
+        <SessionProvider>
+          <Suspense fallback={<Spinner />}>
+            {children}
+          </Suspense>
+        </SessionProvider>
         <Toaster />
       </body>
     </html>
