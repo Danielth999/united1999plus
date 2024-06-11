@@ -33,8 +33,7 @@ async function getOrSetCache(key, cb) {
 
 export async function GET(req) {
   try {
-    const url = new URL(req.url);
-    const searchQuery = url.searchParams.get("search");
+    const searchQuery = req.nextUrl.searchParams.get("search");
 
     const products = await getOrSetCache(
       `products_${searchQuery}`,
