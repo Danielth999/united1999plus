@@ -354,7 +354,7 @@ const ProductListContent = () => {
                     </TableCell>
                     <TableCell>{product.name}</TableCell>
                     <TableCell>{product.Category.name}</TableCell>
-                    <TableCell>{product.price.toFixed(2)} บาท</TableCell>
+                    <TableCell>{product.price.toFixed(2)}/{product.unitType}</TableCell>
                     <TableCell>
                       <Switch
                         checked={product.isPublished}

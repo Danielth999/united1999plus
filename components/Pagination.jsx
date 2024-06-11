@@ -1,4 +1,3 @@
-// components/ui/Pagination.js
 import {
   Pagination,
   PaginationContent,
@@ -30,8 +29,8 @@ const PaginationComponent = ({ totalPages, currentPage, onPageChange }) => {
               onClick={() => handleClick(i)}
               className={
                 i === currentPage
-                  ? "bg-blue-500 text-white"
-                  : "bg-white text-blue-500"
+                  ? "bg-blue-500 text-white cursor-pointer"
+                  : "bg-white text-blue-500 cursor-pointer"
               }
             >
               {i}
@@ -48,8 +47,8 @@ const PaginationComponent = ({ totalPages, currentPage, onPageChange }) => {
                 onClick={() => handleClick(i)}
                 className={
                   i === currentPage
-                    ? "bg-blue-500 text-white"
-                    : "bg-white text-blue-500"
+                    ? "bg-blue-500 text-white cursor-pointer"
+                    : "bg-white text-blue-500 cursor-pointer"
                 }
               >
                 {i}
@@ -64,8 +63,8 @@ const PaginationComponent = ({ totalPages, currentPage, onPageChange }) => {
               onClick={() => handleClick(totalPages)}
               className={
                 totalPages === currentPage
-                  ? "bg-blue-500 text-white"
-                  : "bg-white text-blue-500"
+                  ? "bg-blue-500 text-white cursor-pointer"
+                  : "bg-white text-blue-500 cursor-pointer"
               }
             >
               {totalPages}
@@ -79,8 +78,8 @@ const PaginationComponent = ({ totalPages, currentPage, onPageChange }) => {
               onClick={() => handleClick(1)}
               className={
                 1 === currentPage
-                  ? "bg-blue-500 text-white"
-                  : "bg-white text-blue-500"
+                  ? "bg-blue-500 text-white cursor-pointer"
+                  : "bg-white text-blue-500 cursor-pointer"
               }
             >
               1
@@ -95,8 +94,8 @@ const PaginationComponent = ({ totalPages, currentPage, onPageChange }) => {
                 onClick={() => handleClick(i)}
                 className={
                   i === currentPage
-                    ? "bg-blue-500 text-white"
-                    : "bg-white text-blue-500"
+                    ? "bg-blue-500 text-white cursor-pointer"
+                    : "bg-white text-blue-500 cursor-pointer"
                 }
               >
                 {i}
@@ -111,8 +110,8 @@ const PaginationComponent = ({ totalPages, currentPage, onPageChange }) => {
               onClick={() => handleClick(1)}
               className={
                 1 === currentPage
-                  ? "bg-blue-500 text-white"
-                  : "bg-white text-blue-500"
+                  ? "bg-blue-500 text-white cursor-pointer"
+                  : "bg-white text-blue-500 cursor-pointer"
               }
             >
               1
@@ -131,8 +130,8 @@ const PaginationComponent = ({ totalPages, currentPage, onPageChange }) => {
                 onClick={() => handleClick(i)}
                 className={
                   i === currentPage
-                    ? "bg-blue-500 text-white"
-                    : "bg-white text-blue-500"
+                    ? "bg-blue-500 text-white cursor-pointer"
+                    : "bg-white text-blue-500 cursor-pointer"
                 }
               >
                 {i}
@@ -147,8 +146,8 @@ const PaginationComponent = ({ totalPages, currentPage, onPageChange }) => {
               onClick={() => handleClick(totalPages)}
               className={
                 totalPages === currentPage
-                  ? "bg-blue-500 text-white"
-                  : "bg-white text-blue-500"
+                  ? "bg-blue-500 text-white cursor-pointer"
+                  : "bg-white text-blue-500 cursor-pointer"
               }
             >
               {totalPages}
@@ -168,6 +167,7 @@ const PaginationComponent = ({ totalPages, currentPage, onPageChange }) => {
           <PaginationPrevious
             onClick={() => handleClick(currentPage - 1)}
             disabled={currentPage === 1}
+            className="cursor-pointer"
           />
         </PaginationItem>
         {renderPageNumbers()}
@@ -175,6 +175,7 @@ const PaginationComponent = ({ totalPages, currentPage, onPageChange }) => {
           <PaginationNext
             onClick={() => handleClick(currentPage + 1)}
             disabled={currentPage === totalPages}
+            className="cursor-pointer"
           />
         </PaginationItem>
       </PaginationContent>

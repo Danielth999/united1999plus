@@ -17,15 +17,13 @@ const fetcher = url => axios.get(url).then(res => res.data);
 
 const CleaningProducts = () => {
   const { data: category, error } = useSWR(
-    `${process.env.NEXT_PUBLIC_API_URL}/api/category/filter/cleaning-products`,
+    `${process.env.NEXT_PUBLIC_API_URL}/api/category/filter/cleaning-products?limit=10`,
     fetcher,
     {
-  
-      
-      dedupingInterval: 60000, // เ
+      dedupingInterval: 60000,
+      refreshInterval: 60000,
     }
   );
-
   if (error) return <div>Failed to load</div>; // ถ้ามี error ให้แสดงข้อความว่า "Failed to load"
   if (!category) // ถ้าไม่มีข้อมูลให้แสดง spinner
     return (
@@ -81,6 +79,16 @@ const CleaningProducts = () => {
             </Card>
           ))}
         </div>
+
+        {products.length === 10 && (
+          <div className="flex justify-center mt-5">
+            <Link href={`/category/cleaning-products`}>
+              <button className="bg-blue-500 text-white py-2 px-4 rounded-full hover:bg-blue-600">
+                ดูเพิ่มเติม
+              </button>
+            </Link>
+          </div>
+        )}
       </div>
     </>
   );

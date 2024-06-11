@@ -26,6 +26,7 @@ const ModalEditProduct = ({ product, onProductUpdated }) => {
     stock: "",
     color: "",
     size: "",
+    unitType: "", // ล้างฟิลด์นี้
     isPublished: false,
     categoryId: "",
     image: null,
@@ -43,6 +44,7 @@ const ModalEditProduct = ({ product, onProductUpdated }) => {
         stock: product.stock,
         color: product.color,
         size: product.size,
+        unitType: product.unitType, // ล้างฟิลด์นี้
         isPublished: product.isPublished,
         categoryId: product.categoryId ? product.categoryId.toString() : "",
         image: null,
@@ -88,7 +90,12 @@ const ModalEditProduct = ({ product, onProductUpdated }) => {
     e.preventDefault();
 
     // Check if all fields are filled
-    if (!editProduct.name || !editProduct.description || !editProduct.price || !editProduct.categoryId) {
+    if (
+      !editProduct.name ||
+      !editProduct.description ||
+      !editProduct.price ||
+      !editProduct.categoryId
+    ) {
       toast({
         title: "Error",
         description: "กรุณากรอกข้อมูลให้ครบทุกช่อง",
@@ -112,6 +119,7 @@ const ModalEditProduct = ({ product, onProductUpdated }) => {
     formData.append("stock", editProduct.stock);
     formData.append("color", editProduct.color);
     formData.append("size", editProduct.size);
+    formData.append("unitType", editProduct.unitType); // ล้างฟิลด์นี้
     formData.append("isPublished", editProduct.isPublished);
     formData.append("categoryId", editProduct.categoryId);
     if (editProduct.image) {
@@ -175,6 +183,13 @@ const ModalEditProduct = ({ product, onProductUpdated }) => {
                   placeholder="ชื่อผลิตภัณฑ์"
                 />
                 <Input
+                  type="text"
+                  name="stock"
+                  value={editProduct.stock}
+                  onChange={handleChange}
+                  placeholder="จำนวน"
+                />
+                <Input
                   type="number"
                   name="price"
                   value={editProduct.price}
@@ -183,11 +198,12 @@ const ModalEditProduct = ({ product, onProductUpdated }) => {
                 />
                 <Input
                   type="text"
-                  name="stock"
-                  value={editProduct.stock}
+                  name="unitType"
+                  value={editProduct.unitType}
                   onChange={handleChange}
-                  placeholder="จำนวน"
+                  placeholder="หน่วย"
                 />
+
                 <Input
                   type="text"
                   name="color"
@@ -208,7 +224,7 @@ const ModalEditProduct = ({ product, onProductUpdated }) => {
                   onChange={handleChange}
                   className="w-full border rounded p-2"
                 >
-                  <option value="" disabled>
+                  <option  disabled>
                     เลือกหมวดหมู่
                   </option>
                   {categories.map((category) => (

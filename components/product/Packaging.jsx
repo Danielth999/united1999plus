@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 import Image from "next/image";
 import {
@@ -18,20 +18,16 @@ const fetcher = (url) => axios.get(url).then((res) => res.data);
 
 const Packaging = () => {
   const { data: category, error } = useSWR(
-    `${process.env.NEXT_PUBLIC_API_URL}/api/category/filter/packaging`,
+    `${process.env.NEXT_PUBLIC_API_URL}/api/category/filter/packaging?limit=10`,
     fetcher,
     {
-     
-    
-      dedupingInterval: 60000, // เก็บ cache ไว้ใน 60 วินาที เพื่อป้องกันการดึงข้อมูลซ้ำเกินไป
-
-
+      dedupingInterval: 60000,
+      refreshInterval: 60000,
     }
   );
 
-  if (error) return <div>Failed to load</div>; // ถ้ามี error ให้แสดงข้อความว่า "Failed to load"
+  if (error) return <div>Failed to load</div>;
   if (!category)
-    // ถ้าไม่มีข้อมูลให้แสดง spinner
     return (
       <div className="flex justify-center">
         <Loading />
@@ -50,7 +46,7 @@ const Packaging = () => {
           {products.map((item) => (
             <Card
               key={item.productId}
-              className="hover:shadow-xl border overflow-hidden "
+              className="hover:shadow-xl border overflow-hidden"
             >
               <Link href={`/products/${item.productId}`}>
                 <CardHeader className="border-b w-full h-60 relative">
@@ -63,28 +59,44 @@ const Packaging = () => {
                   />
                 </CardHeader>
               </Link>
-              <CardContent className="">
+              <CardContent>
                 <CardTitle className="line-clamp-2">
                   <Link href={`/products/${item.productId}`}>{item.name}</Link>
                 </CardTitle>
               </CardContent>
-              <CardFooter className="flex justify-between mt-auto">
-                <Badge
-                  variant="customPrimary"
-                  className="font-bold min-w-[40px] text-center"
-                >
-                  {item.price}฿
-                </Badge>
-                <Badge
-                  variant="customSecondary"
-                  className="min-w-[120px] text-center line-clamp-1"
-                >
-                  {category.name}
-                </Badge>
+              <CardFooter className="flex justify-between p-4 bg-gray-100 border-t">
+                <div className="flex flex-col items-center">
+                  <Badge
+                    variant="customPrimary"
+                    className="font-bold w-full text-center"
+                  >
+                    <span>
+                      ฿{item.price}/{item.unitType}
+                    </span>
+                  </Badge>
+                </div>
+                <div className="flex flex-col items-center">
+                  <Badge
+                    variant="customSecondary"
+                    className="w-full text-center line-clamp-1"
+                  >
+                    {category.name}
+                  </Badge>
+                </div>
               </CardFooter>
             </Card>
           ))}
         </div>
+
+        {products.length === 10 && (
+          <div className="flex justify-center mt-5">
+            <Link href={`/category/packaging`}>
+              <button className="bg-blue-500 text-white py-2 px-4 rounded-full hover:bg-blue-600">
+                ดูเพิ่มเติม
+              </button>
+            </Link>
+          </div>
+        )}
       </div>
     </>
   );

@@ -1,34 +1,22 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import axios from "axios";
 import Image from "next/image";
 import { useParams } from "next/navigation";
+import useSWR from "swr";
 import Spinner from "@/components/spinner/Spinner";
 import Navbar from "@/components/nav/Navbar";
 import BreadcrumbComponent from "../components/Breadcrumb"; // นำเข้าจากตำแหน่งที่ถูกต้อง
 
+const fetcher = (url) => axios.get(url).then((res) => res.data);
+
 const ViewProduct = () => {
   const { id } = useParams();
-  const [product, setProduct] = useState(null);
-  const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchProduct = async () => {
-      try {
-        const response = await axios.get(
-          `${process.env.NEXT_PUBLIC_API_URL}/api/products/${id}`
-        );
-        setProduct(response.data);
-      } catch (err) {
-        setError(err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchProduct();
-  }, [id]);
+  const { data: product, error } = useSWR(
+    `${process.env.NEXT_PUBLIC_API_URL}/api/products/${id}`,
+    fetcher
+  );
+  const [openEditModal, setOpenEditModal] = useState(false);
 
   if (error)
     return (
@@ -40,7 +28,7 @@ const ViewProduct = () => {
       </>
     );
 
-  if (loading)
+  if (!product)
     return (
       <>
         <Navbar />
@@ -53,73 +41,89 @@ const ViewProduct = () => {
   return (
     <>
       <Navbar />
-      <section className="text-gray-600 body-font overflow-hidden">
-        <div className="container px-5 py-16 mx-auto">
-          {product.Category && (
-            <BreadcrumbComponent
-              category={product.Category}
-              productName={product.name}
-            />
-          )}
-          <div className="flex flex-wrap">
-            <div className="lg:w-1/2 w-full lg:pr-10 lg:py-6 mb-6 lg:mb-0 border p-2 rounded-sm">
-              {product.Category && (
-                <h2 className="text-sm title-font text-gray-500 tracking-widest">
-                  {product.Category.name}
-                </h2>
-              )}
-              <h1 className="text-gray-900 text-3xl title-font font-medium mb-4">
-                {product.name}
-              </h1>
-              <div className="flex mb-4">
-                <span className="flex-grow text-indigo-500 border-b-2 border-indigo-500 py-2 text-lg px-1">
-                  รายละเอียดสินค้า
-                </span>
+      <div className="container px-5 py-4 mx-auto">
+        {product.Category && (
+          <BreadcrumbComponent
+            category={product.Category}
+            productName={product.name}
+          />
+        )}
+        <div className="bg-gray-100 border-2 py-8">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="relative w-full overflow-hidden rounded-lg bg-gray-300 dark:bg-gray-700 mb-4 h-[330px] sm:h-[350px] md:h-[410px] lg:h-[490px]">
+                <Image
+                  src={product.imageUrl}
+                  alt={product.name}
+                  fill
+                  sizes="(max-width: 640px) 100vw, (max-width: 768px) 100vw, (max-width: 1024px) 33vw, 25vw"
+                  style={{ objectFit: "cover", objectPosition: "center" }}
+                />
               </div>
-              <p className="leading-relaxed mb-4">{product.description}</p>
-              <div className="flex border-t border-gray-200 py-2">
-                <span className="text-gray-500">สี</span>
-                <span className="ml-auto text-gray-900">แดง</span>
-              </div>
-              <div className="flex border-t border-gray-200 py-2">
-                <span className="text-gray-500">ขนาด</span>
-                <span className="ml-auto text-gray-900">ปานกลาง</span>
-              </div>
-              <div className="flex border-t border-b mb-6 border-gray-200 py-2">
-                <span className="text-gray-500">จำนวน</span>
-                <span className="ml-auto text-gray-900">4</span>
-              </div>
-              <div className="flex">
-                <span className="title-font font-medium text-2xl text-gray-900">
-                  ฿{product.price}
-                </span>
-                <button className="flex ml-auto text-white bg-indigo-500 border-0 py-2 px-6 focus:outline-none hover:bg-indigo-600 rounded">
-                  ถูกใจ
-                </button>
-                <button className="rounded-full w-10 h-10 bg-gray-200 p-0 border-0 inline-flex items-center justify-center text-gray-500 ml-4">
-                  <svg
-                    fill="currentColor"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    className="w-5 h-5"
-                    viewBox="0 0 24 24"
-                  >
-                    <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"></path>
-                  </svg>
-                </button>
+              <div className="flex flex-col justify-between h-full">
+                <div>
+                  <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-2">
+                    {product.name}
+                  </h2>
+                  <p className="text-gray-600 dark:text-gray-300 text-sm mb-4">
+                    {product.description}
+                  </p>
+                  <div className="flex mb-4">
+                    <div className="mr-4">
+                      <span className="font-bold text-gray-700 dark:text-gray-300">
+                        ราคา:
+                      </span>
+                      <span className="text-gray-600 dark:text-gray-300">
+                        {product.price} บาท
+                      </span>
+                    </div>
+                    <div>
+                      <span className="font-bold text-gray-700 dark:text-gray-300">
+                        จำนวนในสต็อก:
+                      </span>
+                      <span className="text-gray-600 dark:text-gray-300">
+                        {product.stock}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="mb-4">
+                    <span className="font-bold text-gray-700 dark:text-gray-300">
+                      สี:
+                    </span>
+                    <div className="flex items-center mt-2">
+                      <button className="bg-gray-300 dark:bg-gray-700 text-gray-700 dark:text-white py-2 px-4 rounded-full font-bold mr-2 hover:bg-gray-400 dark:hover:bg-gray-600">
+                        {product.color}
+                      </button>
+                    </div>
+                  </div>
+                  <div className="mb-4">
+                    <span className="font-bold text-gray-700 dark:text-gray-300">
+                      ขนาด:
+                    </span>
+                    <div className="flex items-center mt-2">
+                      <button className="bg-gray-300 dark:bg-gray-700 text-gray-700 dark:text-white py-2 px-4 rounded-full font-bold mr-2 hover:bg-gray-400 dark:hover:bg-gray-600">
+                        {product.size}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                <div className="flex  mx-2 mb-4">
+                  <div className="w-1/2 px-2">
+                    <button className="w-full bg-gray-900 dark:bg-gray-600 text-white py-2 px-4 rounded-full font-bold hover:bg-gray-800 dark:hover:bg-gray-700">
+                      เพิ่มลงในตะกร้า
+                    </button>
+                  </div>
+                  <div className="w-1/2 px-2">
+                    <button className="w-full bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white py-2 px-4 rounded-full font-bold hover:bg-gray-300 dark:hover:bg-gray-600">
+                      เพิ่มลงในสนใจ
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
-            <Image
-              src={product.imageUrl}
-              width={300}
-              height={300}
-              alt={product.name}
-              className="lg:w-1/2 w-full lg:h-auto h-64 object-cover object-center rounded"
-            />
           </div>
         </div>
-      </section>
+      </div>
     </>
   );
 };

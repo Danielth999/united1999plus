@@ -5,7 +5,11 @@ import axios from "axios";
 import { useParams } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
+import { useState } from "react";
 import Navbar from "@/components/nav/Navbar";
+import Footer from "@/components/Footer";
+import Spinner from "@/components/spinner/Spinner";
+import PaginationComponent from "@/components/Pagination";
 import {
   Card,
   CardContent,
@@ -14,17 +18,17 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import Loading from "@/components/spinner/Spinner";
 
-const fetcher = url => axios.get(url).then(res => res.data);
+const fetcher = (url) => axios.get(url).then((res) => res.data);
 
 const CategoryPage = () => {
   const { nameSlug } = useParams();
-  
   const { data: category, error } = useSWR(
     `${process.env.NEXT_PUBLIC_API_URL}/api/category/filter/${nameSlug}`,
     fetcher
   );
+  const [currentPage, setCurrentPage] = useState(1);
+  const productsPerPage = 10;
 
   if (error) {
     return <div>Error fetching category</div>;
@@ -33,7 +37,7 @@ const CategoryPage = () => {
   if (!category) {
     return (
       <div className="flex justify-center items-center h-screen mt-10">
-        <Loading />
+        <Spinner />
       </div>
     );
   }
@@ -41,6 +45,19 @@ const CategoryPage = () => {
   if (!category.Product || category.Product.length === 0) {
     return <div>No products found in this category</div>;
   }
+
+  // Logic for displaying current products
+  const indexOfLastProduct = currentPage * productsPerPage;
+  const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
+  const currentProducts = category.Product.slice(
+    indexOfFirstProduct,
+    indexOfLastProduct
+  );
+  const totalPages = Math.ceil(category.Product.length / productsPerPage);
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+  };
 
   return (
     <>
@@ -54,7 +71,7 @@ const CategoryPage = () => {
       </div>
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 mt-5">
-          {category.Product.map((item) => (
+          {currentProducts.map((item) => (
             <Card
               key={item.productId}
               className="hover:shadow-xl border flex flex-col"
@@ -94,7 +111,15 @@ const CategoryPage = () => {
             </Card>
           ))}
         </div>
+        <div className="flex justify-center mt-5">
+          <PaginationComponent
+            totalPages={totalPages}
+            currentPage={currentPage}
+            onPageChange={handlePageChange}
+          />
+        </div>
       </div>
+      <Footer />
     </>
   );
 };

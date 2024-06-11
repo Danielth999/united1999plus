@@ -35,6 +35,7 @@ model Product {
   isPublished Boolean  @default(false)
   productId   Int      @id @default(autoincrement())
   imageUrl    String
+  unitType    String?
   categoryId  Int
   Category    Category @relation(fields: [categoryId], references: [categoryId])
 }

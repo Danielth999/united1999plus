@@ -2,7 +2,8 @@
 import axios from "axios";
 import Image from "next/image";
 import { useRouter, useParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
+import useSWR from "swr";
 import Spinner from "@/components/spinner/Spinner";
 import { Button } from "@/components/ui/button";
 import {
@@ -14,35 +15,23 @@ import {
 } from "@/components/ui/card";
 import ModalEditProduct from "../components/product/ModalEditProduct";
 
+const fetcher = (url) => axios.get(url).then((res) => res.data);
+
 const ProductDetail = () => {
   const router = useRouter();
-  const { productId } = useParams();
-  const [productData, setProductData] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const { id } = useParams();
+  const { data: productData, error, mutate } = useSWR(
+    id ? `${process.env.NEXT_PUBLIC_API_URL}/api/products/${id}` : null,
+    fetcher,
+    { dedupingInterval: 60000 }
+  );
   const [openEditModal, setOpenEditModal] = useState(false);
 
   useEffect(() => {
-    const fetchProduct = async () => {
-      try {
-        const response = await axios.get(
-          `${process.env.NEXT_PUBLIC_API_URL}/api/products/${productId}`
-        );
-        setProductData(response.data);
-      } catch (error) {
-        setError(error);
-        console.error("Error fetching product data:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
+    // Optional: Fetch the initial data or handle side effects here
+  }, [id]);
 
-    if (productId) {
-      fetchProduct();
-    }
-  }, [productId]);
-
-  if (loading) {
+  if (!productData && !error) {
     return (
       <div className="flex justify-center items-center h-screen">
         <Spinner />
@@ -54,16 +43,16 @@ const ProductDetail = () => {
     return <div>Error fetching product data</div>;
   }
 
-  if (!productData) {
-    return null;
-  }
-
   return (
     <>
       <Card>
         <CardHeader>
           <div className="flex justify-between">
-            <Button variant="destructive" onClick={() => router.back()} className="mb-4">
+            <Button
+              variant="destructive"
+              onClick={() => router.back()}
+              className="mb-4"
+            >
               กลับ
             </Button>
             <Button onClick={() => setOpenEditModal(true)} className="mb-4">
@@ -92,7 +81,7 @@ const ProductDetail = () => {
                     <strong>รายละเอียด:</strong> {productData.description}
                   </p>
                   <p className="text-lg">
-                    <strong>ราคา:</strong> {productData.price} บาท
+                    <strong>ราคา:</strong> {productData.price}/{productData.unitType}
                   </p>
                   <p className="text-lg">
                     <strong>จำนวน:</strong> {productData.stock}
@@ -112,11 +101,14 @@ const ProductDetail = () => {
                   </p>
                   <p className="text-lg">
                     <strong>วันที่สร้าง:</strong>{" "}
-                    {new Date(productData.createdAt).toLocaleDateString("th-TH", {
-                      year: "numeric",
-                      month: "long",
-                      day: "numeric",
-                    })}
+                    {new Date(productData.createdAt).toLocaleDateString(
+                      "th-TH",
+                      {
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
+                      }
+                    )}
                   </p>
                 </div>
               </div>
@@ -129,7 +121,7 @@ const ProductDetail = () => {
         <ModalEditProduct
           product={productData}
           onProductUpdated={(updatedProduct) => {
-            setProductData(updatedProduct);
+            mutate(updatedProduct, false); // Update the cache with the new data
             setOpenEditModal(false);
           }}
         />

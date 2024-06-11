@@ -21,42 +21,39 @@ async function getOrSetCache(key, cb) {
     try {
       return JSON.parse(cachedData); // ถ้ามีข้อมูลใน cache ให้คืนค่าข้อมูลนั้น
     } catch (error) {
-      console.error('Error parsing cached data:', error);
+      console.error("Error parsing cached data:", error);
       // ถ้ามีข้อผิดพลาดในการแปลง JSON แสดงว่า cache อาจมีปัญหา
       await redis.del(key); // ลบข้อมูลใน cache ที่ไม่ถูกต้อง
     }
   }
 
   const freshData = await cb(); // ถ้าไม่มีข้อมูลใน cache ให้เรียกใช้ callback เพื่อดึงข้อมูลใหม่
-  await redis.set(key, JSON.stringify(freshData), 'EX', CACHE_EXPIRATION); // เก็บข้อมูลใหม่ลงใน cache พร้อมตั้งเวลาหมดอายุ
+  await redis.set(key, JSON.stringify(freshData), "EX", CACHE_EXPIRATION); // เก็บข้อมูลใหม่ลงใน cache พร้อมตั้งเวลาหมดอายุ
   return freshData; // คืนค่าข้อมูลใหม่
 }
 
 export async function GET(request, { params }) {
-  const { nameSlug } = params;
+  const { id } = params;
 
   try {
-    const category = await getOrSetCache(`category:${nameSlug}`, async () => {
-      return await prisma.category.findFirst({
-        where: { nameSlug },
+    const product = await getOrSetCache(`product:${id}`, async () => {
+      return await prisma.product.findUnique({
+        where: { productId: parseInt(id, 10) },
         include: {
-          Product: true,
+          Category: true,
         },
       });
     });
 
-    if (!category) {
-      return NextResponse.json(
-        { error: "Category not found" },
-        { status: 404 }
-      );
+    if (!product) {
+      return NextResponse.json({ error: "Product not found" }, { status: 404 });
     }
 
-    return NextResponse.json(category, { status: 200 });
+    return NextResponse.json(product, { status: 200 });
   } catch (error) {
-    console.error("Error fetching category:", error);
+    console.error("Error fetching product:", error);
     return NextResponse.json(
-      { error: "Failed to fetch category" },
+      { error: "Failed to fetch product" },
       { status: 500 }
     );
   } finally {
@@ -72,7 +69,10 @@ export const PUT = async (request, { params }) => {
     const productId = parseInt(id, 10);
 
     if (isNaN(productId)) {
-      return NextResponse.json({ error: "Invalid product ID" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Invalid product ID" },
+        { status: 400 }
+      );
     }
 
     const contentType = request.headers.get("Content-Type");
@@ -96,6 +96,7 @@ export const PUT = async (request, { params }) => {
       const stock = formData.get("stock");
       const color = formData.get("color");
       const size = formData.get("size");
+      const unitType = formData.get("unitType");
       const categoryId = parseInt(formData.get("categoryId"), 10);
       const image = formData.get("image");
 
@@ -106,6 +107,7 @@ export const PUT = async (request, { params }) => {
         stock,
         color,
         size,
+        unitType,
         categoryId,
       };
 
@@ -132,7 +134,9 @@ export const PUT = async (request, { params }) => {
           );
         }
 
-        updateData.imageUrl = supabase.storage.from("products").getPublicUrl(fileName).data.publicUrl;
+        updateData.imageUrl = supabase.storage
+          .from("products")
+          .getPublicUrl(fileName).data.publicUrl;
 
         const oldProduct = await prisma.product.findUnique({
           where: { productId },
@@ -145,7 +149,10 @@ export const PUT = async (request, { params }) => {
             .remove([oldFileName]);
 
           if (deleteError) {
-            console.error("Error deleting old image from Supabase:", deleteError);
+            console.error(
+              "Error deleting old image from Supabase:",
+              deleteError
+            );
           }
         }
       }
@@ -185,7 +192,10 @@ export const DELETE = async (request, { params }) => {
     const productId = parseInt(id, 10);
 
     if (isNaN(productId)) {
-      return NextResponse.json({ error: "Invalid product ID" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Invalid product ID" },
+        { status: 400 }
+      );
     }
 
     const product = await prisma.product.findUnique({
@@ -193,10 +203,7 @@ export const DELETE = async (request, { params }) => {
     });
 
     if (!product) {
-      return NextResponse.json(
-        { error: "Product not found" },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "Product not found" }, { status: 404 });
     }
 
     await prisma.product.delete({

@@ -11,23 +11,23 @@ import {
 import { Badge } from "@/components/ui/badge";
 import Loading from "@/components/spinner/Spinner";
 import Link from "next/link";
-import useSWR from 'swr';
+import useSWR from "swr";
 
-const fetcher = url => axios.get(url).then(res => res.data);
+const fetcher = (url) => axios.get(url).then((res) => res.data);
 
 const OfficeSupplies = () => {
   const { data: category, error } = useSWR(
-    `${process.env.NEXT_PUBLIC_API_URL}/api/category/filter/office-supplies`,
+    `${process.env.NEXT_PUBLIC_API_URL}/api/category/filter/office-supplies?limit=10`,
     fetcher,
     {
-      
-      
-      dedupingInterval: 60000, // เ
+      dedupingInterval: 60000,
+      refreshInterval: 60000,
+     
     }
   );
 
-  if (error) return <div>Failed to load</div>; // ถ้ามี error ให้แสดงข้อความว่า "Failed to load"
-  if (!category) // ถ้าไม่มีข้อมูลให้แสดง spinner
+  if (error) return <div>Failed to load</div>;
+  if (!category)
     return (
       <div className="flex justify-center">
         <Loading />
@@ -81,6 +81,15 @@ const OfficeSupplies = () => {
             </Card>
           ))}
         </div>
+        {products.length > 0 && (
+          <div className="flex justify-center mt-5">
+            <Link href={`/category/office-supplies`}>
+              <button className="bg-blue-500 text-white py-2 px-4 rounded-full hover:bg-blue-600">
+                ดูเพิ่มเติม
+              </button>
+            </Link>
+          </div>
+        )}
       </div>
     </>
   );

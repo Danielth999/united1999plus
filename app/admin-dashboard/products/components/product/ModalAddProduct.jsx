@@ -30,6 +30,7 @@ const ModalAddProduct = ({ onProductAdded }) => {
     color: "",
     size: "",
     isPublished: false,
+    unitType: "", // ล้างฟิลด์นี้
     categoryId: "",
     image: null,
   });
@@ -82,7 +83,8 @@ const ModalAddProduct = ({ onProductAdded }) => {
       !formData.image ||
       !formData.stock ||
       !formData.color ||
-      !formData.size
+      !formData.size ||
+      !formData.unitType // ตรวจสอบฟิลด์นี้ด้วย
     ) {
       toast({
         title: "Error",
@@ -111,6 +113,7 @@ const ModalAddProduct = ({ onProductAdded }) => {
       stock: "",
       color: "",
       size: "",
+      unitType: "", // ล้างฟิลด์นี้
       isPublished: false,
       categoryId: "",
       image: null,
@@ -123,6 +126,7 @@ const ModalAddProduct = ({ onProductAdded }) => {
     data.append("stock", formData.stock);
     data.append("color", formData.color);
     data.append("size", formData.size);
+    data.append("unitType", formData.unitType); // เพิ่มฟิลด์นี้
     data.append("isPublished", formData.isPublished);
     data.append("categoryId", formData.categoryId);
     if (formData.image) {
@@ -190,7 +194,13 @@ const ModalAddProduct = ({ onProductAdded }) => {
                   onChange={handleChange}
                   placeholder="ชื่อผลิตภัณฑ์"
                 />
-
+                <Input
+                  type="text"
+                  name="stock"
+                  value={formData.stock}
+                  onChange={handleChange}
+                  placeholder="จำนวน"
+                />
                 <Input
                   type="number"
                   name="price"
@@ -200,11 +210,12 @@ const ModalAddProduct = ({ onProductAdded }) => {
                 />
                 <Input
                   type="text"
-                  name="stock"
-                  value={formData.stock}
+                  name="unitType"
+                  value={formData.unitType}
                   onChange={handleChange}
-                  placeholder="จำนวน"
+                  placeholder="หน่วย"
                 />
+
                 <Input
                   type="text"
                   name="color"
@@ -219,13 +230,14 @@ const ModalAddProduct = ({ onProductAdded }) => {
                   onChange={handleChange}
                   placeholder="ขนาด"
                 />
+
                 <select
                   name="categoryId"
                   value={formData.categoryId}
                   onChange={handleChange}
-                  className="w-full border rounded p-2"
+                  className="w-full borders rounded p-2 col-span-2"
                 >
-                  <option value="" disabled>
+                  <option  disabled>
                     เลือกหมวดหมู่
                   </option>
                   {categories.map((category) => (
