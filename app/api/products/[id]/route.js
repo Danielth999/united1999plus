@@ -12,7 +12,7 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 const supabase = createClient(supabaseUrl, supabaseKey);
 const mutex = new Mutex();
-const CACHE_EXPIRATION = 60 * 30; // 30 minutes
+const CACHE_EXPIRATION = 60 * 2; // 30 minutes
 
 // Helper function to get or set cache
 async function getOrSetCache(key, cb) {
