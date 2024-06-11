@@ -1,8 +1,8 @@
 import { Prompt } from "next/font/google";
 import "./globals.css";
 import SessionProvider from "../components/SessionProvider";
+
 import { Toaster } from "@/components/ui/toaster";
-import { Suspense } from "react";
 
 const prompt = Prompt({
   subsets: ["latin"],
@@ -22,11 +22,7 @@ export default function RootLayout({ children }) {
         <link rel="icon" href="/favicon.ico" />
       </head>
       <body className={prompt.className}>
-        <SessionProvider>
-          <Suspense>
-            {children}
-          </Suspense>
-        </SessionProvider>
+        <SessionProvider>{children}</SessionProvider>
         <Toaster />
       </body>
     </html>

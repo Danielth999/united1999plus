@@ -9,6 +9,7 @@ const SearchProduct = () => {
 
   const handleSearch = (e) => {
     e.preventDefault();
+    if (!searchTerm) return;
     router.push(`/products?search=${encodeURIComponent(searchTerm)}`);
   };
 

@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, Suspense, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Image from "next/image";
 import Link from "next/link";
@@ -146,12 +146,10 @@ const ProductPage = () => {
             )}
           </h1>
         </div>
-        <Suspense fallback={<Spinner />}>
-          <ProductList
-            searchQuery={searchQuery}
-            setResultsCount={setResultsCount}
-          />
-        </Suspense>
+        <ProductList
+          searchQuery={searchQuery}
+          setResultsCount={setResultsCount}
+        />
       </div>
       <Footer />
     </>
