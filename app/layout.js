@@ -3,7 +3,6 @@ import "./globals.css";
 import SessionProvider from "../components/SessionProvider";
 import { Toaster } from "@/components/ui/toaster";
 import { Suspense } from "react";
-import Spinner from "@/components/spinner/Spinner"; // นำเข้า Spinner เพื่อแสดงระหว่างการโหลด
 
 const prompt = Prompt({
   subsets: ["latin"],
@@ -24,7 +23,7 @@ export default function RootLayout({ children }) {
       </head>
       <body className={prompt.className}>
         <SessionProvider>
-          <Suspense fallback={<Spinner />}>
+          <Suspense>
             {children}
           </Suspense>
         </SessionProvider>
