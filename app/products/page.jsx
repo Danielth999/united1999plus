@@ -126,33 +126,25 @@ const ProductPage = () => {
             <Link href="/" className="hover:underline">
               หน้าหลัก
             </Link>{" "}
-            /{" "}
-            <Link href="/" className="hover:underline">
-              สินค้าทั้งหมด
-            </Link>
+            / สินค้าทั้งหมด
           </small>
         </div>
         <div className="mt-2">
           <h1 className="text-3xl">
             {searchQuery ? (
               <>
-                ผลการค้นหา{" "}
-                <span className="text-red-500">
+                ผลการค้นหา{' '}
+                <span className="text-orange-500">
                   '{searchQuery}' ({resultsCount})
                 </span>
               </>
             ) : (
-              <>
-              สินค้าทั้งหมด <span className="text-red-500">({resultsCount})</span>
-              </>
+              "สินค้าทั้งหมด"
             )}
           </h1>
         </div>
         <Suspense fallback={<Spinner />}>
-          <ProductList
-            searchQuery={searchQuery}
-            setResultsCount={setResultsCount}
-          />
+          <ProductList searchQuery={searchQuery} setResultsCount={setResultsCount} />
         </Suspense>
       </div>
       <Footer />
