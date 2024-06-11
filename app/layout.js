@@ -3,7 +3,7 @@ import "./globals.css";
 import SessionProvider from "../components/SessionProvider";
 
 import { Toaster } from "@/components/ui/toaster";
-
+import { Suspense } from "react";
 const prompt = Prompt({
   subsets: ["latin"],
   weight: ["400", "700"],
@@ -22,7 +22,9 @@ export default function RootLayout({ children }) {
         <link rel="icon" href="/favicon.ico" />
       </head>
       <body className={prompt.className}>
-        <SessionProvider>{children}</SessionProvider>
+        <SessionProvider>
+          <Suspense>{children}</Suspense>
+        </SessionProvider>
         <Toaster />
       </body>
     </html>
