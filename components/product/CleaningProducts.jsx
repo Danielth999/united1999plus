@@ -62,19 +62,25 @@ const CleaningProducts = () => {
                   <Link href={`/products/${item.productId}`}>{item.name}</Link>
                 </CardTitle>
               </CardContent>
-              <CardFooter className="flex justify-between mt-auto">
-                <Badge
-                  variant="customPrimary"
-                  className="font-bold min-w-[40px] text-center"
-                >
-                  {item.price}฿
-                </Badge>
-                <Badge
-                  variant="customSecondary"
-                  className="min-w-[120px] text-center line-clamp-1"
-                >
-                  {category.name}
-                </Badge>
+              <CardFooter className="flex justify-between p-4  border-t">
+                <div className="flex flex-col items-center">
+                  <Badge
+                    variant="customPrimary"
+                    className="font-bold w-full text-center"
+                  >
+                    <span>
+                      ฿{item.price}/{item.unitType}
+                    </span>
+                  </Badge>
+                </div>
+                <div className="flex flex-col items-center">
+                  <Badge
+                    variant="customSecondary"
+                    className="w-full text-center line-clamp-1"
+                  >
+                    {category.name}
+                  </Badge>
+                </div>
               </CardFooter>
             </Card>
           ))}

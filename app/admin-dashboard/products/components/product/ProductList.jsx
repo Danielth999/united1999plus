@@ -232,8 +232,11 @@ const ProductListContent = () => {
     (product) =>
       (product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         product.description.toLowerCase().includes(searchTerm.toLowerCase())) &&
-      (categoryFilter === "" || product.categoryId === parseInt(categoryFilter)) &&
-      (publishFilter === "" || (publishFilter === "published" && product.isPublished) || (publishFilter === "unpublished" && !product.isPublished))
+      (categoryFilter === "" ||
+        product.categoryId === parseInt(categoryFilter)) &&
+      (publishFilter === "" ||
+        (publishFilter === "published" && product.isPublished) ||
+        (publishFilter === "unpublished" && !product.isPublished))
   );
 
   const currentProducts = filteredProducts.slice(
@@ -354,7 +357,9 @@ const ProductListContent = () => {
                     </TableCell>
                     <TableCell>{product.name}</TableCell>
                     <TableCell>{product.Category.name}</TableCell>
-                    <TableCell>{product.price.toFixed(2)}/{product.unitType}</TableCell>
+                    <TableCell>
+                      {product.price.toFixed(2)}/{product.unitType}
+                    </TableCell>
                     <TableCell>
                       <Switch
                         checked={product.isPublished}

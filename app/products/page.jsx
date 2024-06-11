@@ -86,7 +86,7 @@ const ProductList = ({ searchQuery, setResultsCount }) => {
                 <Link href={`/products/${item.productId}`}>{item.name}</Link>
               </CardTitle>
             </CardContent>
-            <CardFooter className="flex justify-between p-4 bg-gray-100 border-t">
+            <CardFooter className="flex justify-between p-4  border-t">
                 <div className="flex flex-col items-center">
                   <Badge
                     variant="customPrimary"
