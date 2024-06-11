@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, Suspense } from "react";
+import React, { useState, Suspense, useEffect } from "react";
 import axios from "axios";
 import Image from "next/image";
 import Link from "next/link";
@@ -28,6 +28,12 @@ const ProductList = ({ searchQuery, setResultsCount }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const productsPerPage = 10;
 
+  useEffect(() => {
+    if (data) {
+      setResultsCount(data.length);
+    }
+  }, [data, setResultsCount]);
+
   if (error) {
     return <div>Error loading products: {error.message}</div>;
   }
@@ -49,9 +55,6 @@ const ProductList = ({ searchQuery, setResultsCount }) => {
     indexOfLastProduct
   );
   const totalPages = Math.ceil(products.length / productsPerPage);
-
-  // ตั้งค่าจำนวนผลลัพธ์การค้นหา
-  setResultsCount(products.length);
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
