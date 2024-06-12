@@ -22,7 +22,9 @@ const fetcher = (url) => axios.get(url).then((res) => res.data);
 
 const ProductList = ({ searchQuery, setResultsCount }) => {
   const { data, error } = useSWR(
-    `/api/products${searchQuery ? `?search=${searchQuery}` : ""}`,
+    `${process.env.NEXT_PUBLIC_API_URL}/api/products${
+      searchQuery ? `?search=${searchQuery}` : ""
+    }`,
     fetcher
   );
   const [currentPage, setCurrentPage] = useState(1);
@@ -87,25 +89,25 @@ const ProductList = ({ searchQuery, setResultsCount }) => {
               </CardTitle>
             </CardContent>
             <CardFooter className="flex justify-between p-4  border-t">
-                <div className="flex flex-col items-center">
-                  <Badge
-                    variant="customPrimary"
-                    className="font-bold w-full text-center"
-                  >
-                    <span>
-                      ฿{item.price}/{item.unitType}
-                    </span>
-                  </Badge>
-                </div>
-                <div className="flex flex-col items-center">
-                  <Badge
-                    variant="customSecondary"
-                    className="w-full text-center line-clamp-1"
-                  >
-                    {category.name}
-                  </Badge>
-                </div>
-              </CardFooter>
+              <div className="flex flex-col items-center">
+                <Badge
+                  variant="customPrimary"
+                  className="font-bold w-full text-center"
+                >
+                  <span>
+                    ฿{item.price}/{item.unitType}
+                  </span>
+                </Badge>
+              </div>
+              <div className="flex flex-col items-center">
+                <Badge
+                  variant="customSecondary"
+                  className="w-full text-center line-clamp-1"
+                >
+                  {item.Category.name}
+                </Badge>
+              </div>
+            </CardFooter>
           </Card>
         ))}
       </div>
