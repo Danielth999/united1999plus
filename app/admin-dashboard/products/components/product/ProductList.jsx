@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, Suspense } from "react";
+import { useState, Suspense } from "react";
 import useSWR, { mutate } from "swr";
 import { useRouter } from "next/navigation";
 import { Pencil, Trash, Eye } from "lucide-react";
@@ -49,7 +49,11 @@ const ProductListContent = () => {
     `${process.env.NEXT_PUBLIC_API_URL}/api/products`,
     fetcher,
     {
-      refreshInterval: 2000,
+
+
+      refreshInterval: 1000,
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false,
       
     }
   );
@@ -445,4 +449,5 @@ const ProductList = () => {
     </Suspense>
   );
 };
+
 export default ProductList;

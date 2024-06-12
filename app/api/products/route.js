@@ -4,7 +4,6 @@ import { createClient } from "@supabase/supabase-js";
 import { v4 as uuidv4 } from "uuid";
 import { Mutex } from "async-mutex";
 import sharp from "sharp";
-import redis from "@/lib/redis";
 
 const prisma = new PrismaClient();
 const mutex = new Mutex();
@@ -13,45 +12,23 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 export const supabase = createClient(supabaseUrl, supabaseKey);
 
-const CACHE_EXPIRATION = 60 * 5; // 30 minutes
-
-async function getOrSetCache(key, cb) {
-  const cachedData = await redis.get(key);
-  if (cachedData) {
-    try {
-      return JSON.parse(cachedData);
-    } catch (error) {
-      console.error("Error parsing cached data:", error);
-      await redis.del(key);
-    }
-  }
-
-  const freshData = await cb();
-  await redis.set(key, JSON.stringify(freshData), "EX", CACHE_EXPIRATION);
-  return freshData;
-}
-
+// GET all products with optional search query
 export async function GET(req) {
   try {
     const searchQuery = req.nextUrl.searchParams.get("search");
 
-    const products = await getOrSetCache(
-      `products_${searchQuery || "all"}`,
-      async () => {
-        const where = searchQuery
-          ? {
-              OR: [{ name: { contains: searchQuery, mode: "insensitive" } }],
-            }
-          : {};
+    const where = searchQuery
+      ? {
+          OR: [{ name: { contains: searchQuery, mode: "insensitive" } }],
+        }
+      : {};
 
-        return await prisma.product.findMany({
-          where,
-          include: {
-            Category: true,
-          },
-        });
-      }
-    );
+    const products = await prisma.product.findMany({
+      where,
+      include: {
+        Category: true,
+      },
+    });
 
     return NextResponse.json(products, { status: 200 });
   } catch (error) {
@@ -65,7 +42,7 @@ export async function GET(req) {
   }
 }
 
-
+// POST a new product
 export async function POST(req) {
   const release = await mutex.acquire();
 
@@ -82,22 +59,9 @@ export async function POST(req) {
     const categoryId = formData.get("categoryId");
     const image = formData.get("image");
 
-    if (
-      !name ||
-      !description ||
-      !price ||
-      !stock ||
-      !color ||
-      !size ||
-      !unitType ||
-      !categoryId ||
-      !image
-    ) {
+    if (!name || !description || !price || !stock || !color || !size || !unitType || !categoryId || !image) {
       console.error("Validation error: Missing required fields");
-      return NextResponse.json(
-        { error: "All fields are required" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "All fields are required" }, { status: 400 });
     }
 
     const fileName = `${uuidv4()}.webp`;
@@ -109,16 +73,11 @@ export async function POST(req) {
 
     const { error: uploadError } = await supabase.storage
       .from("products")
-      .upload(fileName, buffer, {
-        contentType: "image/webp",
-      });
+      .upload(fileName, buffer, { contentType: "image/webp" });
 
     if (uploadError) {
       console.error("Error uploading image:", uploadError);
-      return NextResponse.json(
-        { error: "Failed to upload image" },
-        { status: 500 }
-      );
+      return NextResponse.json({ error: "Failed to upload image" }, { status: 500 });
     }
 
     const productUrl = supabase.storage.from("products").getPublicUrl(fileName);
@@ -138,23 +97,12 @@ export async function POST(req) {
       },
     });
 
-    // Clear all relevant caches
-    await redis.del("products_all");
-    await redis.keys("products_*").then((keys) => {
-      keys.forEach((key) => redis.del(key));
-    });
-
     return NextResponse.json(product, { status: 201 });
   } catch (error) {
     console.error("Error creating product:", error);
-    return NextResponse.json(
-      { error: "Failed to create product" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to create product" }, { status: 500 });
   } finally {
     release();
     await prisma.$disconnect();
   }
 }
-
-export const dynamic = "force-dynamic";
