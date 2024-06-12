@@ -44,6 +44,10 @@ const RegisterPage = () => {
         setUserName("");
         setEmail("");
         setPassword("");
+        
+        // เก็บอีเมลใน localStorage
+        localStorage.setItem("registeredEmail", email);
+
         router.push("/login");
       } else {
         toast({

@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Navbar from "@/components/nav/Navbar";
 import Footer from "@/components/Footer";
 import Link from "next/link";
@@ -12,6 +12,15 @@ const LoginPage = () => {
   const [password, setPassword] = useState("");
   const router = useRouter();
   const { toast } = useToast();
+
+  useEffect(() => {
+    // ดึงอีเมลจาก localStorage และลบค่าออกจาก localStorage หลังจากดึง
+    const registeredEmail = localStorage.getItem("registeredEmail");
+    if (registeredEmail) {
+      setEmail(registeredEmail);
+      localStorage.removeItem("registeredEmail");
+    }
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -31,7 +40,6 @@ const LoginPage = () => {
         });
         console.error(result.error);
       } else {
-        // Assuming the user information is in result.user
         toast({
           title: "ยินดีต้อนรับ",
           description: `ยินดีต้อนรับ, ${email}`,
