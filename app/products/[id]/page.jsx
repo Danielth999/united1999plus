@@ -48,7 +48,7 @@ const ViewProduct = () => {
             productName={product.name}
           />
         )}
-        <div className="bg-gray-100 border-2 py-8">
+        <div className=" border-2 py-8">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="relative w-full overflow-hidden rounded-lg bg-gray-300 dark:bg-gray-700 mb-4 h-[330px] sm:h-[350px] md:h-[410px] lg:h-[490px]">
