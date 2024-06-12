@@ -237,7 +237,7 @@ const ModalAddProduct = ({ onProductAdded }) => {
                   onChange={handleChange}
                   className="w-full borders rounded p-2 col-span-2"
                 >
-                  <option  disabled>
+                  <option  >
                     เลือกหมวดหมู่
                   </option>
                   {categories.map((category) => (
