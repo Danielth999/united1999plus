@@ -52,7 +52,10 @@ const UserListContent = () => {
   const [isDeleteMultipleOpen, setIsDeleteMultipleOpen] = useState(false); // สำหรับการลบหลายรายการ
 
   // Use SWR to fetch users data
-  const { data, error, mutate } = useSWR(`${process.env.NEXT_PUBLIC_API_URL}/api/users`, fetcher);
+  const { data, error, mutate } = useSWR(`${process.env.NEXT_PUBLIC_API_URL}/api/users`, fetcher,{
+    revalidateOnFocus: false,
+    refreshInterval: 1000,
+  });
 
   const users = Array.isArray(data) ? data : []; // ถ้า data ไม่เป็น array ให้ใช้ array ว่าง
 

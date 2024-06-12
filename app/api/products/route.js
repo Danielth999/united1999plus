@@ -13,7 +13,7 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 export const supabase = createClient(supabaseUrl, supabaseKey);
 
-const CACHE_EXPIRATION = 60 * 2; // 30 minutes
+const CACHE_EXPIRATION = 60 * 5; // 30 minutes
 
 async function getOrSetCache(key, cb) {
   const cachedData = await redis.get(key);

@@ -26,7 +26,11 @@ async function getOrSetCache(key, cb) {
 export const GET = async (Request) => {
   try {
     const users = await getOrSetCache("users", async () => {
-      return await prisma.user.findMany();
+      return await prisma.user.findMany({
+        orderBy: {
+          userId: "asc",
+        },
+      });
     });
 
     return Response.json(users, { status: 200 });

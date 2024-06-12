@@ -1,5 +1,6 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import useSWR, { mutate } from "swr";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { Pencil, Trash } from "lucide-react";
@@ -29,13 +30,11 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import DeleteConfirmationDialog from "@/components/DeleteConfirmationDialog";
 
+const fetcher = (url) => axios.get(url).then((res) => res.data);
+
 const CategoryList = () => {
   const router = useRouter();
   const { toast } = useToast();
-  const [categories, setCategories] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(null);
-
   const [currentPage, setCurrentPage] = useState(1);
   const [categoriesPerPage] = useState(5);
   const [searchTerm, setSearchTerm] = useState("");
@@ -45,36 +44,24 @@ const CategoryList = () => {
   const [isAlertOpen, setIsAlertOpen] = useState(false);
   const [deleteMultiple, setDeleteMultiple] = useState(false);
 
-  const fetchCategories = async () => {
-    try {
-      const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/category`
-      );
-      setCategories(response.data);
-      setIsLoading(false);
-    } catch (error) {
-      setError(error);
-      setIsLoading(false);
+  const { data: categories, error } = useSWR(
+    `${process.env.NEXT_PUBLIC_API_URL}/api/category`,
+    fetcher,{
+      refreshInterval: 1000,
     }
-  };
+  );
 
-  useEffect(() => {
-    fetchCategories();
-  }, []);
-
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const page = parseInt(params.get("page")) || 1;
-    setCurrentPage(page);
-  }, []);
-
-  if (isLoading)
+  if (!categories) {
     return (
       <div className="flex justify-center items-center h-screen">
         <Spinner />
       </div>
     );
-  if (error) return <div>Error loading categories</div>;
+  }
+
+  if (error) {
+    return <div>Error loading categories</div>;
+  }
 
   const handleDelete = async () => {
     if (!deleteCategory) return;
@@ -82,21 +69,24 @@ const CategoryList = () => {
     const optimisticCategories = categories.filter(
       (cat) => cat.categoryId !== deleteCategory.categoryId
     );
-    setCategories(optimisticCategories); // Update UI optimistically
-    setDeleteCategory(null); // Clear the delete category state
-    setIsAlertOpen(false); // Close the alert dialog
-    toast({
-      title: "Success",
-      description: "ลบหมวดหมู่สำเร็จ",
-      status: "success",
-      variant: "success",
-      isClosable: true,
-    });
+    mutate(
+      `${process.env.NEXT_PUBLIC_API_URL}/api/category`,
+      optimisticCategories,
+      false
+    );
 
     try {
       await axios.delete(
         `${process.env.NEXT_PUBLIC_API_URL}/api/category/${deleteCategory.categoryId}`
       );
+      toast({
+        title: "Success",
+        description: "ลบหมวดหมู่สำเร็จ",
+        status: "success",
+        variant: "success",
+        isClosable: true,
+      });
+      mutate(`${process.env.NEXT_PUBLIC_API_URL}/api/category`);
     } catch (error) {
       console.error("Error deleting category:", error);
       toast({
@@ -106,8 +96,10 @@ const CategoryList = () => {
         variant: "destructive",
         isClosable: true,
       });
-      // Revert the change in case of an error
-      setCategories(categories);
+      mutate(`${process.env.NEXT_PUBLIC_API_URL}/api/category`);
+    } finally {
+      setDeleteCategory(null);
+      setIsAlertOpen(false);
     }
   };
 
@@ -115,9 +107,11 @@ const CategoryList = () => {
     const optimisticCategories = categories.filter(
       (cat) => !selectedCategories.includes(cat.categoryId)
     );
-    setCategories(optimisticCategories); // Update UI optimistically
-    setSelectedCategories([]); // Clear selected categories state
-    setDeleteMultiple(false);
+    mutate(
+      `${process.env.NEXT_PUBLIC_API_URL}/api/category`,
+      optimisticCategories,
+      false
+    );
 
     try {
       await Promise.all(
@@ -127,13 +121,13 @@ const CategoryList = () => {
           )
         )
       );
-
       toast({
         title: "ลบรายการที่เลือกสำเร็จ",
         description: `ลบรายการที่เลือกสำเร็จ`,
         variant: "success",
         status: "success",
       });
+      mutate(`${process.env.NEXT_PUBLIC_API_URL}/api/category`);
     } catch (error) {
       console.error("Error deleting selected categories:", error);
       toast({
@@ -142,8 +136,10 @@ const CategoryList = () => {
         variant: "destructive",
         status: "error",
       });
-      // Revert the change in case of an error
-      setCategories(categories);
+      mutate(`${process.env.NEXT_PUBLIC_API_URL}/api/category`);
+    } finally {
+      setSelectedCategories([]);
+      setDeleteMultiple(false);
     }
   };
 
@@ -153,7 +149,7 @@ const CategoryList = () => {
 
   const handleDeleteClick = (category) => {
     setDeleteCategory(category);
-    setIsAlertOpen(true); // Open the alert dialog
+    setIsAlertOpen(true);
   };
 
   const handleCheckboxChange = (categoryId) => {
@@ -166,20 +162,18 @@ const CategoryList = () => {
     });
   };
 
-  // Logic for displaying categories
   const indexOfLastCategory = currentPage * categoriesPerPage;
   const indexOfFirstCategory = indexOfLastCategory - categoriesPerPage;
 
-  const filteredCategories = categories.filter((category) => {
-    return category.name.toLowerCase().includes(searchTerm.toLowerCase());
-  });
+  const filteredCategories = categories.filter((category) =>
+    category.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   const currentCategories = filteredCategories.slice(
     indexOfFirstCategory,
     indexOfLastCategory
   );
 
-  // Change page
   const paginate = (pageNumber) => {
     setCurrentPage(pageNumber);
     router.push(`?page=${pageNumber}`);
@@ -192,7 +186,11 @@ const CategoryList = () => {
         <div className="flex items-center justify-between">
           <CardDescription>ค้นหาและจัดการหมวดหมู่ในระบบ</CardDescription>
           <div>
-            <ModalAddCategory onCategoryAdded={fetchCategories} />
+            <ModalAddCategory
+              onCategoryAdded={() =>
+                mutate(`${process.env.NEXT_PUBLIC_API_URL}/api/category`)
+              }
+            />
           </div>
         </div>
       </CardHeader>
@@ -307,10 +305,7 @@ const CategoryList = () => {
       {selectedCategories.length > 0 && (
         <CardFooter className="flex justify-between items-center">
           <span>{selectedCategories.length} รายการที่เลือก</span>
-          <Button
-            variant="destructive"
-            onClick={() => setDeleteMultiple(true)}
-          >
+          <Button variant="destructive" onClick={() => setDeleteMultiple(true)}>
             ลบรายการที่เลือก
           </Button>
         </CardFooter>
@@ -318,7 +313,9 @@ const CategoryList = () => {
       {selectedCategory && (
         <ModalEditCategory
           category={selectedCategory}
-          onCategoryUpdated={fetchCategories}
+          onCategoryUpdated={() =>
+            mutate(`${process.env.NEXT_PUBLIC_API_URL}/api/category`)
+          }
         />
       )}
       <DeleteConfirmationDialog
