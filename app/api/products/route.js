@@ -36,7 +36,7 @@ export async function GET(req) {
     const searchQuery = req.nextUrl.searchParams.get("search");
 
     const products = await getOrSetCache(
-      `products_${searchQuery}`,
+      `products_${searchQuery || "all"}`,
       async () => {
         const where = searchQuery
           ? {
@@ -64,6 +64,7 @@ export async function GET(req) {
     await prisma.$disconnect();
   }
 }
+
 
 export async function POST(req) {
   const release = await mutex.acquire();
@@ -137,7 +138,11 @@ export async function POST(req) {
       },
     });
 
-    await redis.del("products");
+    // Clear all relevant caches
+    await redis.del("products_all");
+    await redis.keys("products_*").then((keys) => {
+      keys.forEach((key) => redis.del(key));
+    });
 
     return NextResponse.json(product, { status: 201 });
   } catch (error) {

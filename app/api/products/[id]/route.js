@@ -12,37 +12,16 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 const supabase = createClient(supabaseUrl, supabaseKey);
 const mutex = new Mutex();
-const CACHE_EXPIRATION = 60 * 2; // 30 minutes
-
-// Helper function to get or set cache
-async function getOrSetCache(key, cb) {
-  const cachedData = await redis.get(key); // ตรวจสอบว่ามีข้อมูลใน cache หรือไม่
-  if (cachedData) {
-    try {
-      return JSON.parse(cachedData); // ถ้ามีข้อมูลใน cache ให้คืนค่าข้อมูลนั้น
-    } catch (error) {
-      console.error("Error parsing cached data:", error);
-      // ถ้ามีข้อผิดพลาดในการแปลง JSON แสดงว่า cache อาจมีปัญหา
-      await redis.del(key); // ลบข้อมูลใน cache ที่ไม่ถูกต้อง
-    }
-  }
-
-  const freshData = await cb(); // ถ้าไม่มีข้อมูลใน cache ให้เรียกใช้ callback เพื่อดึงข้อมูลใหม่
-  await redis.set(key, JSON.stringify(freshData), "EX", CACHE_EXPIRATION); // เก็บข้อมูลใหม่ลงใน cache พร้อมตั้งเวลาหมดอายุ
-  return freshData; // คืนค่าข้อมูลใหม่
-}
 
 export async function GET(request, { params }) {
   const { id } = params;
 
   try {
-    const product = await getOrSetCache(`product:${id}`, async () => {
-      return await prisma.product.findUnique({
-        where: { productId: parseInt(id, 10) },
-        include: {
-          Category: true,
-        },
-      });
+    const product = await prisma.product.findUnique({
+      where: { productId: parseInt(id, 10) },
+      include: {
+        Category: true,
+      },
     });
 
     if (!product) {
@@ -162,8 +141,10 @@ export const PUT = async (request, { params }) => {
         data: updateData,
       });
 
-      // Clear cache after updating the product
-      await redis.del("products");
+      await redis.del("products_all");
+      await redis.keys("products_*").then((keys) => {
+        keys.forEach((key) => redis.del(key));
+      });
 
       return NextResponse.json(updatedProduct, { status: 200 });
     } else {
@@ -225,8 +206,11 @@ export const DELETE = async (request, { params }) => {
       }
     }
 
-    // Clear cache after deleting the product
-    await redis.del("products");
+    // Clear all relevant caches
+    await redis.del("products_all");
+    await redis.keys("products_*").then((keys) => {
+      keys.forEach((key) => redis.del(key));
+    });
 
     return NextResponse.json(
       { message: "Product and image deleted successfully" },

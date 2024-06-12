@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect, Suspense } from "react";
-import axios from "axios";
+import useSWR, { mutate } from "swr";
 import { useRouter } from "next/navigation";
 import { Pencil, Trash, Eye } from "lucide-react";
 import Spinner from "@/components/spinner/Spinner";
@@ -9,7 +9,6 @@ import ModalEditProduct from "./ModalEditProduct";
 import PaginationComponent from "@/components/Pagination";
 import Image from "next/image";
 import { Switch } from "@/components/ui/switch";
-
 import {
   Card,
   CardContent,
@@ -31,53 +30,36 @@ import { Button } from "@/components/ui/button";
 import DeleteConfirmationDialog from "@/components/DeleteConfirmationDialog";
 import { useToast } from "@/components/ui/use-toast";
 
+const fetcher = (url) => fetch(url).then((res) => res.json());
+
 const ProductListContent = () => {
   const router = useRouter();
   const { toast } = useToast();
   const [currentPage, setCurrentPage] = useState(1);
   const [productsPerPage] = useState(5);
   const [searchTerm, setSearchTerm] = useState("");
-  const [categoryFilter, setCategoryFilter] = useState(""); // สำหรับการกรองตามหมวดหมู่
-  const [publishFilter, setPublishFilter] = useState(""); // สำหรับการกรองตามสถานะการเผยแพร่
-  const [categories, setCategories] = useState([]); // เก็บข้อมูลหมวดหมู่
-  const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [categoryFilter, setCategoryFilter] = useState("");
+  const [publishFilter, setPublishFilter] = useState("");
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [deleteProduct, setDeleteProduct] = useState(null);
   const [selectedProducts, setSelectedProducts] = useState([]);
-  const [deleteMultiple, setDeleteMultiple] = useState(false); // สำหรับจัดการ dialog การลบหลายรายการ
+  const [deleteMultiple, setDeleteMultiple] = useState(false);
 
-  const fetchProducts = async () => {
-    try {
-      const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/products`
-      );
-      setProducts(response.data);
-      setLoading(false);
-    } catch (error) {
-      setError(error);
-      setLoading(false);
+  const { data: products, error: productsError } = useSWR(
+    `${process.env.NEXT_PUBLIC_API_URL}/api/products`,
+    fetcher,
+    {
+      refreshInterval: 2000,
+      
     }
-  };
+  );
 
-  const fetchCategories = async () => {
-    try {
-      const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/category`
-      );
-      setCategories(response.data);
-    } catch (error) {
-      console.error("Error fetching categories:", error);
-    }
-  };
+  const { data: categories, error: categoriesError } = useSWR(
+    `${process.env.NEXT_PUBLIC_API_URL}/api/category`,
+    fetcher
+  );
 
-  useEffect(() => {
-    fetchProducts();
-    fetchCategories();
-  }, []);
-
-  if (loading) {
+  if (!products || !categories) {
     return (
       <div className="flex justify-center items-center h-screen">
         <Spinner />
@@ -85,7 +67,7 @@ const ProductListContent = () => {
     );
   }
 
-  if (error) {
+  if (productsError || categoriesError) {
     return (
       <div className="flex justify-center items-center h-screen">
         <h1 className="text-red-500">เกิดข้อผิดพลาดในการแสดงผลข้อมูลสินค้า</h1>
@@ -102,22 +84,27 @@ const ProductListContent = () => {
     const optimisticProducts = products.filter(
       (product) => product.productId !== deleteProduct.productId
     );
-    setProducts(optimisticProducts); // Optimistically update UI
+    mutate(
+      `${process.env.NEXT_PUBLIC_API_URL}/api/products`,
+      optimisticProducts,
+      false
+    );
 
     try {
-      await axios.delete(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/products/${deleteProduct.productId}`
+      await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/products/${deleteProduct.productId}`,
+        { method: "DELETE" }
       );
       const endTime = performance.now();
-      const deleteDuration = ((endTime - startTime) / 1000).toFixed(2); // แปลงเป็นวินาที
+      const deleteDuration = ((endTime - startTime) / 1000).toFixed(2);
       toast({
         title: "ลบสำเร็จ",
         description: `เวลาในการลบ: ${deleteDuration} วินาที`,
         variant: "success",
         status: "success",
       });
+      mutate(`${process.env.NEXT_PUBLIC_API_URL}/api/products`);
     } catch (error) {
-      setProducts(products); // Revert UI update on error
       console.error("Error deleting product:", error);
       toast({
         title: "ลบไม่สำเร็จ",
@@ -126,7 +113,7 @@ const ProductListContent = () => {
         status: "error",
       });
     } finally {
-      setDeleteProduct(null); // Clear the delete product state
+      setDeleteProduct(null);
     }
   };
 
@@ -136,27 +123,32 @@ const ProductListContent = () => {
     const optimisticProducts = products.filter(
       (product) => !selectedProducts.includes(product.productId)
     );
-    setProducts(optimisticProducts); // Optimistically update UI
+    mutate(
+      `${process.env.NEXT_PUBLIC_API_URL}/api/products`,
+      optimisticProducts,
+      false
+    );
 
     try {
       await Promise.all(
         selectedProducts.map((productId) =>
-          axios.delete(
-            `${process.env.NEXT_PUBLIC_API_URL}/api/products/${productId}`
+          fetch(
+            `${process.env.NEXT_PUBLIC_API_URL}/api/products/${productId}`,
+            { method: "DELETE" }
           )
         )
       );
       const endTime = performance.now();
-      const deleteDuration = ((endTime - startTime) / 1000).toFixed(2); // แปลงเป็นวินาที
+      const deleteDuration = ((endTime - startTime) / 1000).toFixed(2);
       toast({
         title: "ลบรายการที่เลือกสำเร็จ",
         description: `เวลาในการลบ: ${deleteDuration} วินาที`,
         variant: "success",
         status: "success",
       });
-      setSelectedProducts([]); // Clear selected products state
+      setSelectedProducts([]);
+      mutate(`${process.env.NEXT_PUBLIC_API_URL}/api/products`);
     } catch (error) {
-      setProducts(products); // Revert UI update on error
       console.error("Error deleting selected products:", error);
       toast({
         title: "ลบรายการที่เลือกไม่สำเร็จ",
@@ -194,13 +186,20 @@ const ProductListContent = () => {
         : product
     );
 
-    setProducts(updatedProducts); // Update UI optimistically
+    mutate(
+      `${process.env.NEXT_PUBLIC_API_URL}/api/products`,
+      updatedProducts,
+      false
+    );
 
     try {
-      await axios.put(
+      await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/api/products/${productId}`,
-        { isPublished: !currentStatus },
-        { headers: { "Content-Type": "application/json" } }
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ isPublished: !currentStatus }),
+        }
       );
 
       toast({
@@ -210,10 +209,8 @@ const ProductListContent = () => {
         variant: "success",
         isClosable: true,
       });
+      mutate(`${process.env.NEXT_PUBLIC_API_URL}/api/products`);
     } catch (error) {
-      // Revert the change in case of an error
-      setProducts(products);
-
       console.error("Error toggling publish status:", error);
       toast({
         title: "Error",
@@ -222,6 +219,7 @@ const ProductListContent = () => {
         variant: "destructive",
         isClosable: true,
       });
+      mutate(`${process.env.NEXT_PUBLIC_API_URL}/api/products`);
     }
   };
 
@@ -256,7 +254,11 @@ const ProductListContent = () => {
           <CardTitle>รายการผลิตภัณฑ์</CardTitle>
           <div className="flex justify-between items-center">
             <CardDescription>ค้นหาและจัดการผลิตภัณฑ์ในระบบ</CardDescription>
-            <ModalAddProduct onProductAdded={fetchProducts} />
+            <ModalAddProduct
+              onProductAdded={() =>
+                mutate(`${process.env.NEXT_PUBLIC_API_URL}/api/products`)
+              }
+            />
           </div>
         </CardHeader>
         <CardContent>
@@ -416,7 +418,9 @@ const ProductListContent = () => {
       {selectedProduct && (
         <ModalEditProduct
           product={selectedProduct}
-          onProductUpdated={fetchProducts}
+          onProductUpdated={() =>
+            mutate(`${process.env.NEXT_PUBLIC_API_URL}/api/products`)
+          }
         />
       )}
       <DeleteConfirmationDialog
@@ -441,5 +445,4 @@ const ProductList = () => {
     </Suspense>
   );
 };
-
 export default ProductList;
