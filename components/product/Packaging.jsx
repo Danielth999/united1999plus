@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import axios from "axios";
 import Image from "next/image";
 import {
@@ -11,8 +11,14 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import Loading from "@/components/spinner/Spinner";
-import Link from "next/link";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import useSWR from "swr";
+import ProductDetail from "@/components/product/action/ProductDetail"; // ตรวจสอบตำแหน่งให้ถูกต้อง
 
 const fetcher = (url) => axios.get(url).then((res) => res.data);
 
@@ -21,10 +27,13 @@ const Packaging = () => {
     `${process.env.NEXT_PUBLIC_API_URL}/api/category/filter/packaging?limit=10`,
     fetcher,
     {
-      dedupingInterval: 60000,
-      refreshInterval: 60000,
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false,
+      refreshInterval: 2000,
     }
   );
+
+  const [selectedProductId, setSelectedProductId] = useState(null);
 
   if (error) return <div>Failed to load</div>;
   if (!category)
@@ -46,25 +55,22 @@ const Packaging = () => {
           {products.map((item) => (
             <Card
               key={item.productId}
-              className="hover:shadow-xl border overflow-hidden"
+              className="hover:shadow-xl border flex flex-col"
+              onClick={() => setSelectedProductId(item.productId)}
             >
-              <Link href={`/products/${item.productId}`}>
-                <CardHeader className="border-b w-full h-60 relative">
-                  <Image
-                    src={item.imageUrl}
-                    alt={item.name}
-                    fill
-                    sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
-                    style={{ objectFit: "cover", objectPosition: "center" }}
-                  />
-                </CardHeader>
-              </Link>
-              <CardContent>
-                <CardTitle className="line-clamp-2">
-                  <Link href={`/products/${item.productId}`}>{item.name}</Link>
-                </CardTitle>
+              <CardHeader className="border-b w-full h-60 relative">
+                <Image
+                  src={item.imageUrl}
+                  alt={item.name}
+                  fill
+                  sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                  style={{ objectFit: "cover", objectPosition: "center" }}
+                />
+              </CardHeader>
+              <CardContent className="flex-grow">
+                <CardTitle className="line-clamp-2">{item.name}</CardTitle>
               </CardContent>
-              <CardFooter className="flex justify-between p-4  border-t">
+              <CardFooter className="flex justify-between p-4 border-t">
                 <div className="flex flex-col items-center">
                   <Badge
                     variant="customPrimary"
@@ -90,14 +96,26 @@ const Packaging = () => {
 
         {products.length === 10 && (
           <div className="flex justify-center mt-5">
-            <Link href={`/category/packaging`}>
-              <button className="bg-blue-500 text-white py-2 px-4 rounded-full hover:bg-blue-600">
-                ดูเพิ่มเติม
-              </button>
-            </Link>
+            <button className="bg-blue-500 text-white py-2 px-4 rounded-full hover:bg-blue-600">
+              ดูเพิ่มเติม
+            </button>
           </div>
         )}
       </div>
+
+      {selectedProductId && (
+        <Dialog
+          open={!!selectedProductId}
+          onOpenChange={() => setSelectedProductId(null)}
+        >
+          <DialogContent className="max-w-4xl mx-auto p-4">
+            <DialogHeader>
+              <DialogTitle>รายละเอียดสินค้า</DialogTitle>
+            </DialogHeader>
+            <ProductDetail productId={selectedProductId} />
+          </DialogContent>
+        </Dialog>
+      )}
     </>
   );
 };

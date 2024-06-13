@@ -8,7 +8,6 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
@@ -17,7 +16,7 @@ import { Textarea } from "@/components/ui/textarea";
 import Image from "next/image";
 import { Checkbox } from "@/components/ui/checkbox";
 
-const ModalEditProduct = ({ product, onProductUpdated }) => {
+const ModalEditProduct = ({ product, onProductUpdated, open, setOpen }) => {
   const { toast } = useToast();
   const [editProduct, setEditProduct] = useState({
     name: "",
@@ -26,31 +25,29 @@ const ModalEditProduct = ({ product, onProductUpdated }) => {
     stock: "",
     color: "",
     size: "",
-    unitType: "", // ล้างฟิลด์นี้
+    unitType: "",
     isPublished: false,
     categoryId: "",
     image: null,
   });
   const [categories, setCategories] = useState([]);
   const [previewImage, setPreviewImage] = useState(null);
-  const [open, setOpen] = useState(false);
 
   useEffect(() => {
     if (product) {
       setEditProduct({
-        name: product.name,
-        description: product.description,
-        price: product.price,
-        stock: product.stock,
-        color: product.color,
-        size: product.size,
-        unitType: product.unitType, // ล้างฟิลด์นี้
-        isPublished: product.isPublished,
+        name: product.name || "",
+        description: product.description || "",
+        price: product.price || "",
+        stock: product.stock || "",
+        color: product.color || "",
+        size: product.size || "",
+        unitType: product.unitType || "",
+        isPublished: product.isPublished || false,
         categoryId: product.categoryId ? product.categoryId.toString() : "",
         image: null,
       });
       setPreviewImage(product.imageUrl || null);
-      setOpen(true); // Open the dialog
     }
   }, [product]);
 
@@ -89,7 +86,6 @@ const ModalEditProduct = ({ product, onProductUpdated }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Check if all fields are filled
     if (
       !editProduct.name ||
       !editProduct.description ||
@@ -106,7 +102,6 @@ const ModalEditProduct = ({ product, onProductUpdated }) => {
       return;
     }
 
-    // Optimistic UI Update
     const updatedProduct = { ...product, ...editProduct };
     onProductUpdated(updatedProduct);
     setOpen(false);
@@ -119,7 +114,7 @@ const ModalEditProduct = ({ product, onProductUpdated }) => {
     formData.append("stock", editProduct.stock);
     formData.append("color", editProduct.color);
     formData.append("size", editProduct.size);
-    formData.append("unitType", editProduct.unitType); // ล้างฟิลด์นี้
+    formData.append("unitType", editProduct.unitType);
     formData.append("isPublished", editProduct.isPublished);
     formData.append("categoryId", editProduct.categoryId);
     if (editProduct.image) {
@@ -152,16 +147,12 @@ const ModalEditProduct = ({ product, onProductUpdated }) => {
         variant: "destructive",
         isClosable: true,
       });
-      // Revert Optimistic Update on Error
       onProductUpdated(product);
     }
   };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button className="bg-[#204d9c] hidden text-white">แก้ไขสินค้า</Button>
-      </DialogTrigger>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>แก้ไขสินค้า</DialogTitle>
@@ -203,7 +194,6 @@ const ModalEditProduct = ({ product, onProductUpdated }) => {
                   onChange={handleChange}
                   placeholder="หน่วย"
                 />
-
                 <Input
                   type="text"
                   name="color"
@@ -224,9 +214,7 @@ const ModalEditProduct = ({ product, onProductUpdated }) => {
                   onChange={handleChange}
                   className="w-full border rounded p-2"
                 >
-                  <option >
-                    เลือกหมวดหมู่
-                  </option>
+                  <option>เลือกหมวดหมู่</option>
                   {categories.map((category) => (
                     <option
                       key={category.categoryId}
