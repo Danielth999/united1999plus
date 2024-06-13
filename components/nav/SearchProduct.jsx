@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { Search } from "lucide-react";
 import { useRouter } from "next/navigation";
 
-const SearchProduct = () => {
+const SearchProduct = ({ className }) => {
   const router = useRouter();
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -15,7 +15,7 @@ const SearchProduct = () => {
 
   return (
     <form
-      className="hidden md:flex md:mx-4 items-center h-[70px] flex-1 justify-center"
+      className={`${className} items-center h-[70px] flex-1 justify-center`}
       onSubmit={handleSearch}
     >
       <input

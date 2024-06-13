@@ -1,10 +1,9 @@
-"use client";
+'use client';
 import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import logo from "../../public/logo/logo-real-no-bg.png";
 import { useSession, signOut } from "next-auth/react";
-import { useRouter } from "next/navigation";
 import { Search, Menu, X, LayoutGrid } from "lucide-react";
 import Header from "./Header";
 import {
@@ -18,7 +17,7 @@ import useSWR from "swr";
 import axios from "axios";
 import { useToast } from "@/components/ui/use-toast";
 
-const fetcher = url => axios.get(url).then(res => res.data);
+const fetcher = (url) => axios.get(url).then((res) => res.data);
 
 const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -28,7 +27,6 @@ const Navbar = () => {
     fetcher
   );
   const { data: session, status } = useSession();
-  const router = useRouter();
 
   if (error) {
     toast({
@@ -99,7 +97,7 @@ const Navbar = () => {
               </DropdownMenu>
             </div>
           </div>
-          <SearchProduct />
+          <SearchProduct className="hidden md:flex" />
           {status === "authenticated" && session ? (
             <div className="flex items-center space-x-4">
               <DropdownMenu>
@@ -145,16 +143,7 @@ const Navbar = () => {
           <div className="md:hidden">
             <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
               <div className="px-4 py-2">
-                <form className="flex">
-                  <input
-                    type="search"
-                    className="w-full border outline-none rounded-md p-2"
-                    placeholder="ค้นหาชื่อสิ้นค้าหรือเลขรหัส SKU"
-                  />
-                  <button className="bg-red-500 p-2 flex justify-center items-center rounded-r-md">
-                    <Search className="text-white" />
-                  </button>
-                </form>
+                <SearchProduct className="flex" />
               </div>
               <div className="text-[#204d9c] font-bold px-3 py-2">หมวดหมู่</div>
               {categories?.map((category) => (
