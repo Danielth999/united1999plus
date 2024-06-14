@@ -100,14 +100,6 @@ const ProductList = ({ searchQuery, setResultsCount, onViewProduct }) => {
             <CardFooter className="flex justify-between p-4 border-t">
               <div className="flex flex-col items-center">
                 <Badge
-                  variant="customPrimary"
-                  className="font-bold w-full text-center"
-                >
-                  <span>จำนวน {item.stock}</span>
-                </Badge>
-              </div>
-              <div className="flex flex-col items-center">
-                <Badge
                   variant="customSecondary"
                   className="w-full text-center line-clamp-1"
                 >
