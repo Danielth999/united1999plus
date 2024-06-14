@@ -20,7 +20,11 @@ const fetcher = (url) => axios.get(url).then((res) => res.data);
 const ProductDetail = () => {
   const router = useRouter();
   const { id } = useParams();
-  const { data: productData, error, mutate } = useSWR(
+  const {
+    data: productData,
+    error,
+    mutate,
+  } = useSWR(
     id ? `${process.env.NEXT_PUBLIC_API_URL}/api/products/${id}` : null,
     fetcher,
     { dedupingInterval: 60000 }
@@ -79,9 +83,6 @@ const ProductDetail = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                   <p className="text-lg">
                     <strong>รายละเอียด:</strong> {productData.description}
-                  </p>
-                  <p className="text-lg">
-                    <strong>ราคา:</strong> {productData.price}/{productData.unitType}
                   </p>
                   <p className="text-lg">
                     <strong>จำนวน:</strong> {productData.stock}

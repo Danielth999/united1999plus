@@ -4,7 +4,7 @@ import { createClient } from "@supabase/supabase-js";
 import { v4 as uuidv4 } from "uuid";
 import { Mutex } from "async-mutex";
 import sharp from "sharp";
-
+import redis from "@/lib/redis";
 const prisma = new PrismaClient();
 const mutex = new Mutex();
 
@@ -41,11 +41,11 @@ export async function POST(req) {
     const formData = await req.formData();
     const name = formData.get("name");
     const description = formData.get("description");
-    const price = formData.get("price");
+
     const stock = formData.get("stock");
     const color = formData.get("color");
     const size = formData.get("size");
-    const unitType = formData.get("unitType");
+   
     const isPublished = formData.get("isPublished") === "true";
     const categoryId = formData.get("categoryId");
     const image = formData.get("image");
@@ -53,11 +53,10 @@ export async function POST(req) {
     if (
       !name ||
       !description ||
-      !price ||
       !stock ||
       !color ||
       !size ||
-      !unitType ||
+     
       !categoryId ||
       !image
     ) {
@@ -93,17 +92,21 @@ export async function POST(req) {
       data: {
         name,
         description,
-        price: parseFloat(price),
+
         stock,
         color,
         size,
-        unitType,
+       
         isPublished,
         categoryId: parseInt(categoryId, 10),
         imageUrl: productUrl.data.publicUrl,
       },
     });
-
+    await redis.keys("category_*").then((keys) => {
+      if (keys.length > 0) {
+        redis.del(keys);
+      }
+    });
     return NextResponse.json(product, { status: 201 });
   } catch (error) {
     console.error("Error creating product:", error);

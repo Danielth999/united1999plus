@@ -3,7 +3,6 @@ import { NextResponse } from "next/server";
 import { Mutex } from "async-mutex";
 import path from "path";
 import { createClient } from "@supabase/supabase-js";
-
 import { v4 as uuidv4 } from "uuid";
 import sharp from "sharp";
 
@@ -29,13 +28,15 @@ export async function GET(request, { params }) {
     return NextResponse.json(product, { status: 200 });
   } catch (error) {
     console.error("Error fetching product:", error);
-    return NextResponse.json({ error: "Failed to fetch product" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to fetch product" },
+      { status: 500 }
+    );
   } finally {
     await prisma.$disconnect();
   }
 }
 
-// PUT to update a product
 export async function PUT(request, { params }) {
   const release = await mutex.acquire();
 
@@ -44,7 +45,10 @@ export async function PUT(request, { params }) {
     const productId = parseInt(id, 10);
 
     if (isNaN(productId)) {
-      return NextResponse.json({ error: "Invalid product ID" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Invalid product ID" },
+        { status: 400 }
+      );
     }
 
     const contentType = request.headers.get("Content-Type");
@@ -61,41 +65,63 @@ export async function PUT(request, { params }) {
       const formData = await request.formData();
       const name = formData.get("name");
       const description = formData.get("description");
-      const price = parseFloat(formData.get("price"));
       const stock = formData.get("stock");
       const color = formData.get("color");
       const size = formData.get("size");
-      const unitType = formData.get("unitType");
       const categoryId = parseInt(formData.get("categoryId"), 10);
       const image = formData.get("image");
 
-      const updateData = { name, description, price, stock, color, size, unitType, categoryId };
+      const updateData = {
+        name,
+        description,
+        stock,
+        color,
+        size,
+        categoryId,
+      };
 
       if (image && image.name) {
         const imageBuffer = Buffer.from(await image.arrayBuffer());
         const fileName = `${uuidv4()}.webp`;
 
-        const buffer = await sharp(imageBuffer).resize({ width: 800 }).webp().toBuffer();
+        const buffer = await sharp(imageBuffer)
+          .resize({ width: 800 })
+          .webp()
+          .toBuffer();
 
-        const { data, error: uploadError } = await supabase.storage.from("products").upload(fileName, buffer, {
-          contentType: "image/webp",
-        });
+        const { data, error: uploadError } = await supabase.storage
+          .from("products")
+          .upload(fileName, buffer, {
+            contentType: "image/webp",
+          });
 
         if (uploadError) {
           console.error("Error uploading image:", uploadError);
-          return NextResponse.json({ error: "Failed to upload image" }, { status: 500 });
+          return NextResponse.json(
+            { error: "Failed to upload image" },
+            { status: 500 }
+          );
         }
 
-        updateData.imageUrl = supabase.storage.from("products").getPublicUrl(fileName).data.publicUrl;
+        updateData.imageUrl = supabase.storage
+          .from("products")
+          .getPublicUrl(fileName).data.publicUrl;
 
-        const oldProduct = await prisma.product.findUnique({ where: { productId } });
+        const oldProduct = await prisma.product.findUnique({
+          where: { productId },
+        });
 
         if (oldProduct && oldProduct.imageUrl) {
           const oldFileName = path.basename(oldProduct.imageUrl);
-          const { error: deleteError } = await supabase.storage.from("products").remove([oldFileName]);
+          const { error: deleteError } = await supabase.storage
+            .from("products")
+            .remove([oldFileName]);
 
           if (deleteError) {
-            console.error("Error deleting old image from Supabase:", deleteError);
+            console.error(
+              "Error deleting old image from Supabase:",
+              deleteError
+            );
           }
         }
       }
@@ -107,18 +133,23 @@ export async function PUT(request, { params }) {
 
       return NextResponse.json(updatedProduct, { status: 200 });
     } else {
-      return NextResponse.json({ error: "Unsupported Content-Type" }, { status: 415 });
+      return NextResponse.json(
+        { error: "Unsupported Content-Type" },
+        { status: 415 }
+      );
     }
   } catch (error) {
     console.error("Error updating product:", error);
-    return NextResponse.json({ error: "Failed to update product" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to update product" },
+      { status: 500 }
+    );
   } finally {
     release();
     await prisma.$disconnect();
   }
 }
 
-// DELETE a product
 export async function DELETE(request, { params }) {
   const release = await mutex.acquire();
 
@@ -127,7 +158,10 @@ export async function DELETE(request, { params }) {
     const productId = parseInt(id, 10);
 
     if (isNaN(productId)) {
-      return NextResponse.json({ error: "Invalid product ID" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Invalid product ID" },
+        { status: 400 }
+      );
     }
 
     const product = await prisma.product.findUnique({
@@ -144,20 +178,31 @@ export async function DELETE(request, { params }) {
 
     if (product.imageUrl) {
       const fileName = path.basename(product.imageUrl);
-      const { error } = await supabase.storage.from("products").remove([fileName]);
+      const { error } = await supabase.storage
+        .from("products")
+        .remove([fileName]);
 
       if (error) {
         console.error("Error deleting image from Supabase:", error);
-        return NextResponse.json({ error: "Failed to delete image from storage" }, { status: 500 });
+        return NextResponse.json(
+          { error: "Failed to delete image from storage" },
+          { status: 500 }
+        );
       }
     }
 
-    return NextResponse.json({ message: "Product and image deleted successfully" }, { status: 200 });
+    return NextResponse.json(
+      { message: "Product and image deleted successfully" },
+      { status: 200 }
+    );
   } catch (error) {
     console.error("Error deleting product:", error);
-    return NextResponse.json({ error: "Failed to delete product" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to delete product" },
+      { status: 500 }
+    );
   } finally {
     release();
     await prisma.$disconnect();
   }
-};
+}

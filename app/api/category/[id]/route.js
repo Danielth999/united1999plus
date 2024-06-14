@@ -71,11 +71,7 @@ export const PUT = async (request, { params }) => {
       data: updateData,
     });
     await redis.del("categories");
-    await redis.keys("category_*").then((keys) => {
-      if (keys.length > 0) {
-        redis.del(keys);
-      }
-    });
+
     return NextResponse.json(updatedCategory, { status: 200 });
   } catch (error) {
     console.error("Error updating category:", error);
@@ -125,11 +121,7 @@ export const DELETE = async (request, { params }) => {
       }
     }
     await redis.del("categories");
-    await redis.keys("category_*").then((keys) => {
-      if (keys.length > 0) {
-        redis.del(keys);
-      }
-    });
+
     return NextResponse.json(
       { message: "Category and image deleted successfully" },
       { status: 200 }

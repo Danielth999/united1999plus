@@ -49,12 +49,9 @@ const ProductListContent = () => {
     `${process.env.NEXT_PUBLIC_API_URL}/api/products`,
     fetcher,
     {
-
-
       refreshInterval: 1000,
       revalidateOnFocus: false,
       revalidateOnReconnect: false,
-      
     }
   );
 
@@ -330,7 +327,7 @@ const ProductListContent = () => {
                   <TableHead>รูปภาพ</TableHead>
                   <TableHead>ชื่อผลิตภัณฑ์</TableHead>
                   <TableHead>หมวดหมู่</TableHead>
-                  <TableHead>ราคา</TableHead>
+
                   <TableHead>เผยแพร่</TableHead>
                   <TableHead>จัดการ</TableHead>
                 </TableRow>
@@ -363,9 +360,7 @@ const ProductListContent = () => {
                     </TableCell>
                     <TableCell>{product.name}</TableCell>
                     <TableCell>{product.Category.name}</TableCell>
-                    <TableCell>
-                      {product.price.toFixed(2)}/{product.unitType}
-                    </TableCell>
+                   
                     <TableCell>
                       <Switch
                         checked={product.isPublished}

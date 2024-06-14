@@ -18,6 +18,13 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import ProductDetail from "@/components/product/action/ProductDetail"; // ตรวจสอบตำแหน่งให้ถูกต้อง
 
 const fetcher = (url) => axios.get(url).then((res) => res.data);
 
@@ -29,6 +36,7 @@ const CategoryPage = () => {
   );
   const [currentPage, setCurrentPage] = useState(1);
   const productsPerPage = 10;
+  const [selectedProductId, setSelectedProductId] = useState(null);
 
   if (error) {
     return <div>Error fetching category</div>;
@@ -75,36 +83,23 @@ const CategoryPage = () => {
             <Card
               key={item.productId}
               className="hover:shadow-xl hover:border-[#204d9c] border flex flex-col"
+              onClick={() => setSelectedProductId(item.productId)}
             >
               <CardHeader className="border-b">
                 <div className="relative w-full h-48 overflow-hidden">
-                  <Link href={`/products/${item.productId}`}>
-                    <Image
-                      src={item.imageUrl}
-                      alt={item.name}
-                      fill
-                      style={{ objectFit: "contain" }}
-                      className="max-h-full"
-                    />
-                  </Link>
+                  <Image
+                    src={item.imageUrl}
+                    alt={item.name}
+                    fill
+                    style={{ objectFit: "contain" }}
+                    className="max-h-full"
+                  />
                 </div>
               </CardHeader>
               <CardContent className="flex-grow">
-                <CardTitle className="line-clamp-2">
-                  <Link href={`/products/${item.productId}`}>{item.name}</Link>
-                </CardTitle>
+                <CardTitle className="line-clamp-2">{item.name}</CardTitle>
               </CardContent>
               <CardFooter className="flex justify-between p-4  border-t">
-                <div className="flex flex-col items-center">
-                  <Badge
-                    variant="customPrimary"
-                    className="font-bold w-full text-center"
-                  >
-                    <span>
-                      ฿{item.price}/{item.unitType}
-                    </span>
-                  </Badge>
-                </div>
                 <div className="flex flex-col items-center">
                   <Badge
                     variant="customSecondary"
@@ -125,6 +120,19 @@ const CategoryPage = () => {
           />
         </div>
       </div>
+      {selectedProductId && (
+        <Dialog
+          open={!!selectedProductId}
+          onOpenChange={() => setSelectedProductId(null)}
+        >
+          <DialogContent className="max-w-4xl mx-auto p-4">
+            <DialogHeader>
+              <DialogTitle>รายละเอียดสินค้า</DialogTitle>
+            </DialogHeader>
+            <ProductDetail productId={selectedProductId} />
+          </DialogContent>
+        </Dialog>
+      )}
       <Footer />
     </>
   );

@@ -22,11 +22,11 @@ const ModalEditProduct = ({ product, onProductUpdated }) => {
   const [editProduct, setEditProduct] = useState({
     name: "",
     description: "",
-    price: "",
+
     stock: "",
     color: "",
     size: "",
-    unitType: "", // ล้างฟิลด์นี้
+
     isPublished: false,
     categoryId: "",
     image: null,
@@ -40,11 +40,11 @@ const ModalEditProduct = ({ product, onProductUpdated }) => {
       setEditProduct({
         name: product.name,
         description: product.description,
-        price: product.price,
+
         stock: product.stock,
         color: product.color,
         size: product.size,
-        unitType: product.unitType, // ล้างฟิลด์นี้
+
         isPublished: product.isPublished,
         categoryId: product.categoryId ? product.categoryId.toString() : "",
         image: null,
@@ -93,7 +93,6 @@ const ModalEditProduct = ({ product, onProductUpdated }) => {
     if (
       !editProduct.name ||
       !editProduct.description ||
-      !editProduct.price ||
       !editProduct.categoryId
     ) {
       toast({
@@ -115,11 +114,11 @@ const ModalEditProduct = ({ product, onProductUpdated }) => {
     const formData = new FormData();
     formData.append("name", editProduct.name);
     formData.append("description", editProduct.description);
-    formData.append("price", editProduct.price);
+
     formData.append("stock", editProduct.stock);
     formData.append("color", editProduct.color);
     formData.append("size", editProduct.size);
-    formData.append("unitType", editProduct.unitType); // ล้างฟิลด์นี้
+
     formData.append("isPublished", editProduct.isPublished);
     formData.append("categoryId", editProduct.categoryId);
     if (editProduct.image) {
@@ -189,20 +188,6 @@ const ModalEditProduct = ({ product, onProductUpdated }) => {
                   onChange={handleChange}
                   placeholder="จำนวน"
                 />
-                <Input
-                  type="number"
-                  name="price"
-                  value={editProduct.price}
-                  onChange={handleChange}
-                  placeholder="ราคา"
-                />
-                <Input
-                  type="text"
-                  name="unitType"
-                  value={editProduct.unitType}
-                  onChange={handleChange}
-                  placeholder="หน่วย"
-                />
 
                 <Input
                   type="text"
@@ -222,11 +207,9 @@ const ModalEditProduct = ({ product, onProductUpdated }) => {
                   name="categoryId"
                   value={editProduct.categoryId}
                   onChange={handleChange}
-                  className="w-full border rounded p-2"
+                  className="w-full border rounded p-2 col-span-2"
                 >
-                  <option >
-                    เลือกหมวดหมู่
-                  </option>
+                  <option>เลือกหมวดหมู่</option>
                   {categories.map((category) => (
                     <option
                       key={category.categoryId}

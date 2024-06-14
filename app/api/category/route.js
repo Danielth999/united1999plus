@@ -21,14 +21,14 @@ async function getOrSetCache(key, cb) {
     try {
       return JSON.parse(cachedData); // ถ้ามีข้อมูลใน cache ให้คืนค่าข้อมูลนั้น
     } catch (error) {
-      console.error('Error parsing cached data:', error);
+      console.error("Error parsing cached data:", error);
       // ถ้ามีข้อผิดพลาดในการแปลง JSON แสดงว่า cache อาจมีปัญหา
       await redis.del(key); // ลบข้อมูลใน cache ที่ไม่ถูกต้อง
     }
   }
 
   const freshData = await cb(); // ถ้าไม่มีข้อมูลใน cache ให้เรียกใช้ callback เพื่อดึงข้อมูลใหม่
-  await redis.set(key, JSON.stringify(freshData), 'EX', CACHE_EXPIRATION); // เก็บข้อมูลใหม่ลงใน cache พร้อมตั้งเวลาหมดอายุ
+  await redis.set(key, JSON.stringify(freshData), "EX", CACHE_EXPIRATION); // เก็บข้อมูลใหม่ลงใน cache พร้อมตั้งเวลาหมดอายุ
   return freshData; // คืนค่าข้อมูลใหม่
 }
 
@@ -110,11 +110,6 @@ export const POST = async (req) => {
 
     // เคลียร์ cache หลังจากสร้างหมวดหมู่ใหม่
     await redis.del("categories");
-    await redis.keys('category_*').then(keys => {
-      if (keys.length > 0) {
-        redis.del(keys);
-      }
-    });
 
     return NextResponse.json(category, { status: 201 });
   } catch (error) {
