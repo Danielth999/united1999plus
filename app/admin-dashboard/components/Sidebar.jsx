@@ -8,6 +8,7 @@ import {
   Package,
   Tag,
   SquareArrowOutDownLeft,
+  GalleryHorizontal,
 } from "lucide-react";
 
 const Sidebar = ({ isExpanded }) => {
@@ -35,6 +36,16 @@ const Sidebar = ({ isExpanded }) => {
           >
             <Home className="mr-3" />
             {isExpanded && <span className="text-xl">แดชบอร์ด</span>}
+          </div>
+        </Link>
+        <Link href="/admin-dashboard/carousel">
+          <div
+            className={`flex items-center py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700 ${
+              pathname === "/admin-dashboard/carousel" ? "bg-blue-500" : ""
+            }`}
+          >
+            <GalleryHorizontal className="mr-3" />
+            {isExpanded && <span className="text-xl">แบนเนอร์</span>}
           </div>
         </Link>
         <Link href="/admin-dashboard/users">

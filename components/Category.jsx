@@ -8,8 +8,35 @@ import "slick-carousel/slick/slick-theme.css";
 import { useToast } from "@/components/ui/use-toast";
 import Spinner from "./spinner/Spinner";
 import useSWR from "swr";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 const fetcher = (url) => axios.get(url).then((res) => res.data);
+
+const CustomNextArrow = (props) => {
+  const { className, style, onClick } = props;
+  return (
+    <div
+      className={className}
+      style={{ ...style, display: "block", background: "none", right: "10px", zIndex: 1 }}
+      onClick={onClick}
+    >
+      <ChevronRight color="black" size={32} />
+    </div>
+  );
+};
+
+const CustomPrevArrow = (props) => {
+  const { className, style, onClick } = props;
+  return (
+    <div
+      className={className}
+      style={{ ...style, display: "block", background: "none", left: "10px", zIndex: 1 }}
+      onClick={onClick}
+    >
+      <ChevronLeft color="black" size={32} />
+    </div>
+  );
+};
 
 const Category = () => {
   const settings = {
@@ -20,6 +47,8 @@ const Category = () => {
     slidesToScroll: 1,
     autoplay: true,
     autoplaySpeed: 3000,
+    nextArrow: <CustomNextArrow />,
+    prevArrow: <CustomPrevArrow />,
   };
   const { toast } = useToast();
 
@@ -120,6 +149,12 @@ const Category = () => {
           </div>
         </div>
       </div>
+      <style jsx global>{`
+        .slick-prev:before,
+        .slick-next:before {
+          display: none !important;
+        }
+      `}</style>
     </>
   );
 };

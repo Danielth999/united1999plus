@@ -22,7 +22,9 @@ const DeleteConfirmationDialog = ({ open, onClose, onConfirm }) => {
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel onClick={onClose}>ยกเลิก</AlertDialogCancel>
-          <AlertDialogAction onClick={onConfirm}>ยืนยัน</AlertDialogAction>
+          <AlertDialogAction variant="destructive" onClick={onConfirm}>
+            ยืนยัน
+          </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

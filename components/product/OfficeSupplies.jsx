@@ -2,6 +2,7 @@
 import { useState } from "react";
 import axios from "axios";
 import Image from "next/image";
+import Link from "next/link";
 import {
   Card,
   CardContent,
@@ -63,24 +64,14 @@ const OfficeSupplies = () => {
                   src={item.imageUrl}
                   alt={item.name}
                   fill
-                  sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
-                  style={{ objectFit: "cover", objectPosition: "center" }}
+                  style={{ objectFit: "contain" }}
+                  className="max-h-full"
                 />
               </CardHeader>
               <CardContent className="flex-grow">
                 <CardTitle className="line-clamp-2">{item.name}</CardTitle>
               </CardContent>
               <CardFooter className="flex justify-between p-4 border-t">
-                <div className="flex flex-col items-center">
-                  <Badge
-                    variant="customPrimary"
-                    className="font-bold w-full text-center"
-                  >
-                    <span>
-                      ฿{item.price}/{item.unitType}
-                    </span>
-                  </Badge>
-                </div>
                 <div className="flex flex-col items-center">
                   <Badge
                     variant="customSecondary"
@@ -93,7 +84,7 @@ const OfficeSupplies = () => {
             </Card>
           ))}
         </div>
-        {products.length > 0 && (
+        {products.length > 10 && (
           <div className="flex justify-center mt-5">
             <Link href={`/category/office-supplies`}>
               <button className="bg-blue-500 text-white py-2 px-4 rounded-full hover:bg-blue-600">

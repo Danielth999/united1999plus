@@ -23,19 +23,20 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import ProductDetail from "@/components/product/action/ProductDetail"; // นำเข้า ProductDetail component
+import ProductDetail from "@/components/product/action/ProductDetail";
 
 const fetcher = (url) => axios.get(url).then((res) => res.data);
 
 const ProductList = ({ searchQuery, setResultsCount, onViewProduct }) => {
   const { data, error } = useSWR(
-    `${process.env.NEXT_PUBLIC_API_URL}/api/products${
+    `${process.env.NEXT_PUBLIC_API_URL}/api/products/filter${
       searchQuery ? `?search=${searchQuery}` : ""
     }`,
-    fetcher,{
+    fetcher,
+    {
       revalidateOnFocus: false,
       revalidateOnReconnect: false,
-      refreshInterval:5000
+      refreshInterval: 5000,
     }
   );
   const [currentPage, setCurrentPage] = useState(1);
@@ -75,11 +76,11 @@ const ProductList = ({ searchQuery, setResultsCount, onViewProduct }) => {
 
   return (
     <>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 mt-5">
+      <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 mt-5">
         {currentProducts.map((item) => (
           <Card
             key={item.productId}
-            className="hover:shadow-xl hover:border-[#204d9c] border flex flex-col"
+            className="hover:shadow-xl hover:border-[#204d9c] border flex flex-col cursor-pointer"
             onClick={() => onViewProduct(item.productId)}
           >
             <CardHeader className="border-b">
@@ -96,15 +97,13 @@ const ProductList = ({ searchQuery, setResultsCount, onViewProduct }) => {
             <CardContent className="flex-grow">
               <CardTitle className="line-clamp-2">{item.name}</CardTitle>
             </CardContent>
-            <CardFooter className="flex justify-between p-4  border-t">
+            <CardFooter className="flex justify-between p-4 border-t">
               <div className="flex flex-col items-center">
                 <Badge
                   variant="customPrimary"
                   className="font-bold w-full text-center"
                 >
-                  <span>
-                    จำนวน {item.stock}
-                  </span>
+                  <span>จำนวน {item.stock}</span>
                 </Badge>
               </div>
               <div className="flex flex-col items-center">
@@ -146,7 +145,6 @@ const ProductPage = () => {
       <div className="max-w-7xl mx-auto p-5">
         <div className="mt-2">
           <small>
-            {" "}
             <Link href="/" className="hover:underline">
               หน้าหลัก
             </Link>{" "}
@@ -175,7 +173,10 @@ const ProductPage = () => {
       </div>
       <Footer />
       {selectedProductId && (
-        <Dialog open={!!selectedProductId} onOpenChange={() => setSelectedProductId(null)}>
+        <Dialog
+          open={!!selectedProductId}
+          onOpenChange={() => setSelectedProductId(null)}
+        >
           <DialogContent className="max-w-4xl mx-auto p-4">
             <DialogHeader>
               <DialogTitle>รายละเอียดสินค้า</DialogTitle>

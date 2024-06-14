@@ -31,7 +31,7 @@ export const authOptions = {
 
         if (!isPasswordValid) {
           console.error("Invalid password");
-          throw new Error("Invalid password");
+          throw new Error("รหัสผ่านไม่ถูกต้อง");
         }
 
         return {
@@ -66,6 +66,15 @@ export const authOptions = {
       }
       return session;
     },
+    redirect: async ({ url, baseUrl }) => {
+      if (url === "/api/auth/signin") {
+        return `${baseUrl}/admin-dashboard/dashboard`;
+      }
+      return baseUrl;
+    },
+  },
+  pages: {
+    signIn: "/login", // กำหนดเส้นทางหน้าล็อกอิน
   },
 };
 

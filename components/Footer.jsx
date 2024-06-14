@@ -1,5 +1,4 @@
-import React from "react";
-
+import Link from "next/link";
 const Footer = () => {
   return (
     <footer className="bg-[#204d9c] text-white mt-20 py-8">
@@ -20,7 +19,6 @@ const Footer = () => {
               <li>บรรจุภัณฑ์เฟสท์</li>
               <li>อุปกรณ์สำนักงาน</li>
               <li>ผลิตภัณฑ์ทำความสะอาด</li>
-              
             </ul>
           </div>
           {/* Section 3 */}
@@ -32,9 +30,38 @@ const Footer = () => {
                 อำเภอ เมืองระยอง จังหวัด ระยอง 21000 จังหวัดระยอง
                 อำเภอเมืองระยอง ตำบลท่าประดู่ 21000
               </li>
-              <li>โทร: 038623126</li>
-              <li>โทร: 0635359269</li>
-              <li>อีเมล: united.sale.ry@gmail.com</li>
+              <li>
+                โทร:{" "}
+                <a className="hover:underline" href={"tel:038-623-126"}>
+                  {" "}
+                  038623126
+                </a>
+              </li>
+              <li>
+                โทร:{" "}
+                <a className="hover:underline" href={"tel:063-535-9269"}>
+                  0635359269
+                </a>
+              </li>
+              <li>
+                อีเมล:{" "}
+                <a
+                  href="mailto:united.sale.ry@gmail.com"
+                  className="hover:underline"
+                >
+                  united.sale.ry@gmail.com
+                </a>
+              </li>
+              <li>
+                ตำแหน่ง:{" "}
+                <Link
+                  target="_blank"
+                  className="hover:underline"
+                  href="https://maps.app.goo.gl/3Csiyy9qcEXeckLM8"
+                >
+                  บริษัท ยูไนเต็ด1999 พลัซ จำกัด
+                </Link>
+              </li>
             </ul>
           </div>
         </div>

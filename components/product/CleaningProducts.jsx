@@ -63,24 +63,14 @@ const CleaningProducts = () => {
                   src={item.imageUrl}
                   alt={item.name}
                   fill
-                  sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
-                  style={{ objectFit: "cover", objectPosition: "center" }}
+                  style={{ objectFit: "contain" }}
+                  className="max-h-full"
                 />
               </CardHeader>
               <CardContent className="flex-grow">
                 <CardTitle className="line-clamp-2">{item.name}</CardTitle>
               </CardContent>
               <CardFooter className="flex justify-between p-4 border-t">
-                <div className="flex flex-col items-center">
-                  <Badge
-                    variant="customPrimary"
-                    className="font-bold w-full text-center"
-                  >
-                    <span>
-                      ฿{item.price}/{item.unitType}
-                    </span>
-                  </Badge>
-                </div>
                 <div className="flex flex-col items-center">
                   <Badge
                     variant="customSecondary"

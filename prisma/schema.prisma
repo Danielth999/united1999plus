@@ -39,3 +39,10 @@ model Product {
   categoryId  Int
   Category    Category @relation(fields: [categoryId], references: [categoryId])
 }
+
+model Image {
+  id          Int      @id @default(autoincrement())
+  url         String
+  createdAt   DateTime @default(now())
+  isPublished Boolean  @default(true)
+}

@@ -64,11 +64,13 @@ const ModalAddProduct = ({ onProductAdded }) => {
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
-    setFormData((prevData) => ({
-      ...prevData,
-      image: file,
-    }));
-    setPreviewImage(URL.createObjectURL(file));
+    if (file) {
+      setFormData((prevData) => ({
+        ...prevData,
+        image: file,
+      }));
+      setPreviewImage(URL.createObjectURL(file));
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -237,9 +239,7 @@ const ModalAddProduct = ({ onProductAdded }) => {
                   onChange={handleChange}
                   className="w-full borders rounded p-2 col-span-2"
                 >
-                  <option  >
-                    เลือกหมวดหมู่
-                  </option>
+                  <option>เลือกหมวดหมู่</option>
                   {categories.map((category) => (
                     <option
                       key={category.categoryId}

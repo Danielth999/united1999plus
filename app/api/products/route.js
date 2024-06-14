@@ -15,16 +15,7 @@ export const supabase = createClient(supabaseUrl, supabaseKey);
 // GET all products with optional search query
 export async function GET(req) {
   try {
-    const searchQuery = req.nextUrl.searchParams.get("search");
-
-    const where = searchQuery
-      ? {
-          OR: [{ name: { contains: searchQuery, mode: "insensitive" } }],
-        }
-      : {};
-
     const products = await prisma.product.findMany({
-      where,
       include: {
         Category: true,
       },
@@ -59,9 +50,22 @@ export async function POST(req) {
     const categoryId = formData.get("categoryId");
     const image = formData.get("image");
 
-    if (!name || !description || !price || !stock || !color || !size || !unitType || !categoryId || !image) {
+    if (
+      !name ||
+      !description ||
+      !price ||
+      !stock ||
+      !color ||
+      !size ||
+      !unitType ||
+      !categoryId ||
+      !image
+    ) {
       console.error("Validation error: Missing required fields");
-      return NextResponse.json({ error: "All fields are required" }, { status: 400 });
+      return NextResponse.json(
+        { error: "All fields are required" },
+        { status: 400 }
+      );
     }
 
     const fileName = `${uuidv4()}.webp`;
@@ -77,7 +81,10 @@ export async function POST(req) {
 
     if (uploadError) {
       console.error("Error uploading image:", uploadError);
-      return NextResponse.json({ error: "Failed to upload image" }, { status: 500 });
+      return NextResponse.json(
+        { error: "Failed to upload image" },
+        { status: 500 }
+      );
     }
 
     const productUrl = supabase.storage.from("products").getPublicUrl(fileName);
@@ -100,7 +107,10 @@ export async function POST(req) {
     return NextResponse.json(product, { status: 201 });
   } catch (error) {
     console.error("Error creating product:", error);
-    return NextResponse.json({ error: "Failed to create product" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to create product" },
+      { status: 500 }
+    );
   } finally {
     release();
     await prisma.$disconnect();

@@ -1,4 +1,4 @@
-'use client';
+"use client";
 import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
@@ -38,7 +38,9 @@ const Navbar = () => {
     return (
       <div className="flex justify-center items-center h-screen">
         <div className="text-center">
-          <h1 className="font-bold text-2xl text-black">เกิดข้อผิดพลาดในการดึงข้อมูล</h1>
+          <h1 className="font-bold text-2xl text-black">
+            เกิดข้อผิดพลาดในการดึงข้อมูล
+          </h1>
         </div>
       </div>
     );
@@ -47,13 +49,13 @@ const Navbar = () => {
   return (
     <>
       <Header />
-      <nav className="bg-white shadow-md ">
+      <nav className="bg-white shadow-md">
         <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between h-[80px] px-4 md:px-6">
           <div className="flex items-center space-x-4">
             <div className="flex md:hidden items-center">
               <button
                 onClick={() => setMenuOpen(!menuOpen)}
-                className="text-[#204d9c]"
+                className="text-[#204d9c] border-none focus:outline-none"
               >
                 {menuOpen ? <X /> : <Menu />}
               </button>
@@ -142,9 +144,8 @@ const Navbar = () => {
         {menuOpen && (
           <div className="md:hidden">
             <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-              <div className="px-4 py-2">
-                <SearchProduct className="flex" />
-              </div>
+              <SearchProduct className="flex mb-4" />
+              <Header className="flex flex-col items-start space-y-2 mb-4" />
               <div className="text-[#204d9c] font-bold px-3 py-2">หมวดหมู่</div>
               {categories?.map((category) => (
                 <Link
@@ -156,6 +157,9 @@ const Navbar = () => {
                   </span>
                 </Link>
               ))}
+              <span className="block px-3 py-2 rounded-md text-base font-medium text-[#204d9c] hover:bg-gray-100">
+                <Link href="/products">สินค้าทั้งหมด</Link>
+              </span>
             </div>
           </div>
         )}

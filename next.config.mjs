@@ -7,6 +7,12 @@ const nextConfig = {
         protocol: "https",
         hostname: "umlwdospvvdauxzulbnu.supabase.co",
         port: "",
+        pathname: "/storage/v1/object/public/images/**",
+      },
+      {
+        protocol: "https",
+        hostname: "umlwdospvvdauxzulbnu.supabase.co",
+        port: "",
         pathname: "/storage/v1/object/public/products/**",
       },
       {

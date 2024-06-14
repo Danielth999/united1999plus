@@ -1,4 +1,4 @@
-'use client'
+"use client";
 import React, { useState } from "react";
 import { Search } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -24,7 +24,7 @@ const SearchProduct = ({ className }) => {
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
         className="w-full max-w-md border outline-none rounded-l-md p-2"
-        placeholder="ค้นหาชื่อสิ้นค้าหรือเลขรหัส SKU"
+        placeholder="ค้นหาชื่อสินค้า"
       />
       <button
         type="submit"

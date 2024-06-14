@@ -51,7 +51,7 @@ const Packaging = () => {
         <h1 className="font-bold text-xl text-black">บรรจุภัณฑ์เฟสต์</h1>
       </div>
       <div className="container mx-auto px-4">
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 mt-5">
+        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 mt-5">
           {products.map((item) => (
             <Card
               key={item.productId}
@@ -63,24 +63,14 @@ const Packaging = () => {
                   src={item.imageUrl}
                   alt={item.name}
                   fill
-                  sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
-                  style={{ objectFit: "cover", objectPosition: "center" }}
+                  style={{ objectFit: "contain" }}
+                  className="max-h-full"
                 />
               </CardHeader>
               <CardContent className="flex-grow">
                 <CardTitle className="line-clamp-2">{item.name}</CardTitle>
               </CardContent>
               <CardFooter className="flex justify-between p-4 border-t">
-                <div className="flex flex-col items-center">
-                  <Badge
-                    variant="customPrimary"
-                    className="font-bold w-full text-center"
-                  >
-                    <span>
-                      ฿{item.price}/{item.unitType}
-                    </span>
-                  </Badge>
-                </div>
                 <div className="flex flex-col items-center">
                   <Badge
                     variant="customSecondary"
