@@ -62,7 +62,7 @@ const ProductDetail = ({ productId }) => {
             </p>
             <div className="mb-4">
               <span className="font-bold text-gray-700 dark:text-gray-300">
-                จำนวนในสต็อก:
+                จำนวน:
               </span>
               <span className="text-gray-600 dark:text-gray-300">
                 {product.stock}
