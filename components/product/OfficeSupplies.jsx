@@ -30,7 +30,7 @@ const OfficeSupplies = () => {
     {
       revalidateOnFocus: false,
       revalidateOnReconnect: false,
-      refreshInterval: 20000,
+      refreshInterval: 2000,
     }
   );
 
