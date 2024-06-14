@@ -1,7 +1,7 @@
 // api/category/filter/[nameSlug].js
-
 import { PrismaClient } from "@prisma/client";
 import { NextResponse } from "next/server";
+import redis from "@/lib/redis";
 
 const prisma = new PrismaClient();
 
@@ -9,27 +9,16 @@ export async function GET(request, { params }) {
   const { nameSlug } = params;
   const { searchParams } = new URL(request.url);
   const limit = parseInt(searchParams.get("limit"));
+  const cacheKey = `category_${nameSlug}_${limit || "all"}`;
 
   try {
-    // ทำการเช็กว่ามีการส่ง limit มาหรือไม่ ถ้ามีให้ทำตามเงื่อนไขด้านล่าง
-    if (limit) {
-      const category = await prisma.category.findFirst({
-        where: { nameSlug },
-        include: {
-          Product: {
-            where: {
-              isPublished: true, // fetch product that is published only
-            },
-            take: limit, // Limit the number of products fetched
-            orderBy: {
-              createdAt: "desc", //
-            },
-          },
-        },
-      });
-      return NextResponse.json(category, { status: 200 });
+    // ตรวจสอบแคชใน Redis
+    const cachedData = await redis.get(cacheKey);
+    if (cachedData) {
+      return NextResponse.json(JSON.parse(cachedData), { status: 200 });
     }
-    // ถ้าไม่มีการส่ง limit มาให้ทำตามเงื่อนไขด้านล่างเพื่อดึงข้อมูลทั้งหมด
+
+    // ดึงข้อมูลจากฐานข้อมูล
     const category = await prisma.category.findFirst({
       where: { nameSlug },
       include: {
@@ -37,6 +26,7 @@ export async function GET(request, { params }) {
           where: {
             isPublished: true, // fetch product that is published only
           },
+          ...(limit && { take: limit }), // Limit the number of products fetched if limit is provided
           orderBy: {
             createdAt: "desc",
           },
@@ -50,6 +40,9 @@ export async function GET(request, { params }) {
         { status: 404 }
       );
     }
+
+    // เก็บข้อมูลในแคช
+    await redis.set(cacheKey, JSON.stringify(category), "EX", 3600); // Cache for 1 hour
 
     return NextResponse.json(category, { status: 200 });
   } catch (error) {

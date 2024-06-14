@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { v4 as uuidv4 } from "uuid";
 import { Mutex } from "async-mutex";
-
+import redis from '@/lib/redis';
 const prisma = new PrismaClient();
 const mutex = new Mutex();
 
@@ -59,7 +59,7 @@ export async function POST(req) {
     const newImages = await prisma.image.createMany({
       data: uploadResults.map((url) => ({ url })),
     });
-
+    await redis.del('carousel_images');
     return NextResponse.json(newImages, { status: 201 });
   } catch (error) {
     console.error("Error creating images:", error);

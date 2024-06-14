@@ -74,7 +74,7 @@ const CategoryPage = () => {
           {currentProducts.map((item) => (
             <Card
               key={item.productId}
-              className="hover:shadow-xl border flex flex-col"
+              className="hover:shadow-xl hover:border-[#204d9c] border flex flex-col"
             >
               <CardHeader className="border-b">
                 <div className="relative w-full h-48 overflow-hidden">

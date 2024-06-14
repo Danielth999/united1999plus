@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import { Mutex } from "async-mutex";
 import path from "path";
 import { createClient } from "@supabase/supabase-js";
-
+import redis from "@/lib/redis";
 const prisma = new PrismaClient();
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -35,18 +35,29 @@ export async function DELETE(request, { params }) {
 
     if (image.url) {
       const fileName = path.basename(image.url);
-      const { error } = await supabase.storage.from("images").remove([fileName]);
+      const { error } = await supabase.storage
+        .from("images")
+        .remove([fileName]);
 
       if (error) {
         console.error("Error deleting image from Supabase:", error);
-        return NextResponse.json({ error: "Failed to delete image from storage" }, { status: 500 });
+        return NextResponse.json(
+          { error: "Failed to delete image from storage" },
+          { status: 500 }
+        );
       }
     }
-
-    return NextResponse.json({ message: "Image deleted successfully" }, { status: 200 });
+    await redis.del('carousel_images');
+    return NextResponse.json(
+      { message: "Image deleted successfully" },
+      { status: 200 }
+    );
   } catch (error) {
     console.error("Error deleting image:", error);
-    return NextResponse.json({ error: "Failed to delete image" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to delete image" },
+      { status: 500 }
+    );
   } finally {
     release();
     await prisma.$disconnect();
@@ -81,7 +92,10 @@ export async function PATCH(request, { params }) {
     return NextResponse.json(updatedImage, { status: 200 });
   } catch (error) {
     console.error("Error updating image:", error);
-    return NextResponse.json({ error: "Failed to update image" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to update image" },
+      { status: 500 }
+    );
   } finally {
     release();
     await prisma.$disconnect();

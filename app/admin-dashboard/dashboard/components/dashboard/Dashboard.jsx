@@ -3,25 +3,26 @@
 import axios from "axios";
 import useSWR from "swr";
 import Loading from "@/components/spinner/Spinner";
+
 const fetcher = (url) => axios.get(url).then((res) => res.data);
 
 const Dashboard = () => {
   const { data: usersData, error: usersError } = useSWR(
     `${process.env.NEXT_PUBLIC_API_URL}/api/users`,
     fetcher,
-    { dedupingInterval: 60000 }
+    { dedupingInterval: 60000, revalidateOnFocus: false, revalidateOnReconnect: false }
   );
 
   const { data: categoriesData, error: categoriesError } = useSWR(
     `${process.env.NEXT_PUBLIC_API_URL}/api/category`,
     fetcher,
-    { dedupingInterval: 60000 }
+    { dedupingInterval: 60000, revalidateOnFocus: false, revalidateOnReconnect: false }
   );
 
   const { data: productsData, error: productsError } = useSWR(
     `${process.env.NEXT_PUBLIC_API_URL}/api/products`,
     fetcher,
-    { dedupingInterval: 60000 }
+    { dedupingInterval: 60000, revalidateOnFocus: false, revalidateOnReconnect: false }
   );
 
   if (usersError || categoriesError || productsError) {

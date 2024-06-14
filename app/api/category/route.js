@@ -110,6 +110,11 @@ export const POST = async (req) => {
 
     // เคลียร์ cache หลังจากสร้างหมวดหมู่ใหม่
     await redis.del("categories");
+    await redis.keys('category_*').then(keys => {
+      if (keys.length > 0) {
+        redis.del(keys);
+      }
+    });
 
     return NextResponse.json(category, { status: 201 });
   } catch (error) {

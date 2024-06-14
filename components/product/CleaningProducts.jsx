@@ -29,7 +29,7 @@ const CleaningProducts = () => {
     {
       revalidateOnFocus: false,
       revalidateOnReconnect: false,
-      refreshInterval: 2000,
+      refreshInterval: 20000,
     }
   );
 
@@ -55,7 +55,7 @@ const CleaningProducts = () => {
           {products.map((item) => (
             <Card
               key={item.productId}
-              className="hover:shadow-xl border flex flex-col"
+              className="hover:shadow-xl hover:border-[#204d9c] border flex flex-col"
               onClick={() => setSelectedProductId(item.productId)}
             >
               <CardHeader className="border-b w-full h-60 relative">
