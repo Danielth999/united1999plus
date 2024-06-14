@@ -52,11 +52,11 @@ const OfficeSupplies = () => {
         <h1 className="font-bold text-xl text-black">อุปกรณ์สำนักงาน</h1>
       </div>
       <div className="container mx-auto px-4">
-        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 mt-5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 mt-5">
           {products.map((item) => (
             <Card
               key={item.productId}
-              className="hover:shadow-xl hover:border-[#204d9c]  border flex flex-col"
+              className="hover:shadow-xl hover:border-[#204d9c] border flex flex-col"
               onClick={() => setSelectedProductId(item.productId)}
             >
               <CardHeader className="border-b w-full h-60 relative">
@@ -100,7 +100,7 @@ const OfficeSupplies = () => {
           open={!!selectedProductId}
           onOpenChange={() => setSelectedProductId(null)}
         >
-          <DialogContent className="max-h-screen overflow-y-auto">
+          <DialogContent className="max-w-4xl w-full mx-auto p-4 max-h-screen overflow-y-auto">
             <DialogHeader>
               <DialogTitle>รายละเอียดสินค้า</DialogTitle>
             </DialogHeader>
