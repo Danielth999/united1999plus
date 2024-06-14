@@ -57,7 +57,7 @@ const ProductDetail = ({ productId }) => {
             <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-2">
               {product.name}
             </h2>
-            <p className="text-gray-600 dark:text-gray-300 text-sm mb-4">
+            <p className="text-gray-600 dark:text-gray-300 text-sm mb-4 max-h-24 overflow-y-auto">
               {product.description}
             </p>
             <div className="mb-4">
