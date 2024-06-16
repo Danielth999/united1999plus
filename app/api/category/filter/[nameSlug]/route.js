@@ -22,7 +22,7 @@ export async function GET(request, { params }) {
             },
             take: limit, // Limit the number of products fetched
             orderBy: {
-              createdAt: "desc", //
+              createdAt: "asc", //
             },
           },
         },

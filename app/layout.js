@@ -13,6 +13,7 @@ const prompt = Prompt({
 export const metadata = {
   title: "UNITED 1999 PLUS",
   description: "UNITED 1999 PLUS",
+  keywords: ['united1999plus', 'UNITED 1999 PLUS', 'บริษัท ยูไนเต็ด1999 พลัซ จำกัด','ยูไนเต็ด1999พลัซ'],
 };
 
 export default function RootLayout({ children }) {

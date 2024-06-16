@@ -94,17 +94,11 @@ const CleaningProducts = () => {
       </div>
 
       {selectedProductId && (
-        <Dialog
+        <ProductDetail
+          productId={selectedProductId}
           open={!!selectedProductId}
-          onOpenChange={() => setSelectedProductId(null)}
-        >
-          <DialogContent className="max-w-full sm:max-w-lg md:max-w-xl lg:max-w-2xl xl:max-w-3xl w-full mx-auto p-4 max-h-screen lg:max-h-auto overflow-y-auto lg:overflow-y-visible">
-            <DialogHeader>
-              <DialogTitle>รายละเอียดสินค้า</DialogTitle>
-            </DialogHeader>
-            <ProductDetail productId={selectedProductId} />
-          </DialogContent>
-        </Dialog>
+          setOpen={setSelectedProductId}
+        />
       )}
     </>
   );

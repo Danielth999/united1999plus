@@ -12,12 +12,6 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import Loading from "@/components/spinner/Spinner";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 import useSWR from "swr";
 import ProductDetail from "@/components/product/action/ProductDetail"; // นำเข้า ProductDetail จากตำแหน่งที่ถูกต้อง
 
@@ -96,17 +90,11 @@ const OfficeSupplies = () => {
       </div>
 
       {selectedProductId && (
-        <Dialog
+        <ProductDetail
+          productId={selectedProductId}
           open={!!selectedProductId}
-          onOpenChange={() => setSelectedProductId(null)}
-        >
-          <DialogContent className="max-w-full sm:max-w-lg md:max-w-xl lg:max-w-2xl xl:max-w-3xl w-full mx-auto p-4 max-h-screen lg:max-h-auto overflow-y-auto lg:overflow-y-visible">
-            <DialogHeader>
-              <DialogTitle>รายละเอียดสินค้า</DialogTitle>
-            </DialogHeader>
-            <ProductDetail productId={selectedProductId} />
-          </DialogContent>
-        </Dialog>
+          setOpen={setSelectedProductId}
+        />
       )}
     </>
   );
