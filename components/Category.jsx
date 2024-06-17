@@ -17,7 +17,13 @@ const CustomNextArrow = (props) => {
   return (
     <div
       className={className}
-      style={{ ...style, display: "block", background: "none", right: "10px", zIndex: 1 }}
+      style={{
+        ...style,
+        display: "block",
+        background: "none",
+        right: "10px",
+        zIndex: 1,
+      }}
       onClick={onClick}
     >
       <ChevronRight color="black" size={32} />
@@ -30,10 +36,16 @@ const CustomPrevArrow = (props) => {
   return (
     <div
       className={className}
-      style={{ ...style, display: "block", background: "none", left: "10px", zIndex: 1 }}
+      style={{
+        ...style,
+        display: "block",
+        background: "none",
+        left: "10px",
+        zIndex: 1,
+      }}
       onClick={onClick}
     >
-      <ChevronLeft color="black" size={32} />
+      <ChevronLeft color="black" size={20} />
     </div>
   );
 };

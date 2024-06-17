@@ -30,12 +30,12 @@ export const PUT = async (request, { params }) => {
 
     if (image && image.name) {
       const imageBuffer = Buffer.from(await image.arrayBuffer());
-      const fileName = `${uuidv4()}.png`;
+      const fileName = `${uuidv4()}.webp`;
 
       const { data, error: uploadError } = await supabase.storage
         .from("categories")
         .upload(fileName, imageBuffer, {
-          contentType: "image/png",
+          contentType: "image/webp",
         });
 
       if (uploadError) {
@@ -101,6 +101,12 @@ export const DELETE = async (request, { params }) => {
         { status: 404 }
       );
     }
+
+    // อัปเดตสินค้าที่มีหมวดหมู่เป็นหมวดหมู่ที่กำลังจะลบให้เป็นค่า null
+    await prisma.product.updateMany({
+      where: { categoryId: parseInt(id, 10) },
+      data: { categoryId: null },
+    });
 
     await prisma.category.delete({
       where: { categoryId: parseInt(id, 10) },

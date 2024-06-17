@@ -78,13 +78,13 @@ export const POST = async (req) => {
 
     // ทำการ buffer รูปภาพและสร้างชื่อไฟล์ใหม่
     const imageBuffer = Buffer.from(await image.arrayBuffer());
-    const fileName = `${uuidv4()}.png`;
+    const fileName = `${uuidv4()}.webp`;
 
     // อัพโหลดรูปภาพไปยัง Supabase Storage
     const uploadResult = await supabase.storage
       .from("categories")
       .upload(fileName, imageBuffer, {
-        contentType: "image/png",
+        contentType: "image/webp",
       });
 
     // ตรวจสอบว่าอัพโหลดรูปภาพสำเร็จหรือไม่

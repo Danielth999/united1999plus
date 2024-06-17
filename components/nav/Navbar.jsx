@@ -54,6 +54,8 @@ const Navbar = () => {
           <div className="flex items-center space-x-4">
             <div className="flex md:hidden items-center">
               <button
+                id="menu"
+                aria-label="menu"
                 onClick={() => setMenuOpen(!menuOpen)}
                 className="text-[#204d9c] border-none focus:outline-none"
               >
