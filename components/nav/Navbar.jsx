@@ -132,11 +132,11 @@ const Navbar = () => {
           ) : (
             <div className="flex items-center space-x-4">
               <Link href="/login">
-                <span className="text-[#204d9c] font-bold">Login</span>
+                <span className="text-[#204d9c] font-bold">เข้าสู่ระบบ</span>
               </Link>
               <Link href="/register">
                 <span className="bg-[#204d9c] text-white py-2 px-4 rounded-lg font-bold">
-                  Register
+                  สมัครสมาชิก
                 </span>
               </Link>
             </div>
