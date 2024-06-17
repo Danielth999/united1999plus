@@ -11,6 +11,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import Spinner from "@/components/spinner/Spinner";
 
 const fetcher = (url) => axios.get(url).then((res) => res.data);
 
@@ -117,7 +118,11 @@ const ProductDetail = ({ productId, open, setOpen }) => {
             </div>
           </div>
         ) : (
-          <Spinner />
+          <>
+            <div className="flex justify-center">
+              <Spinner />
+            </div>
+          </>
         )}
       </DialogContent>
     </Dialog>
