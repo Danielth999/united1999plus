@@ -115,7 +115,7 @@ const Category = () => {
         <div className="block sm:hidden mx-auto w-full max-w-md">
           <Slider {...settings}>
             {category.map((cateItem) => (
-              <div key={cateItem.categoryId} className="p-4 shadow-lg">
+              <div key={cateItem.categoryId} className="p-4 ">
                 <div className="bg-[#f1f0ed] p-6 text-center rounded-md font-medium shadow-lg hover:shadow-2xl transition-all ease-in-out duration-300">
                   <Link
                     href={`/category/${cateItem.nameSlug}`}
