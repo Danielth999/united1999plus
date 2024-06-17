@@ -191,13 +191,15 @@ const ModalAddProduct = ({ onProductAdded }) => {
                   value={formData.name}
                   onChange={handleChange}
                   placeholder="ชื่อผลิตภัณฑ์"
+                  className="col-span-2"
                 />
-                <Input
-                  type="text"
+
+                <Textarea
                   name="stock"
                   value={formData.stock}
                   onChange={handleChange}
                   placeholder="จำนวน"
+                  className="col-span-2"
                 />
 
                 <Input

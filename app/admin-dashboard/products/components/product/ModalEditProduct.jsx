@@ -180,13 +180,15 @@ const ModalEditProduct = ({ product, onProductUpdated }) => {
                   value={editProduct.name}
                   onChange={handleChange}
                   placeholder="ชื่อผลิตภัณฑ์"
+                  className="col-span-2"
                 />
-                <Input
-                  type="text"
+
+                <Textarea
                   name="stock"
                   value={editProduct.stock}
                   onChange={handleChange}
                   placeholder="จำนวน"
+                  className="col-span-2"
                 />
 
                 <Input

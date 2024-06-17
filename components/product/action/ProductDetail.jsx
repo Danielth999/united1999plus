@@ -3,9 +3,8 @@ import { useState } from "react";
 import Image from "next/image";
 import axios from "axios";
 import useSWR from "swr";
-import Spinner from "@/components/spinner/Spinner";
 import { useSession } from "next-auth/react";
-import ModalEditProduct from "./EditProduct"; // นำเข้า ModalEditProduct จากตำแหน่งที่ถูกต้อง
+import ModalEditProduct from "./EditProduct";
 import {
   Dialog,
   DialogContent,
@@ -40,7 +39,7 @@ const ProductDetail = ({ productId, open, setOpen }) => {
         <DialogHeader>
           <DialogTitle>รายละเอียดสินค้า</DialogTitle>
         </DialogHeader>
-        {product && (
+        {product ? (
           <div className="container mx-auto p-4 max-w-3xl">
             <div className="flex flex-col md:flex-row gap-4">
               <div className="w-full md:w-1/2">
@@ -62,16 +61,22 @@ const ProductDetail = ({ productId, open, setOpen }) => {
                   <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-2">
                     {product.name}
                   </h2>
-                  <p className="text-gray-600 dark:text-gray-300 text-sm mb-4 max-h-16 overflow-y-auto">
-                    {product.description}
-                  </p>
-                  <div className="mb-4">
+                  <p
+                    className="text-gray-600 dark:text-gray-300 text-sm mb-4 max-h-20 overflow-y-auto"
+                    dangerouslySetInnerHTML={{
+                      __html: product.description.replace(/\n/g, "<br />"),
+                    }}
+                  ></p>
+                  <div className="mb-4 ">
                     <span className="font-bold text-gray-700 dark:text-gray-300">
-                      จำนวน:
+                      จำนวน: {""}
                     </span>
-                    <span className="text-gray-600 dark:text-gray-300">
-                      {product.stock}
-                    </span>
+                    <p
+                      className="text-gray-600 dark:text-gray-300"
+                      dangerouslySetInnerHTML={{
+                        __html: product.stock.replace(/\n/g, "<br />"),
+                      }}
+                    ></p>
                   </div>
                   <div className="mb-4">
                     <span className="font-bold text-gray-700 dark:text-gray-300">
@@ -111,6 +116,8 @@ const ProductDetail = ({ productId, open, setOpen }) => {
               </div>
             </div>
           </div>
+        ) : (
+          <Spinner />
         )}
       </DialogContent>
     </Dialog>
