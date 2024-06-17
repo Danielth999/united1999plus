@@ -21,11 +21,9 @@ const ModalEditProduct = ({ product, onProductUpdated, open, setOpen }) => {
   const [editProduct, setEditProduct] = useState({
     name: "",
     description: "",
-    price: "",
     stock: "",
     color: "",
     size: "",
-    unitType: "",
     isPublished: false,
     categoryId: "",
     image: null,
@@ -38,11 +36,9 @@ const ModalEditProduct = ({ product, onProductUpdated, open, setOpen }) => {
       setEditProduct({
         name: product.name || "",
         description: product.description || "",
-        price: product.price || "",
         stock: product.stock || "",
         color: product.color || "",
         size: product.size || "",
-        unitType: product.unitType || "",
         isPublished: product.isPublished || false,
         categoryId: product.categoryId ? product.categoryId.toString() : "",
         image: null,
@@ -89,7 +85,6 @@ const ModalEditProduct = ({ product, onProductUpdated, open, setOpen }) => {
     if (
       !editProduct.name ||
       !editProduct.description ||
-      !editProduct.price ||
       !editProduct.categoryId
     ) {
       toast({
@@ -110,11 +105,10 @@ const ModalEditProduct = ({ product, onProductUpdated, open, setOpen }) => {
     const formData = new FormData();
     formData.append("name", editProduct.name);
     formData.append("description", editProduct.description);
-    formData.append("price", editProduct.price);
     formData.append("stock", editProduct.stock);
     formData.append("color", editProduct.color);
     formData.append("size", editProduct.size);
-    formData.append("unitType", editProduct.unitType);
+
     formData.append("isPublished", editProduct.isPublished);
     formData.append("categoryId", editProduct.categoryId);
     if (editProduct.image) {
@@ -180,20 +174,7 @@ const ModalEditProduct = ({ product, onProductUpdated, open, setOpen }) => {
                   onChange={handleChange}
                   placeholder="จำนวน"
                 />
-                <Input
-                  type="number"
-                  name="price"
-                  value={editProduct.price}
-                  onChange={handleChange}
-                  placeholder="ราคา"
-                />
-                <Input
-                  type="text"
-                  name="unitType"
-                  value={editProduct.unitType}
-                  onChange={handleChange}
-                  placeholder="หน่วย"
-                />
+
                 <Input
                   type="text"
                   name="color"
