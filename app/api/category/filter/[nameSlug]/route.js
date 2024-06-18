@@ -1,7 +1,7 @@
-// api/category/filter/[nameSlug].js
-
+// pages/api/category/filter/[nameSlug].js
 import { PrismaClient } from "@prisma/client";
 import { NextResponse } from "next/server";
+import redis from '@/lib/redis'; // Import Redis client
 
 const prisma = new PrismaClient();
 
@@ -10,35 +10,26 @@ export async function GET(request, { params }) {
   const { searchParams } = new URL(request.url);
   const limit = parseInt(searchParams.get("limit"));
 
+  const cacheKey = `category:${nameSlug}:limit:${limit || 'all'}`;
+
   try {
-    // ทำการเช็กว่ามีการส่ง limit มาหรือไม่ ถ้ามีให้ทำตามเงื่อนไขด้านล่าง
-    if (limit) {
-      const category = await prisma.category.findFirst({
-        where: { nameSlug },
-        include: {
-          Product: {
-            where: {
-              isPublished: true, // fetch product that is published only
-            },
-            take: limit, // Limit the number of products fetched
-            orderBy: {
-              createdAt: "asc", //
-            },
-          },
-        },
-      });
-      return NextResponse.json(category, { status: 200 });
+    // Check cache first
+    const cachedCategory = await redis.get(cacheKey);
+    if (cachedCategory) {
+      return NextResponse.json(JSON.parse(cachedCategory), { status: 200 });
     }
-    // ถ้าไม่มีการส่ง limit มาให้ทำตามเงื่อนไขด้านล่างเพื่อดึงข้อมูลทั้งหมด
+
+    // If not found in cache, fetch from database
     const category = await prisma.category.findFirst({
       where: { nameSlug },
       include: {
         Product: {
           where: {
-            isPublished: true, // fetch product that is published only
+            isPublished: true,
           },
+          take: limit || undefined,
           orderBy: {
-            createdAt: "desc",
+            createdAt: limit ? "asc" : "desc",
           },
         },
       },
@@ -50,6 +41,9 @@ export async function GET(request, { params }) {
         { status: 404 }
       );
     }
+
+    // Save to cache with TTL (Time-To-Live) of 1 hour
+    await redis.set(cacheKey, JSON.stringify(category), 'EX', 3600);
 
     return NextResponse.json(category, { status: 200 });
   } catch (error) {

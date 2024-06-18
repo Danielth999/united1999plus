@@ -45,7 +45,7 @@ export async function POST(req) {
     const stock = formData.get("stock");
     const color = formData.get("color");
     const size = formData.get("size");
-   
+
     const isPublished = formData.get("isPublished") === "true";
     const categoryId = formData.get("categoryId");
     const image = formData.get("image");
@@ -56,7 +56,6 @@ export async function POST(req) {
       !stock ||
       !color ||
       !size ||
-     
       !categoryId ||
       !image
     ) {
@@ -92,21 +91,20 @@ export async function POST(req) {
       data: {
         name,
         description,
-
         stock,
         color,
         size,
-       
         isPublished,
         categoryId: parseInt(categoryId, 10),
         imageUrl: productUrl.data.publicUrl,
       },
     });
-    await redis.keys("category_*").then((keys) => {
-      if (keys.length > 0) {
-        redis.del(keys);
-      }
-    });
+    // ลบ cache keys ที่เกี่ยวข้องกับ category
+    const keys = await redis.keys("category:*");
+    console.log("Keys to be deleted:", keys); // แสดง keys ที่จะถูกลบ โดยการ console.log
+    if (keys.length > 0) {
+      await redis.del(keys);
+    }
     return NextResponse.json(product, { status: 201 });
   } catch (error) {
     console.error("Error creating product:", error);

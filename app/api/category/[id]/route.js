@@ -103,10 +103,6 @@ export const DELETE = async (request, { params }) => {
     }
 
     // อัปเดตสินค้าที่มีหมวดหมู่เป็นหมวดหมู่ที่กำลังจะลบให้เป็นค่า null
-    await prisma.product.updateMany({
-      where: { categoryId: parseInt(id, 10) },
-      data: { categoryId: null },
-    });
 
     await prisma.category.delete({
       where: { categoryId: parseInt(id, 10) },
