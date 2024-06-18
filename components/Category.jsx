@@ -9,11 +9,11 @@ import { useToast } from "@/components/ui/use-toast";
 import Spinner from "./spinner/Spinner";
 import useSWR from "swr";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { memo, useMemo } from "react";
 
 const fetcher = (url) => axios.get(url).then((res) => res.data);
 
-const CustomNextArrow = (props) => {
-  const { className, style, onClick } = props;
+const CustomNextArrow = memo(({ className, style, onClick }) => {
   return (
     <div
       className={className}
@@ -29,10 +29,9 @@ const CustomNextArrow = (props) => {
       <ChevronRight color="black" size={32} />
     </div>
   );
-};
+});
 
-const CustomPrevArrow = (props) => {
-  const { className, style, onClick } = props;
+const CustomPrevArrow = memo(({ className, style, onClick }) => {
   return (
     <div
       className={className}
@@ -48,25 +47,31 @@ const CustomPrevArrow = (props) => {
       <ChevronLeft color="black" size={20} />
     </div>
   );
-};
+});
 
 const Category = () => {
-  const settings = {
-    dots: true,
-    infinite: true,
-    speed: 500,
-    slidesToShow: 1,
-    slidesToScroll: 1,
-    autoplay: true,
-    autoplaySpeed: 3000,
-    nextArrow: <CustomNextArrow />,
-    prevArrow: <CustomPrevArrow />,
-  };
+  const settings = useMemo(
+    () => ({
+      dots: true,
+      infinite: true,
+      speed: 500,
+      slidesToShow: 1,
+      slidesToScroll: 1,
+      autoplay: true,
+      autoplaySpeed: 3000,
+      nextArrow: <CustomNextArrow />,
+      prevArrow: <CustomPrevArrow />,
+    }),
+    []
+  );
   const { toast } = useToast();
 
   const { data: category, error } = useSWR(
     `${process.env.NEXT_PUBLIC_API_URL}/api/category`,
-    fetcher
+    fetcher,
+    {
+      revalidateOnFocus: false, // Disable revalidation on window focus
+    }
   );
 
   if (error) {
@@ -115,7 +120,7 @@ const Category = () => {
         <div className="block sm:hidden mx-auto w-full max-w-md">
           <Slider {...settings}>
             {category.map((cateItem) => (
-              <div key={cateItem.categoryId} className="p-4 ">
+              <div key={cateItem.categoryId} className="p-4">
                 <div className="bg-[#f1f0ed] p-6 text-center rounded-md font-medium shadow-lg hover:shadow-2xl transition-all ease-in-out duration-300">
                   <Link
                     href={`/category/${cateItem.nameSlug}`}
@@ -127,6 +132,7 @@ const Category = () => {
                       width={100}
                       height={100}
                       className="object-contain mx-auto mb-4"
+                      loading="lazy"
                     />
                     <div>{cateItem.name}</div>
                   </Link>
@@ -153,6 +159,7 @@ const Category = () => {
                     width={100}
                     height={100}
                     className="object-contain mb-4"
+                    loading="lazy"
                   />
                   <div>{item.name}</div>
                 </Link>
