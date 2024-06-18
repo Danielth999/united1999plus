@@ -9,7 +9,7 @@ import { useToast } from "@/components/ui/use-toast";
 import Spinner from "./spinner/Spinner";
 import useSWR from "swr";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { memo, useMemo } from "react";
+import { memo, useMemo, useCallback } from "react";
 
 const fetcher = (url) => axios.get(url).then((res) => res.data);
 
@@ -70,8 +70,36 @@ const Category = () => {
     `${process.env.NEXT_PUBLIC_API_URL}/api/category`,
     fetcher,
     {
-      revalidateOnFocus: false, // Disable revalidation on window focus
+      revalidateOnFocus: false,
+      dedupingInterval: 60000, // Deduping interval of 1 minute
     }
+  );
+
+  const renderCategory = useCallback(
+    (item) => (
+      <div
+        key={item.categoryId}
+        className="bg-[#f1f0ed] p-6 text-center rounded-md font-medium hover:shadow-2xl transition-all ease-in-out duration-300"
+        style={{ willChange: "transform" }} // Use `willChange` to promote the element to a new layer
+      >
+        <Link
+          href={`/category/${item.nameSlug}`}
+          className="font-bold flex flex-col items-center"
+        >
+          <Image
+            src={item.cateImg}
+            alt={item.name}
+            width={100}
+            height={100}
+            className="object-contain mb-4"
+            loading="lazy"
+            sizes="(max-width: 768px) 100px, 100px" // Set explicit image sizes
+          />
+          <div>{item.name}</div>
+        </Link>
+      </div>
+    ),
+    []
   );
 
   if (error) {
@@ -121,22 +149,7 @@ const Category = () => {
           <Slider {...settings}>
             {category.map((cateItem) => (
               <div key={cateItem.categoryId} className="p-4">
-                <div className="bg-[#f1f0ed] p-6 text-center rounded-md font-medium shadow-lg hover:shadow-2xl transition-all ease-in-out duration-300">
-                  <Link
-                    href={`/category/${cateItem.nameSlug}`}
-                    className="font-bold"
-                  >
-                    <Image
-                      src={cateItem.cateImg}
-                      alt={cateItem.name}
-                      width={100}
-                      height={100}
-                      className="object-contain mx-auto mb-4"
-                      loading="lazy"
-                    />
-                    <div>{cateItem.name}</div>
-                  </Link>
-                </div>
+                {renderCategory(cateItem)}
               </div>
             ))}
           </Slider>
@@ -144,27 +157,7 @@ const Category = () => {
         {/* Grid for medium and larger screens */}
         <div className="hidden sm:block">
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3 gap-6">
-            {category.map((item) => (
-              <div
-                key={item.categoryId}
-                className="bg-[#f1f0ed] p-6 text-center rounded-md font-medium hover:shadow-2xl transition-all ease-in-out duration-300"
-              >
-                <Link
-                  href={`/category/${item.nameSlug}`}
-                  className="font-bold flex flex-col items-center"
-                >
-                  <Image
-                    src={item.cateImg}
-                    alt={item.name}
-                    width={100}
-                    height={100}
-                    className="object-contain mb-4"
-                    loading="lazy"
-                  />
-                  <div>{item.name}</div>
-                </Link>
-              </div>
-            ))}
+            {category.map(renderCategory)}
           </div>
         </div>
       </div>

@@ -29,7 +29,7 @@ const Packaging = () => {
     {
       revalidateOnFocus: false,
       revalidateOnReconnect: false,
-      refreshInterval: 2000, // refresh every minute
+      refreshInterval: 60000, // refresh every minute
     }
   );
 
