@@ -7,7 +7,7 @@ import Image from "next/image";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import useSWR from "swr";
 import axios from "axios";
-import Spinner from "@/components/spinner/Spinner"; // นำเข้า Spinner ของคุณ
+import CarouselSkeleton from "./skeleton/CarouselSkeleton";
 
 const fetcher = (url) => axios.get(url).then((res) => res.data);
 
@@ -73,8 +73,8 @@ const Carousel = () => {
 
   if (!data) {
     return (
-      <div className="flex justify-center items-center h-screen">
-        <Spinner />
+      <div className="flex justify-center ">
+        <CarouselSkeleton />
       </div>
     );
   }
@@ -93,7 +93,7 @@ const Carousel = () => {
               fill
               sizes="100%"
               style={{ objectFit: "cover" }}
-              className="rounded-lg"
+              className="rounded-lg w-auto h-full"
             />
           </div>
         ))}

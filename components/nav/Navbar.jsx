@@ -65,10 +65,11 @@ const Navbar = () => {
             <Link href="/">
               <Image
                 src={logo}
-                width={50}
-                height={50}
+                width="0"
+                height="0"
+                sizes="100vw"
                 alt="logo"
-                className="w-auto h-auto"
+               className="w-[50px] h-auto"
               />
             </Link>
             <div className="hidden md:flex items-center space-x-4">

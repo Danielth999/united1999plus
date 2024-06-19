@@ -12,6 +12,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import Spinner from "@/components/spinner/Spinner";
+import SkeletonScreen from "@/components/skeleton/Skeleton";
 
 const fetcher = (url) => axios.get(url).then((res) => res.data);
 
@@ -120,7 +121,7 @@ const ProductDetail = ({ productId, open, setOpen }) => {
         ) : (
           <>
             <div className="flex justify-center">
-              <Spinner />
+              <SkeletonScreen />
             </div>
           </>
         )}

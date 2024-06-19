@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { v4 as uuidv4 } from "uuid";
 import { Mutex } from "async-mutex";
-import redis from "@/lib/redis";
+import redis from '@/lib/redis';
 const prisma = new PrismaClient();
 const mutex = new Mutex();
 
@@ -37,10 +37,7 @@ export async function POST(req) {
 
     if (!images || images.length === 0) {
       console.error("Validation error: Missing images");
-      return NextResponse.json(
-        { error: "Images are required" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Images are required" }, { status: 400 });
     }
 
     const uploadResults = await Promise.all(
@@ -54,9 +51,7 @@ export async function POST(req) {
           throw new Error(`Error uploading image: ${uploadError.message}`);
         }
 
-        const { publicUrl } = supabase.storage
-          .from("images")
-          .getPublicUrl(fileName).data;
+        const { publicUrl } = supabase.storage.from("images").getPublicUrl(fileName).data;
         return publicUrl;
       })
     );
@@ -64,14 +59,11 @@ export async function POST(req) {
     const newImages = await prisma.image.createMany({
       data: uploadResults.map((url) => ({ url })),
     });
-    await redis.del("carousel_images");
+    await redis.del('carousel_images');
     return NextResponse.json(newImages, { status: 201 });
   } catch (error) {
     console.error("Error creating images:", error);
-    return NextResponse.json(
-      { error: "Failed to create images" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to create images" }, { status: 500 });
   } finally {
     release();
   }

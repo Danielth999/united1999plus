@@ -89,11 +89,11 @@ const Category = () => {
           <Image
             src={item.cateImg}
             alt={item.name}
-            width={100}
-            height={100}
-            className="object-contain mb-4"
+            width="0"
+            height="0"
+            sizes="100vw"
+            className="object-contain w-[100px] h-auto mb-4"
             loading="lazy"
-            sizes="(max-width: 768px) 100px, 100px" // Set explicit image sizes
           />
           <div>{item.name}</div>
         </Link>
