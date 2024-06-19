@@ -6,7 +6,6 @@ import redis from "@/lib/redis";
 
 const prisma = new PrismaClient();
 
-export const runtime = "edge"
 export const GET = async (request, { params }) => {
   const id = params.id;
   const userID = parseInt(id);

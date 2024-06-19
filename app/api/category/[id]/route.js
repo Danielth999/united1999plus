@@ -13,7 +13,6 @@ const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 export const supabase = createClient(supabaseUrl, supabaseKey);
 
-export const runtime = "edge"
 export const PUT = async (request, { params }) => {
   const release = await mutex.acquire();
 

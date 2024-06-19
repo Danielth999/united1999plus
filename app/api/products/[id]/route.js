@@ -1,7 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import { NextResponse } from "next/server";
 import { Mutex } from "async-mutex";
-import path from "path";
 import { createClient } from "@supabase/supabase-js";
 import { v4 as uuidv4 } from "uuid";
 import sharp from "sharp";
@@ -13,19 +12,15 @@ const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 const supabase = createClient(supabaseUrl, supabaseKey);
 const mutex = new Mutex();
 
-export const runtime = "edge"
 export async function GET(request, { params }) {
   const { id } = params;
 
   try {
-    // สร้าง cache โดยใช้ key ชื่อ product:${id}
     const cachedProduct = await redis.get(`productId:${id}`);
-    // ถ้ามี cahce  ให้ return ข้อมูลจาก cache ออกไป โดยการแปลงจาก json เป็น javascript object
     if (cachedProduct) {
       return NextResponse.json(JSON.parse(cachedProduct), { status: 200 });
     }
 
-    // ถ้าไม่มี cache ให้ดึงข้อมูลจาก database และเก็บลงใน cache
     const product = await prisma.product.findUnique({
       where: { productId: parseInt(id, 10) },
       include: { Category: true },
@@ -34,7 +29,7 @@ export async function GET(request, { params }) {
     if (!product) {
       return NextResponse.json({ error: "Product not found" }, { status: 404 });
     }
-    // Set cache for 1 hour (3600 seconds)
+
     await redis.set(`product:${id}`, JSON.stringify(product), "ex", 3600);
 
     return NextResponse.json(product, { status: 200 });
@@ -124,7 +119,9 @@ export async function PUT(request, { params }) {
         });
 
         if (oldProduct && oldProduct.imageUrl) {
-          const oldFileName = path.basename(oldProduct.imageUrl);
+          const oldFileName = new URL(oldProduct.imageUrl).pathname
+            .split("/")
+            .pop();
           const { error: deleteError } = await supabase.storage
             .from("products")
             .remove([oldFileName]);
@@ -144,7 +141,7 @@ export async function PUT(request, { params }) {
       });
 
       const keys = await redis.keys("category:*");
-      console.log("Keys to be deleted:", keys); // แสดง keys ที่จะถูกลบ โดยการ console.log
+      console.log("Keys to be deleted:", keys);
       if (keys.length > 0) {
         await redis.del(keys);
       }
@@ -195,7 +192,7 @@ export async function DELETE(request, { params }) {
     });
 
     if (product.imageUrl) {
-      const fileName = path.basename(product.imageUrl);
+      const fileName = new URL(product.imageUrl).pathname.split("/").pop();
       const { error } = await supabase.storage
         .from("products")
         .remove([fileName]);
@@ -209,7 +206,7 @@ export async function DELETE(request, { params }) {
       }
     }
     const keys = await redis.keys("category:*");
-    console.log("Keys to be deleted:", keys); // แสดง keys ที่จะถูกลบ โดยการ console.log
+    console.log("Keys to be deleted:", keys);
     if (keys.length > 0) {
       await redis.del(keys);
     }

@@ -5,7 +5,6 @@ import redis from '@/lib/redis'; // Import Redis client
 
 const prisma = new PrismaClient();
 
-export const runtime = "edge"
 export async function GET(request, { params }) {
   const { nameSlug } = params;
   const { searchParams } = new URL(request.url);

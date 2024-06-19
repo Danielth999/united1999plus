@@ -15,7 +15,6 @@ if (!supabaseUrl || !supabaseKey) {
   throw new Error("Missing Supabase environment variables");
 }
 
-export const runtime = "edge";
 export async function GET() {
   try {
     const images = await prisma.image.findMany();

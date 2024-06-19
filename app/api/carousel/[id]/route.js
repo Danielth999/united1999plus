@@ -1,16 +1,15 @@
 import { PrismaClient } from "@prisma/client";
 import { NextResponse } from "next/server";
 import { Mutex } from "async-mutex";
-import path from "path";
 import { createClient } from "@supabase/supabase-js";
 import redis from "@/lib/redis";
+
 const prisma = new PrismaClient();
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 const supabase = createClient(supabaseUrl, supabaseKey);
 const mutex = new Mutex();
 
-export const runtime = "edge"
 
 export async function DELETE(request, { params }) {
   const release = await mutex.acquire();
@@ -36,7 +35,7 @@ export async function DELETE(request, { params }) {
     });
 
     if (image.url) {
-      const fileName = path.basename(image.url);
+      const fileName = new URL(image.url).pathname.split('/').pop();
       const { error } = await supabase.storage
         .from("images")
         .remove([fileName]);
@@ -49,7 +48,9 @@ export async function DELETE(request, { params }) {
         );
       }
     }
+
     await redis.del("carousel_images");
+
     return NextResponse.json(
       { message: "Image deleted successfully" },
       { status: 200 }
