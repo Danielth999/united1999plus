@@ -13,9 +13,7 @@ const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 const supabase = createClient(supabaseUrl, supabaseKey);
 const mutex = new Mutex();
 
-export const config = {
-  runtime: "edge",
-};
+export const runtime = "edge"
 export async function GET(request, { params }) {
   const { id } = params;
 

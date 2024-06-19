@@ -32,9 +32,7 @@ async function getOrSetCache(key, cb) {
   return freshData; // คืนค่าข้อมูลใหม่
 }
 
-export const config = {
-  runtime: "edge",
-};
+export const runtime = "edge"
 export const GET = async (req) => {
   try {
     const categories = await getOrSetCache("categories", async () => {
