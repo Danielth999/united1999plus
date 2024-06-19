@@ -10,6 +10,10 @@ const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 const supabase = createClient(supabaseUrl, supabaseKey);
 const mutex = new Mutex();
 
+export const config = {
+  runtime: "edge",
+};
+
 export async function DELETE(request, { params }) {
   const release = await mutex.acquire();
 
@@ -47,7 +51,7 @@ export async function DELETE(request, { params }) {
         );
       }
     }
-    await redis.del('carousel_images');
+    await redis.del("carousel_images");
     return NextResponse.json(
       { message: "Image deleted successfully" },
       { status: 200 }

@@ -5,6 +5,9 @@ import redis from "@/lib/redis";
 
 const prisma = new PrismaClient();
 
+export const config = {
+  runtime: "edge",
+};
 export async function GET(req) {
   try {
     const cacheKey = "carousel_images";
