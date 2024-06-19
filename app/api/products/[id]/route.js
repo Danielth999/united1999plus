@@ -66,6 +66,11 @@ export async function PUT(request, { params }) {
         where: { productId },
         data: { isPublished },
       });
+      const keys = await redis.keys("category:*");
+      console.log("Keys to be deleted:", keys);
+      if (keys.length > 0) {
+        await redis.del(keys);
+      }
       await redis.del(`product:${id}`);
       return NextResponse.json(updatedProduct, { status: 200 });
     } else if (contentType.startsWith("multipart/form-data")) {

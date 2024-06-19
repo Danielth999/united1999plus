@@ -29,7 +29,7 @@ const CleaningProducts = () => {
     {
       revalidateOnFocus: false,
       revalidateOnReconnect: false,
-      refreshInterval: 6000,
+      refreshInterval: 5000,
     }
   );
 
