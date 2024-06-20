@@ -129,7 +129,7 @@ const CleaningProducts = () => {
                 <CardHeader className="border-b w-full h-60 relative">
                   <Image
                     src={item.imageUrl}
-                    alt={item.name}
+                    alt={`image/${item.name}`}
                     fill
                     style={{ objectFit: "contain" }}
                     className="max-h-full"

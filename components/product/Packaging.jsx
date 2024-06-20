@@ -130,7 +130,7 @@ const Packaging = () => {
                 <CardHeader className="border-b w-full h-60 relative">
                   <Image
                     src={item.imageUrl}
-                    alt={item.name}
+                    alt={`image/${item.name}`}
                     fill
                     sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                     style={{ objectFit: "contain" }}
