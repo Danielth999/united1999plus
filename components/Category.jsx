@@ -79,7 +79,7 @@ const Category = () => {
     (item) => (
       <div
         key={item.categoryId}
-        className="bg-[#f1f0ed] p-6 text-center rounded-md font-medium hover:shadow-2xl transition-all ease-in-out duration-300"
+        className="bg-[#f1f0ed] p-6 text-center rounded-md font-medium lg:hover:shadow-2xl transition-all ease-in-out duration-300"
         style={{ willChange: "transform" }}
       >
         <Link
