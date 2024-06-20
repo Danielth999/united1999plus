@@ -11,49 +11,33 @@ import CarouselSkeleton from "./skeleton/CarouselSkeleton";
 
 const fetcher = (url) => axios.get(url).then((res) => res.data);
 
-const CustomNextArrow = (props) => {
-  const { className, style, onClick } = props;
-  return (
-    <div
-      className={className}
-      style={{
-        ...style,
-        display: "block",
-        background: "none",
-        right: "10px",
-        zIndex: 1,
-      }}
-      onClick={onClick}
-    >
-      <ChevronRight color="black" size={32} />
-    </div>
-  );
-};
+const CustomNextArrow = ({ className, style, onClick }) => (
+  <div
+    className={className}
+    style={{ ...style, display: "block", background: "none", right: "10px", zIndex: 1 }}
+    onClick={onClick}
+  >
+    <ChevronRight color="black" size={32} />
+  </div>
+);
 
-const CustomPrevArrow = (props) => {
-  const { className, style, onClick } = props;
-  return (
-    <div
-      className={className}
-      style={{
-        ...style,
-        display: "block",
-        background: "none",
-        left: "10px",
-        zIndex: 1,
-      }}
-      onClick={onClick}
-    >
-      <ChevronLeft color="black" size={32} />
-    </div>
-  );
-};
+const CustomPrevArrow = ({ className, style, onClick }) => (
+  <div
+    className={className}
+    style={{ ...style, display: "block", background: "none", left: "10px", zIndex: 1 }}
+    onClick={onClick}
+  >
+    <ChevronLeft color="black" size={32} />
+  </div>
+);
 
 const Carousel = () => {
-  const { data, error } = useSWR(
-    `${process.env.NEXT_PUBLIC_API_URL}/api/carousel/filter`,
-    fetcher
-  );
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+  if (!apiUrl) {
+    return <div>Error: API URL is not defined</div>;
+  }
+
+  const { data, error } = useSWR(`${apiUrl}/api/carousel/filter`, fetcher);
 
   const settings = {
     dots: true,
@@ -73,7 +57,7 @@ const Carousel = () => {
 
   if (!data) {
     return (
-      <div className="flex justify-center ">
+      <div className="flex justify-center">
         <CarouselSkeleton />
       </div>
     );
@@ -95,6 +79,7 @@ const Carousel = () => {
               style={{ objectFit: "cover" }}
               loading="lazy"
               className="rounded-lg w-auto h-full"
+              priority={index === 0} // โหลดภาพแรกด้วยลำดับความสำคัญสูง
             />
           </div>
         ))}
