@@ -20,13 +20,18 @@ export const metadata = {
     "ยูไนเต็ด1999พลัซ",
   ],
   author: "UNITED 1999 PLUS",
-  viewport: "width=device-width, initial-scale=1.0",
   charset: "UTF-8",
   robots: "index, follow",
   ogTitle: "UNITED 1999 PLUS",
   ogDescription: "UNITED 1999 PLUS",
   ogType: "website",
   ogUrl: "https://united1999plus.vercel.app",
+};
+
+/** @type {import('next').Viewport} */
+export const viewport = {
+  width: "device-width",
+  initialScale: 1.0,
 };
 
 export default function RootLayout({ children }) {
@@ -41,7 +46,6 @@ export default function RootLayout({ children }) {
         <meta name="description" content={metadata.description} />
         <meta name="keywords" content={metadata.keywords.join(", ")} />
         <meta name="author" content={metadata.author} />
-        <meta name="viewport" content={metadata.viewport} />
         <meta charSet={metadata.charset} />
         <meta name="robots" content={metadata.robots} />
         <meta property="og:title" content={metadata.ogTitle} />
