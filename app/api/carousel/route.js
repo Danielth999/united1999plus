@@ -3,7 +3,9 @@ import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { v4 as uuidv4 } from "uuid";
 import { Mutex } from "async-mutex";
+import sharp from "sharp";
 import redis from '@/lib/redis';
+
 const prisma = new PrismaClient();
 const mutex = new Mutex();
 
@@ -42,10 +44,15 @@ export async function POST(req) {
 
     const uploadResults = await Promise.all(
       images.map(async (image) => {
-        const fileName = `${uuidv4()}-${image.name}`;
+        const buffer = await image.arrayBuffer();
+        const webpBuffer = await sharp(Buffer.from(buffer)).webp().toBuffer();
+        const fileName = `${uuidv4()}-${image.name.split('.').slice(0, -1).join('.')}.webp`;
+
         const { error: uploadError } = await supabase.storage
           .from("images")
-          .upload(fileName, image);
+          .upload(fileName, webpBuffer, {
+            contentType: 'image/webp'
+          });
 
         if (uploadError) {
           throw new Error(`Error uploading image: ${uploadError.message}`);
