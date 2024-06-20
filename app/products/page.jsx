@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Image from "next/image";
 import Link from "next/link";
+import Head from "next/head";
 import { useSearchParams } from "next/navigation";
 import Navbar from "@/components/nav/Navbar";
 import Footer from "@/components/Footer";
@@ -131,8 +132,80 @@ const ProductPage = () => {
     setSelectedProductId(productId);
   };
 
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    itemListElement: products.map((product, index) => ({
+      "@type": "ListItem",
+      position: index + 1,
+      url: `https://united1999plus.vercel.app/product/${product.productId}`,
+      name: product.name,
+    })),
+  };
+
   return (
     <>
+      <Head>
+        <title>
+          {searchQuery ? `ผลการค้นหา '${searchQuery}'` : "สินค้าทั้งหมด"} -
+          UNITED 1999 PLUS
+        </title>
+        <meta
+          name="description"
+          content={
+            searchQuery
+              ? `ผลการค้นหาสำหรับ '${searchQuery}'`
+              : "สินค้าทั้งหมดจาก UNITED 1999 PLUS"
+          }
+        />
+        <meta
+          name="keywords"
+          content="สินค้าทั้งหมด, UNITED 1999 PLUS, ผลิตภัณฑ์, ค้นหา"
+        />
+        <meta
+          property="og:title"
+          content={
+            searchQuery ? `ผลการค้นหา '${searchQuery}'` : "สินค้าทั้งหมด"
+          }
+        />
+        <meta
+          property="og:description"
+          content={
+            searchQuery
+              ? `ผลการค้นหาสำหรับ '${searchQuery}'`
+              : "สินค้าทั้งหมดจาก UNITED 1999 PLUS"
+          }
+        />
+        <meta property="og:url" content="https://united1999plus.vercel.app" />
+        <meta property="og:type" content="website" />
+        <meta
+          property="og:image"
+          content="https://united1999plus.vercel.app/logo/logo-real-no-bg.png"
+        />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta
+          name="twitter:title"
+          content={
+            searchQuery ? `ผลการค้นหา '${searchQuery}'` : "สินค้าทั้งหมด"
+          }
+        />
+        <meta
+          name="twitter:description"
+          content={
+            searchQuery
+              ? `ผลการค้นหาสำหรับ '${searchQuery}'`
+              : "สินค้าทั้งหมดจาก UNITED 1999 PLUS"
+          }
+        />
+        <meta
+          name="twitter:image"
+          content="https://united1999plus.vercel.app/logo/logo-real-no-bg.png"
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+        />
+      </Head>
       <Navbar />
       <div className="max-w-7xl mx-auto p-5">
         <div className="mt-2">

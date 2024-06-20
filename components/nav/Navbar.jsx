@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import Head from "next/head";
 import logo from "../../public/logo/logo-real-no-bg.png";
 import { useSession, signOut } from "next-auth/react";
 import { Search, Menu, X, LayoutGrid } from "lucide-react";
@@ -46,8 +47,38 @@ const Navbar = () => {
     );
   }
 
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: "UNITED 1999 PLUS",
+    url: "https://united1999plus.vercel.app",
+    potentialAction: {
+      "@type": "SearchAction",
+      target: "https://united1999plus.vercel.app/search?q={search_term_string}",
+      "query-input": "required name=search_term_string",
+    },
+  };
+
   return (
     <>
+      <Head>
+        <title>UNITED 1999 PLUS - หมวดหมู่สินค้า</title>
+        <meta name="description" content="เลือกดูหมวดหมู่สินค้าต่างๆ ของเรา" />
+        <meta name="keywords" content="หมวดหมู่สินค้า, UNITED 1999 PLUS, บรรจุภัณฑ์เฟสท์, อุปกรณ์สำนักงาน, ผลิตภัณฑ์ทำความสะอาด" />
+        <meta property="og:title" content="UNITED 1999 PLUS - หมวดหมู่สินค้า" />
+        <meta property="og:description" content="เลือกดูหมวดหมู่สินค้าต่างๆ ของเรา" />
+        <meta property="og:url" content="https://united1999plus.vercel.app" />
+        <meta property="og:type" content="website" />
+        <meta property="og:image" content="https://united1999plus.vercel.app/logo/logo-real-no-bg.png" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="UNITED 1999 PLUS - หมวดหมู่สินค้า" />
+        <meta name="twitter:description" content="เลือกดูหมวดหมู่สินค้าต่างๆ ของเรา" />
+        <meta name="twitter:image" content="https://united1999plus.vercel.app/logo/logo-real-no-bg.png" />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+        />
+      </Head>
       <Header />
       <nav className="bg-white shadow-md">
         <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between h-[80px] px-4 md:px-6">
@@ -62,14 +93,14 @@ const Navbar = () => {
                 {menuOpen ? <X /> : <Menu />}
               </button>
             </div>
-            <Link href="/">
+            <Link href="/" passHref>
               <Image
                 src={logo}
                 width="0"
                 height="0"
                 sizes="100vw"
                 alt="logo"
-               className="w-[50px] h-auto"
+                className="w-[50px] h-auto"
               />
             </Link>
             <div className="hidden md:flex items-center space-x-4">
@@ -84,6 +115,7 @@ const Navbar = () => {
                     <DropdownMenuItem key={items.categoryId}>
                       <Link
                         href={`/category/${items.nameSlug}`}
+                        passHref
                         className="flex justify-between w-full px-4 py-2 text-left text-black hover:bg-gray-100"
                       >
                         {items.name}
@@ -93,6 +125,7 @@ const Navbar = () => {
                   <DropdownMenuItem>
                     <Link
                       href="/products"
+                      passHref
                       className="flex justify-between w-full px-4 py-2 text-left text-black hover:bg-gray-100"
                     >
                       สินค้าทั้งหมด
@@ -119,7 +152,9 @@ const Navbar = () => {
                 <DropdownMenuContent>
                   {session.user.role === "admin" && (
                     <DropdownMenuItem>
-                      <Link href="/admin-dashboard/dashboard">ระบบจัดการ</Link>
+                      <Link href="/admin-dashboard/dashboard" passHref>
+                        ระบบจัดการ
+                      </Link>
                     </DropdownMenuItem>
                   )}
                   <DropdownMenuItem>
@@ -132,10 +167,10 @@ const Navbar = () => {
             </div>
           ) : (
             <div className="flex items-center space-x-4">
-              <Link href="/login">
+              <Link href="/login" passHref>
                 <span className="text-[#204d9c] font-bold">เข้าสู่ระบบ</span>
               </Link>
-              <Link href="/register">
+              <Link href="/register" passHref>
                 <span className="bg-[#204d9c] text-white py-2 px-4 rounded-lg font-bold">
                   สมัครสมาชิก
                 </span>
@@ -154,6 +189,7 @@ const Navbar = () => {
                 <Link
                   href={`category/${category.nameSlug}`}
                   key={category.categoryId}
+                  passHref
                 >
                   <span className="block px-3 py-2 rounded-md text-base font-medium text-[#204d9c] hover:bg-gray-100">
                     {category.name}
@@ -161,7 +197,9 @@ const Navbar = () => {
                 </Link>
               ))}
               <span className="block px-3 py-2 rounded-md text-base font-medium text-[#204d9c] hover:bg-gray-100">
-                <Link href="/products">สินค้าทั้งหมด</Link>
+                <Link href="/products" passHref>
+                  สินค้าทั้งหมด
+                </Link>
               </span>
             </div>
           </div>

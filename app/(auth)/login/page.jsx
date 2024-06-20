@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
+import Head from "next/head";
 import Navbar from "@/components/nav/Navbar";
 import Footer from "@/components/Footer";
 import Link from "next/link";
@@ -59,8 +60,34 @@ const LoginPage = () => {
     }
   };
 
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    name: "เข้าสู่ระบบ - UNITED 1999 PLUS",
+    url: "https://united1999plus.vercel.app/login",
+    description: "เข้าสู่ระบบเพื่อเข้าถึงบริการและผลิตภัณฑ์ของ UNITED 1999 PLUS",
+  };
+
   return (
     <>
+      <Head>
+        <title>เข้าสู่ระบบ - UNITED 1999 PLUS</title>
+        <meta name="description" content="เข้าสู่ระบบเพื่อเข้าถึงบริการและผลิตภัณฑ์ของ UNITED 1999 PLUS" />
+        <meta name="keywords" content="เข้าสู่ระบบ, UNITED 1999 PLUS, บริการ, ผลิตภัณฑ์" />
+        <meta property="og:title" content="เข้าสู่ระบบ - UNITED 1999 PLUS" />
+        <meta property="og:description" content="เข้าสู่ระบบเพื่อเข้าถึงบริการและผลิตภัณฑ์ของ UNITED 1999 PLUS" />
+        <meta property="og:url" content="https://united1999plus.vercel.app/login" />
+        <meta property="og:type" content="website" />
+        <meta property="og:image" content="https://united1999plus.vercel.app/logo/logo-real-no-bg.png" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="เข้าสู่ระบบ - UNITED 1999 PLUS" />
+        <meta name="twitter:description" content="เข้าสู่ระบบเพื่อเข้าถึงบริการและผลิตภัณฑ์ของ UNITED 1999 PLUS" />
+        <meta name="twitter:image" content="https://united1999plus.vercel.app/logo/logo-real-no-bg.png" />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+        />
+      </Head>
       <Navbar />
       <div className="flex justify-center mt-10">
         <div className="max-w-md w-full bg-white shadow-lg rounded-md p-8">

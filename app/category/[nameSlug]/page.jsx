@@ -6,6 +6,7 @@ import { useParams } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
+import Head from "next/head";
 import Navbar from "@/components/nav/Navbar";
 import Footer from "@/components/Footer";
 import Spinner from "@/components/spinner/Spinner";
@@ -67,8 +68,64 @@ const CategoryPage = () => {
     setCurrentPage(page);
   };
 
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    itemListElement: category.Product.map((product, index) => ({
+      "@type": "ListItem",
+      position: index + 1,
+      url: `https://united1999plus.vercel.app/product/${product.productId}`,
+      name: product.name,
+    })),
+  };
+
   return (
     <>
+      <Head>
+        <title>หมวดหมู่: {category.name} - UNITED 1999 PLUS</title>
+        <meta
+          name="description"
+          content={`เลือกดูสินค้าหมวดหมู่ ${category.name} จาก UNITED 1999 PLUS`}
+        />
+        <meta
+          name="keywords"
+          content={`หมวดหมู่สินค้า, ${category.name}, UNITED 1999 PLUS`}
+        />
+        <meta
+          property="og:title"
+          content={`หมวดหมู่: ${category.name} - UNITED 1999 PLUS`}
+        />
+        <meta
+          property="og:description"
+          content={`เลือกดูสินค้าหมวดหมู่ ${category.name} จาก UNITED 1999 PLUS`}
+        />
+        <meta
+          property="og:url"
+          content={`https://united1999plus.vercel.app/category/${nameSlug}`}
+        />
+        <meta property="og:type" content="website" />
+        <meta
+          property="og:image"
+          content="https://united1999plus.vercel.app/logo/logo-real-no-bg.png"
+        />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta
+          name="twitter:title"
+          content={`หมวดหมู่: ${category.name} - UNITED 1999 PLUS`}
+        />
+        <meta
+          name="twitter:description"
+          content={`เลือกดูสินค้าหมวดหมู่ ${category.name} จาก UNITED 1999 PLUS`}
+        />
+        <meta
+          name="twitter:image"
+          content="https://united1999plus.vercel.app/logo/logo-real-no-bg.png"
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+        />
+      </Head>
       <Navbar />
       <div className="container mx-auto">
         <div className="mt-10">

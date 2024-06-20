@@ -1,4 +1,5 @@
 import Link from "next/link";
+
 const Footer = () => {
   return (
     <footer className="bg-[#204d9c] text-white mt-20 py-8">
@@ -16,9 +17,21 @@ const Footer = () => {
           <div className="text-center md:text-left">
             <h2 className="text-xl font-bold mb-4">ผลิตภัณฑ์</h2>
             <ul>
-              <li>บรรจุภัณฑ์เฟสท์</li>
-              <li>อุปกรณ์สำนักงาน</li>
-              <li>ผลิตภัณฑ์ทำความสะอาด</li>
+              <li>
+                <Link href="/category/packaging" className="hover:underline">
+                  บรรจุภัณฑ์เฟสท์
+                </Link>
+              </li>
+              <li>
+                <Link href="/category/office-supplies" className="hover:underline">
+                  อุปกรณ์สำนักงาน
+                </Link>
+              </li>
+              <li>
+                <Link href="/category/cleaning-products" className="hover:underline">
+                  ผลิตภัณฑ์ทำความสะอาด
+                </Link>
+              </li>
             </ul>
           </div>
           {/* Section 3 */}
@@ -31,14 +44,13 @@ const Footer = () => {
               </li>
               <li>
                 โทร:{" "}
-                <a className="hover:underline" href={"tel:038-623-126"}>
-                  {" "}
+                <a className="hover:underline" href="tel:038-623-126">
                   038-623126
                 </a>
               </li>
               <li>
                 Fax:{" "}
-                <a className="hover:underline" href={"tel:038-623-433"}>
+                <a className="hover:underline" href="tel:038-623-433">
                   (038)623433
                 </a>
               </li>
