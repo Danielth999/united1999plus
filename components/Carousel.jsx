@@ -77,7 +77,7 @@ const Carousel = () => {
               fill
               sizes="100%"
               style={{ objectFit: "cover" }}
-              loading="lazy"
+             
               className="rounded-lg w-auto h-full"
               priority={index === 0} // โหลดภาพแรกด้วยลำดับความสำคัญสูง
             />
