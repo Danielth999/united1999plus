@@ -49,7 +49,7 @@ const ProductDetail = ({ productId, open, setOpen }) => {
                   <Image
                     src={product.imageUrl}
                     alt={product.name}
-                    layout="responsive"
+                 responsive="true"
                     width={500}
                     height={500}
                     sizes="(max-width: 640px) 100vw, (max-width: 768px) 100vw, (max-width: 1024px) 50vw, 25vw"
