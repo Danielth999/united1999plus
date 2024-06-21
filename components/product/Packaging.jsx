@@ -2,6 +2,7 @@
 import { useState } from "react";
 import axios from "axios";
 import Image from "next/image";
+import Link from "next/link";
 import Head from "next/head";
 import {
   Card,
@@ -157,9 +158,12 @@ const Packaging = () => {
 
           {products.length === 10 && (
             <div className="flex justify-center mt-5">
-              <button className="bg-blue-500 text-white py-2 px-4 rounded-full hover:bg-blue-600">
+              <Link
+                href={"/category/packaging"}
+                className="bg-blue-500 text-white py-2 px-4 rounded-full hover:bg-blue-600"
+              >
                 ดูเพิ่มเติม
-              </button>
+              </Link>
             </div>
           )}
         </section>
