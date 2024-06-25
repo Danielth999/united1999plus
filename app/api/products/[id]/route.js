@@ -71,6 +71,10 @@ export async function PUT(request, { params }) {
       if (keys.length > 0) {
         await redis.del(keys);
       }
+      const filterKeys = await redis.keys("products:search:*");
+      if (filterKeys.length > 0) {
+        await redis.del(filterKeys);
+      }
       await redis.del(`product:${id}`);
       return NextResponse.json(updatedProduct, { status: 200 });
     } else if (contentType.startsWith("multipart/form-data")) {
@@ -150,6 +154,10 @@ export async function PUT(request, { params }) {
       if (keys.length > 0) {
         await redis.del(keys);
       }
+      const filterKeys = await redis.keys("products:search:*");
+      if (filterKeys.length > 0) {
+        await redis.del(filterKeys);
+      }
       await redis.del(`product:${id}`);
       return NextResponse.json(updatedProduct, { status: 200 });
     } else {
@@ -209,6 +217,10 @@ export async function DELETE(request, { params }) {
           { status: 500 }
         );
       }
+    }
+    const filterKeys = await redis.keys("products:search:*");
+    if (filterKeys.length > 0) {
+      await redis.del(filterKeys);
     }
     const keys = await redis.keys("category:*");
     console.log("Keys to be deleted:", keys);

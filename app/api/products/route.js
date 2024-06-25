@@ -105,6 +105,10 @@ export async function POST(req) {
     if (keys.length > 0) {
       await redis.del(keys);
     }
+    const filterKeys = await redis.keys("products:search:*");
+    if (filterKeys.length > 0) {
+      await redis.del(filterKeys);
+    }
     return NextResponse.json(product, { status: 201 });
   } catch (error) {
     console.error("Error creating product:", error);
