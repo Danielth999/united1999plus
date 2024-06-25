@@ -9,12 +9,6 @@ import ScrollToTopButton from "@/components/ScrollToTopButton";
 import Footer from "@/components/Footer";
 
 export default function Home() {
-  const videoIds = [
-    "7377644250030165253",
-    "7379461511304973575",
-    "7236574453977632005",
-  ];
-
   return (
     <>
       <header>

@@ -2,79 +2,48 @@
 import axios from "axios";
 import Link from "next/link";
 import Image from "next/image";
-import Slider from "react-slick";
-import "slick-carousel/slick/slick.css";
-import "slick-carousel/slick/slick-theme.css";
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Pagination, Autoplay } from 'swiper/modules';
+import 'swiper/css';
+import 'swiper/css/pagination';
 import { useToast } from "@/components/ui/use-toast";
 import useSWR from "swr";
-import { ChevronLeft, ChevronRight } from "lucide-react";
 import { memo, useMemo, useCallback } from "react";
 import CategorySkeleton from "@/components/skeleton/CategorySkeleton";
 
+// ฟังก์ชันสำหรับดึงข้อมูลจาก API
 const fetcher = (url) => axios.get(url).then((res) => res.data);
 
-const CustomNextArrow = memo(({ className, style, onClick }) => {
-  return (
-    <div
-      className={className}
-      style={{
-        ...style,
-        display: "block",
-        background: "none",
-        right: "10px",
-        zIndex: 1,
-      }}
-      onClick={onClick}
-    >
-      <ChevronRight color="black" size={32} />
-    </div>
-  );
-});
-
-const CustomPrevArrow = memo(({ className, style, onClick }) => {
-  return (
-    <div
-      className={className}
-      style={{
-        ...style,
-        display: "block",
-        background: "none",
-        left: "10px",
-        zIndex: 1,
-      }}
-      onClick={onClick}
-    >
-      <ChevronLeft color="black" size={20} />
-    </div>
-  );
-});
-
 const Category = () => {
-  const settings = useMemo(
+  // กำหนดค่าตั้งต้นสำหรับ Swiper
+  const swiperOptions = useMemo(
     () => ({
-      dots: true,
-      infinite: true,
-      speed: 500,
-      slidesToShow: 1,
-      slidesToScroll: 1,
-      autoplay: true,
-      autoplaySpeed: 3000,
-      nextArrow: <CustomNextArrow />,
-      prevArrow: <CustomPrevArrow />,
+      modules: [Pagination, Autoplay],
+      spaceBetween: 50,
+      slidesPerView: 1,
+      pagination: { clickable: true },
+      autoplay: {
+        delay: 3000,
+        disableOnInteraction: false,
+      },
+      loop: true,
     }),
     []
   );
+  
   const { toast } = useToast();
 
+  // ดึงข้อมูลหมวดหมู่จาก API
   const { data: category, error } = useSWR(
     `${process.env.NEXT_PUBLIC_API_URL}/api/category`,
     fetcher,
     {
       revalidateOnFocus: false,
-      dedupingInterval: 60000, // Deduping interval of 1 minute
+      dedupingInterval: 60000, // ตั้งเวลา dedupe 1 นาที
     }
   );
 
+  // ฟังก์ชันสำหรับแสดงผลแต่ละหมวดหมู่
   const renderCategory = useCallback(
     (item) => (
       <div
@@ -102,6 +71,7 @@ const Category = () => {
     []
   );
 
+  // แสดงข้อความเมื่อเกิดข้อผิดพลาด
   if (error) {
     toast({
       title: "เกิดข้อผิดพลาด",
@@ -120,8 +90,9 @@ const Category = () => {
     );
   }
 
-  const skeletonCount = category?.length || 1; // จำนวน skeleton ตามความยาวของ category
+  const skeletonCount = category?.length || 1;
 
+  // แสดง skeleton ขณะโหลดข้อมูล
   if (!category) {
     return (
       <>
@@ -135,6 +106,7 @@ const Category = () => {
     );
   }
 
+  // แสดงข้อความเมื่อไม่มีหมวดหมู่
   if (!Array.isArray(category)) {
     return (
       <div className="text-center mt-10">
@@ -156,29 +128,25 @@ const Category = () => {
         </div>
       )}
       <div className="md:mt-5">
-        {/* Carousel for small screens */}
+        {/* Swiper สำหรับหน้าจอขนาดเล็ก */}
         <div className="block sm:hidden mx-auto w-full max-w-md">
-          <Slider {...settings}>
+          <Swiper {...swiperOptions}>
             {category.map((cateItem) => (
-              <div key={cateItem.categoryId} className="p-4">
-                {renderCategory(cateItem)}
-              </div>
+              <SwiperSlide key={cateItem.categoryId}>
+                <div className="p-4">
+                  {renderCategory(cateItem)}
+                </div>
+              </SwiperSlide>
             ))}
-          </Slider>
+          </Swiper>
         </div>
-        {/* Grid for medium and larger screens */}
+        {/* Grid สำหรับหน้าจอขนาดกลางและใหญ่ */}
         <div className="hidden sm:block">
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3 gap-6">
             {category.map(renderCategory)}
           </div>
         </div>
       </div>
-      <style jsx global>{`
-        .slick-prev:before,
-        .slick-next:before {
-          display: none !important;
-        }
-      `}</style>
     </>
   );
 };

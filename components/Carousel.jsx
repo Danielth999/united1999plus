@@ -1,55 +1,50 @@
 "use client";
-import React from "react";
-import Slider from "react-slick";
-import "slick-carousel/slick/slick.css";
-import "slick-carousel/slick/slick-theme.css";
+import React, { useMemo, useCallback } from "react";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Navigation, Pagination, Autoplay } from "swiper/modules";
+import "swiper/css";
+import "swiper/css/navigation";
+import "swiper/css/pagination";
 import Image from "next/image";
-import { ChevronLeft, ChevronRight } from "lucide-react";
 import useSWR from "swr";
 import axios from "axios";
 import CarouselSkeleton from "./skeleton/CarouselSkeleton";
 
-const fetcher = (url) => axios.get(url).then((res) => res.data);
-
-const CustomNextArrow = ({ className, style, onClick }) => (
-  <div
-    className={className}
-    style={{ ...style, display: "block", background: "none", right: "10px", zIndex: 1 }}
-    onClick={onClick}
-  >
-    <ChevronRight color="black" size={32} />
-  </div>
-);
-
-const CustomPrevArrow = ({ className, style, onClick }) => (
-  <div
-    className={className}
-    style={{ ...style, display: "block", background: "none", left: "10px", zIndex: 1 }}
-    onClick={onClick}
-  >
-    <ChevronLeft color="black" size={32} />
-  </div>
-);
-
 const Carousel = () => {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+
+  const fetcher = useMemo(
+    () => (url) => axios.get(url).then((res) => res.data),
+    []
+  );
+
+  const swiperOptions = useCallback(
+    () => ({
+      modules: [Navigation, Pagination, Autoplay],
+      spaceBetween: 50,
+      slidesPerView: 1,
+      navigation: {
+        nextEl: ".swiper-button-next",
+        prevEl: ".swiper-button-prev",
+      },
+      pagination: { clickable: true },
+      autoplay: {
+        delay: 3000,
+        disableOnInteraction: false,
+      },
+      loop: true,
+    }),
+    []
+  );
+
+  const { data, error } = useSWR(
+    apiUrl ? `${apiUrl}/api/carousel/filter` : null,
+    fetcher
+  );
+
   if (!apiUrl) {
     return <div>Error: API URL is not defined</div>;
   }
-
-  const { data, error } = useSWR(`${apiUrl}/api/carousel/filter`, fetcher);
-
-  const settings = {
-    dots: true,
-    infinite: true,
-    speed: 500,
-    slidesToShow: 1,
-    slidesToScroll: 1,
-    autoplay: true,
-    autoplaySpeed: 3000,
-    nextArrow: <CustomNextArrow />,
-    prevArrow: <CustomPrevArrow />,
-  };
 
   if (error) {
     return <div>Error loading images</div>;
@@ -65,29 +60,34 @@ const Carousel = () => {
 
   return (
     <div className="w-full mx-auto rounded-lg overflow-hidden p-2 sm:p-4 md:p-6 lg:p-8 xl:p-10">
-      <Slider {...settings}>
+      <Swiper {...swiperOptions()}>
         {data.map((image, index) => (
-          <div
-            key={index}
-            className="relative w-full h-[200px] sm:h-[300px] md:h-[350px] lg:h-[400px] xl:h-[500px]"
-          >
-            <Image
-              src={image.url}
-              alt={`Slide ${index + 1}`}
-              fill
-              sizes="100%"
-              style={{ objectFit: "cover" }}
-             
-              className="rounded-lg w-auto h-full"
-              priority={index === 0} // โหลดภาพแรกด้วยลำดับความสำคัญสูง
-            />
-          </div>
+          <SwiperSlide key={index}>
+            <div className="relative w-full h-[200px] sm:h-[300px] md:h-[350px] lg:h-[400px] xl:h-[500px]">
+              <Image
+                src={image.url}
+                alt={`Slide ${index + 1}`}
+                fill
+                sizes="100%"
+                style={{ objectFit: "cover" }}
+                className="rounded-lg w-auto h-full"
+                priority={index === 0}
+              />
+            </div>
+          </SwiperSlide>
         ))}
-      </Slider>
+        <div className="swiper-button-prev"></div>
+        <div className="swiper-button-next"></div>
+      </Swiper>
       <style jsx global>{`
-        .slick-prev:before,
-        .slick-next:before {
-          display: none !important;
+        .swiper-button-prev,
+        .swiper-button-next {
+          background: none;
+          color: black;
+        }
+        .swiper-button-prev::after,
+        .swiper-button-next::after {
+          display: none;
         }
       `}</style>
     </div>

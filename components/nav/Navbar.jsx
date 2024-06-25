@@ -64,16 +64,34 @@ const Navbar = () => {
       <Head>
         <title>UNITED 1999 PLUS - หมวดหมู่สินค้า</title>
         <meta name="description" content="เลือกดูหมวดหมู่สินค้าต่างๆ ของเรา" />
-        <meta name="keywords" content="หมวดหมู่สินค้า, UNITED 1999 PLUS, บรรจุภัณฑ์เฟสท์, อุปกรณ์สำนักงาน, ผลิตภัณฑ์ทำความสะอาด" />
+        <meta
+          name="keywords"
+          content="หมวดหมู่สินค้า, UNITED 1999 PLUS, บรรจุภัณฑ์เฟสท์, อุปกรณ์สำนักงาน, ผลิตภัณฑ์ทำความสะอาด"
+        />
         <meta property="og:title" content="UNITED 1999 PLUS - หมวดหมู่สินค้า" />
-        <meta property="og:description" content="เลือกดูหมวดหมู่สินค้าต่างๆ ของเรา" />
+        <meta
+          property="og:description"
+          content="เลือกดูหมวดหมู่สินค้าต่างๆ ของเรา"
+        />
         <meta property="og:url" content="https://united1999plus.vercel.app" />
         <meta property="og:type" content="website" />
-        <meta property="og:image" content="https://united1999plus.vercel.app/logo/logo-real-no-bg.png" />
+        <meta
+          property="og:image"
+          content="https://united1999plus.vercel.app/logo/logo-real-no-bg.png"
+        />
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="UNITED 1999 PLUS - หมวดหมู่สินค้า" />
-        <meta name="twitter:description" content="เลือกดูหมวดหมู่สินค้าต่างๆ ของเรา" />
-        <meta name="twitter:image" content="https://united1999plus.vercel.app/logo/logo-real-no-bg.png" />
+        <meta
+          name="twitter:title"
+          content="UNITED 1999 PLUS - หมวดหมู่สินค้า"
+        />
+        <meta
+          name="twitter:description"
+          content="เลือกดูหมวดหมู่สินค้าต่างๆ ของเรา"
+        />
+        <meta
+          name="twitter:image"
+          content="https://united1999plus.vercel.app/logo/logo-real-no-bg.png"
+        />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
