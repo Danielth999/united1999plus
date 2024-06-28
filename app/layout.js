@@ -1,7 +1,7 @@
 import { Prompt } from "next/font/google";
 import "./globals.css";
 import SessionProvider from "../components/SessionProvider";
-import { Toaster } from "@/components/ui/toaster";
+import { Toaster } from 'react-hot-toast';
 import { Suspense } from "react";
 
 const prompt = Prompt({

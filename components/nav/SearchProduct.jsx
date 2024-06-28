@@ -18,20 +18,22 @@ const SearchProduct = ({ className }) => {
       className={`${className} items-center h-[70px] flex-1 justify-center`}
       onSubmit={handleSearch}
     >
-      <input
-        type="search"
-        name="search"
-        value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
-        className="w-full max-w-md border outline-none rounded-l-md p-2"
-        placeholder="ค้นหาชื่อสินค้า"
-      />
-      <button
-        type="submit"
-        className="bg-red-500 p-2 flex justify-center items-center rounded-r-md"
-      >
-        <Search className="text-white" />
-      </button>
+      <div className="relative w-[500px]">
+        <input
+          type="search"
+          name="search"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="w-full border outline-none rounded-full p-2 pr-10" // เพิ่ม pr-10 เพื่อให้มีพื้นที่สำหรับไอคอน
+          placeholder="ค้นหาชื่อสินค้า"
+        />
+        <button
+          type="submit"
+          className="absolute right-0 top-1/2 transform -translate-y-1/2 bg-red-500 p-2 rounded-full"
+        >
+          <Search className="text-white" />
+        </button>
+      </div>
     </form>
   );
 };

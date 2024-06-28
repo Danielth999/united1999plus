@@ -119,68 +119,86 @@ const RegisterPage = () => {
       </Head>
       <Navbar />
       <div className="flex justify-center mt-10">
-        <div className="max-w-md w-full bg-white shadow-lg rounded-md p-8">
-          <h2 className="text-3xl font-bold mb-6 text-center">สมัครสมาชิก</h2>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label htmlFor="username" className="block text-gray-700 mb-1">
-                ชื่อผู้ใช้
-              </label>
-              <input
-                type="text"
-                id="username"
-                name="username"
-                value={username}
-                onChange={(e) => setUserName(e.target.value)}
-                className="w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500"
-                placeholder="ชื่อผู้ใช้"
-              />
+        <div className="w-full max-w-xl py-6">
+          <header className="text-center">
+            <h1 className="mb-2 inline-flex items-center gap-2 text-2xl font-bold">
+              <img src="/logo/logo-real-no-bg.png" width="40" height="auto" alt="logo company" />
+              <span className="text-[#0571cc]">United 1999 Plus</span>
+            </h1>
+            <h2 className="text-sm font-medium text-gray-500 dark:text-gray-400">
+              ยินดีตอนรับ, กรุณาสมัครสมาชิกเพื่อเข้าสู่ระบบ
+            </h2>
+          </header>
+
+          <div className="flex flex-col overflow-hidden rounded-lg bg-white shadow-sm">
+            <div className="grow p-5 md:px-16 md:py-12">
+              <form onSubmit={handleSubmit} className="space-y-6">
+                <div className="space-y-1">
+                  <label htmlFor="username" className="text-sm font-medium">ชื่อผู้ใช้</label>
+                  <input
+                    type="text"
+                    id="username"
+                    name="username"
+                    value={username}
+                    onChange={(e) => setUserName(e.target.value)}
+                    className="block w-full rounded-lg border border-gray-200 px-5 py-3 leading-6 placeholder-gray-500 focus:border-blue-500 focus:ring focus:ring-blue-500/50"
+                    placeholder="ชื่อผู้ใช้"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label htmlFor="email" className="text-sm font-medium">อีเมล</label>
+                  <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="block w-full rounded-lg border border-gray-200 px-5 py-3 leading-6 placeholder-gray-500 focus:border-blue-500 focus:ring focus:ring-blue-500/50"
+                    placeholder="อีเมล"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label htmlFor="password" className="text-sm font-medium">รหัสผ่าน</label>
+                  <input
+                    type="password"
+                    id="password"
+                    name="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="block w-full rounded-lg border border-gray-200 px-5 py-3 leading-6 placeholder-gray-500 focus:border-blue-500 focus:ring focus:ring-blue-500/50"
+                    placeholder="••••••••"
+                  />
+                </div>
+                <div>
+                  <button
+                    type="submit"
+                    className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-[#0571cc] bg-[#0571cc] px-6 py-3 font-semibold leading-6 text-white hover:border-blue-600 hover:bg-blue-600 hover:text-white focus:ring focus:ring-blue-400/50 active:border-blue-700 active:bg-blue-700 dark:focus:ring-blue-400/90"
+                  >
+                    <svg
+                      className="hi-mini hi-arrow-uturn-right inline-block size-5 opacity-50"
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                      aria-hidden="true"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M12.207 2.232a.75.75 0 00.025 1.06l4.146 3.958H6.375a5.375 5.375 0 000 10.75H9.25a.75.75 0 000-1.5H6.375a3.875 3.875 0 010-7.75h10.003l-4.146 3.957a.75.75 0 001.036 1.085l5.5-5.25a.75.75 0 000-1.085l-5.5-5.25a.75.75 0 00-1.06.025z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                    <span>สมัครสมาชิก</span>
+                  </button>
+                </div>
+              </form>
             </div>
-            <div>
-              <label htmlFor="email" className="block text-gray-700 mb-1">
-                อีเมล
-              </label>
-              <input
-                type="email"
-                id="email"
-                name="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500"
-                placeholder="อีเมล"
-              />
+            <div className="grow p-5 text-center text-sm md:px-16">
+              มีบัญชีแล้วใช่ไหม?
+              <Link href="/login" className="font-medium text-blue-600 hover:text-blue-400">
+                เข้าสู่ระบบ
+              </Link>
             </div>
-            <div>
-              <label htmlFor="password" className="block text-gray-700 mb-1">
-                รหัสผ่าน
-              </label>
-              <input
-                type="password"
-                id="password"
-                name="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500"
-                placeholder="••••••••"
-              />
-            </div>
-            <div>
-              <button
-                type="submit"
-                className="w-full bg-blue-500 text-white font-bold py-2 px-4 rounded-md hover:bg-blue-600 focus:outline-none focus:bg-blue-600"
-              >
-                สมัครสมาชิก
-              </button>
-            </div>
-            <div className="text-center text-gray-600">
-              <span>
-                เป็นสมาชิกอยู่แล้ว ?{" "}
-                <Link className="underline hover:text-blue-600" href="/login">
-                  เข้าสู่ระบบ
-                </Link>
-              </span>
-            </div>
-          </form>
+          </div>
         </div>
       </div>
       <Footer />
