@@ -2,7 +2,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import axios from "axios";
-import useSWR from "swr";
+import useSWR, { useSWRConfig } from "swr"; // เพิ่มการนำเข้า useSWRConfig
 import { useSession } from "next-auth/react";
 import Head from "next/head";
 import ModalEditProduct from "./EditProduct";
@@ -12,7 +12,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import Spinner from "@/components/spinner/Spinner";
 import SkeletonScreen from "@/components/skeleton/Skeleton";
 
 const fetcher = (url) => axios.get(url).then((res) => res.data);
@@ -24,14 +23,17 @@ const ProductDetail = ({ productId, open, setOpen }) => {
     {
       revalidateOnFocus: false,
       revalidateOnReconnect: false,
-      refreshInterval: 4000,
     }
   );
+  const { mutate } = useSWRConfig(); // ใช้ useSWRConfig เพื่อดึง mutate
   const [openEditModal, setOpenEditModal] = useState(false);
   const { data: session, status } = useSession();
 
+  // เพิ่มฟังก์ชัน handleProductUpdated
   const handleProductUpdated = (updatedProduct) => {
-    // Handle the updated product (e.g., re-fetch product data or update state)
+    // ทำการอัปเดตข้อมูลผลิตภัณฑ์ใน state
+    mutate(`${process.env.NEXT_PUBLIC_API_URL}/api/products/${productId}`, updatedProduct, false);
+    setOpenEditModal(false);
   };
 
   if (error) return <p>Error loading product: {error.message}</p>;
@@ -62,14 +64,18 @@ const ProductDetail = ({ productId, open, setOpen }) => {
   return (
     <>
       <Head>
-        <title>{product ? product.name : "Loading..."} - UNITED 1999 PLUS</title>
+        <title>
+          {product ? product.name : "Loading..."} - UNITED 1999 PLUS
+        </title>
         <meta
           name="description"
           content={product ? product.description : "Loading..."}
         />
         <meta
           name="keywords"
-          content={`ผลิตภัณฑ์, UNITED 1999 PLUS, ${product ? product.name : ""}`}
+          content={`ผลิตภัณฑ์, UNITED 1999 PLUS, ${
+            product ? product.name : ""
+          }`}
         />
         <meta
           property="og:title"
@@ -79,10 +85,7 @@ const ProductDetail = ({ productId, open, setOpen }) => {
           property="og:description"
           content={product ? product.description : "Loading..."}
         />
-        <meta
-          property="og:image"
-          content={product ? product.imageUrl : ""}
-        />
+        <meta property="og:image" content={product ? product.imageUrl : ""} />
         <meta
           property="og:url"
           content={`https://united1999plus.vercel.app/product/${productId}`}
@@ -97,10 +100,7 @@ const ProductDetail = ({ productId, open, setOpen }) => {
           name="twitter:description"
           content={product ? product.description : "Loading..."}
         />
-        <meta
-          name="twitter:image"
-          content={product ? product.imageUrl : ""}
-        />
+        <meta name="twitter:image" content={product ? product.imageUrl : ""} />
         {structuredData && (
           <script
             type="application/ld+json"

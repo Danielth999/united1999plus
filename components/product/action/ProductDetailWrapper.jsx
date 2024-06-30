@@ -1,17 +1,22 @@
-'use client'
+// components/product/action/ProductDetailWrapper.jsx
+"use client";
 
 import { useState } from "react";
 import ProductDetail from "./ProductDetail";
 
-const ProductDetailWrapper = ({ productId }) => {
+export default function ProductDetailWrapper({ children, productId }) {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
     <>
-      <button onClick={() => setIsOpen(true)}>ดูรายละเอียด</button>
-      {isOpen && <ProductDetail productId={productId} />}
+      <div onClick={() => setIsOpen(true)}>{children}</div>
+      {isOpen && (
+        <ProductDetail
+          productId={productId}
+          open={isOpen}
+          setOpen={setIsOpen}
+        />
+      )}
     </>
   );
-};
-
-export default ProductDetailWrapper;
+}

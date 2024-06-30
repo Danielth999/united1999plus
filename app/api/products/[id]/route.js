@@ -16,10 +16,10 @@ export async function GET(request, { params }) {
   const { id } = params;
 
   try {
-    const cachedProduct = await redis.get(`productId:${id}`);
-    if (cachedProduct) {
-      return NextResponse.json(JSON.parse(cachedProduct), { status: 200 });
-    }
+    // const cachedProduct = await redis.get(`productId:${id}`);
+    // if (cachedProduct) {
+    //   return NextResponse.json(JSON.parse(cachedProduct), { status: 200 });
+    // }
 
     const product = await prisma.product.findUnique({
       where: { productId: parseInt(id, 10) },
@@ -30,7 +30,7 @@ export async function GET(request, { params }) {
       return NextResponse.json({ error: "Product not found" }, { status: 404 });
     }
 
-    await redis.set(`product:${id}`, JSON.stringify(product), "ex", 3600);
+    // await redis.set(`product:${id}`, JSON.stringify(product), "ex", 3600);
 
     return NextResponse.json(product, { status: 200 });
   } catch (error) {
@@ -39,8 +39,6 @@ export async function GET(request, { params }) {
       { error: "Failed to fetch product" },
       { status: 500 }
     );
-  } finally {
-    await prisma.$disconnect();
   }
 }
 

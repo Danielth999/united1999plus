@@ -29,9 +29,9 @@ const ProductList = ({ searchQuery, setResultsCount, onViewProduct }) => {
     }`,
     fetcher,
     {
-      revalidateOnFocus: false,
-      revalidateOnReconnect: false,
-      refreshInterval: 5000,
+      revalidateOnFocus: true,
+      revalidateOnReconnect: true,
+     
     }
   );
   const [currentPage, setCurrentPage] = useState(1);
