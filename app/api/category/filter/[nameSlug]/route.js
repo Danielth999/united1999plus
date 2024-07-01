@@ -10,14 +10,14 @@ export async function GET(request, { params }) {
   const { searchParams } = new URL(request.url);
   const limit = parseInt(searchParams.get("limit"));
 
-  const cacheKey = `category:${nameSlug}:limit:${limit || 'all'}`;
+  // const cacheKey = `category:${nameSlug}:limit:${limit || 'all'}`;
 
   try {
     // Check cache first
-    const cachedCategory = await redis.get(cacheKey);
-    if (cachedCategory) {
-      return NextResponse.json(JSON.parse(cachedCategory), { status: 200 });
-    }
+    // const cachedCategory = await redis.get(cacheKey);
+    // if (cachedCategory) {
+    //   return NextResponse.json(JSON.parse(cachedCategory), { status: 200 });
+    // }
 
     // If not found in cache, fetch from database
     const category = await prisma.category.findFirst({
@@ -43,7 +43,7 @@ export async function GET(request, { params }) {
     }
 
     // Save to cache with TTL (Time-To-Live) of 1 hour
-    await redis.set(cacheKey, JSON.stringify(category), 'EX', 3600);
+    // await redis.set(cacheKey, JSON.stringify(category), 'EX', 3600);
 
     return NextResponse.json(category, { status: 200 });
   } catch (error) {

@@ -20,7 +20,6 @@ export async function GET(request, { params }) {
     // if (cachedProduct) {
     //   return NextResponse.json(JSON.parse(cachedProduct), { status: 200 });
     // }
-
     const product = await prisma.product.findUnique({
       where: { productId: parseInt(id, 10) },
       include: { Category: true },

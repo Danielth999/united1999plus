@@ -32,7 +32,7 @@ const ProductDetail = ({ productId, open, setOpen }) => {
   // เพิ่มฟังก์ชัน handleProductUpdated
   const handleProductUpdated = (updatedProduct) => {
     // ทำการอัปเดตข้อมูลผลิตภัณฑ์ใน state
-    mutate(`${process.env.NEXT_PUBLIC_API_URL}/api/products/${productId}`, updatedProduct, false);
+    mutate(`${process.env.NEXT_PUBLIC_API_URL}/api/products/filter/${productId}`, updatedProduct, false);
     setOpenEditModal(false);
   };
 
