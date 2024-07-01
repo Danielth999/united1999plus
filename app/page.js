@@ -7,7 +7,6 @@ import OfficeSupplies from "@/components/product/OfficeSupplies";
 import CleaningProducts from "@/components/product/CleaningProducts";
 import ScrollToTopButton from "@/components/ScrollToTopButton";
 import Footer from "@/components/Footer";
-
 export default function Home() {
   return (
     <>

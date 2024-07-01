@@ -17,7 +17,7 @@ const Sidebar = ({ isExpanded }) => {
   return (
     <div
       className={`flex ${
-        isExpanded ? "w-64" : "w-24"
+        isExpanded ? "w-64" : "w-0"
       } bg-gray-800 text-white min-h-screen flex-col transition-width duration-300`}
     >
       <div className="p-4">
@@ -31,7 +31,7 @@ const Sidebar = ({ isExpanded }) => {
         <Link href="/admin-dashboard/dashboard">
           <div
             className={`flex  items-center py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700 ${
-              pathname === "/admin-dashboard/dashboard" ? "bg-blue-500" : ""
+              isExpanded &&  pathname === "/admin-dashboard/dashboard" ? "bg-blue-500" : ""
             }`}
           >
             <Home className="mr-3" />
@@ -41,7 +41,7 @@ const Sidebar = ({ isExpanded }) => {
         <Link href="/admin-dashboard/carousel">
           <div
             className={`flex items-center py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700 ${
-              pathname === "/admin-dashboard/carousel" ? "bg-blue-500" : ""
+              isExpanded &&  pathname === "/admin-dashboard/carousel" ? "bg-blue-500" : ""
             }`}
           >
             <GalleryHorizontal className="mr-3" />
@@ -51,7 +51,7 @@ const Sidebar = ({ isExpanded }) => {
         <Link href="/admin-dashboard/users">
           <div
             className={`flex items-center py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700 ${
-              pathname === "/admin-dashboard/users" ? "bg-blue-500" : ""
+              isExpanded &&  pathname === "/admin-dashboard/users" ? "bg-blue-500" : ""
             }`}
           >
             <Users className="mr-3" />
@@ -61,7 +61,7 @@ const Sidebar = ({ isExpanded }) => {
         <Link href="/admin-dashboard/products">
           <div
             className={`flex items-center py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700 ${
-              pathname === "/admin-dashboard/products" ? "bg-blue-500" : ""
+              isExpanded &&  pathname === "/admin-dashboard/products" ? "bg-blue-500" : ""
             }`}
           >
             <Package className="mr-3" />
@@ -71,7 +71,7 @@ const Sidebar = ({ isExpanded }) => {
         <Link href="/admin-dashboard/category">
           <div
             className={`flex items-center py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700 ${
-              pathname === "/admin-dashboard/category" ? "bg-blue-500" : ""
+              isExpanded &&  pathname === "/admin-dashboard/category" ? "bg-blue-500" : ""
             }`}
           >
             <Tag className="mr-3" />

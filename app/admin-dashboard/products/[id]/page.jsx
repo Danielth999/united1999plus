@@ -13,6 +13,7 @@ import {
   CardTitle,
   CardDescription,
 } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import ModalEditProduct from "../components/product/ModalEditProduct";
 
 const fetcher = (url) => axios.get(url).then((res) => res.data);
@@ -31,10 +32,6 @@ const ProductDetail = () => {
   );
   const [openEditModal, setOpenEditModal] = useState(false);
 
-  useEffect(() => {
-    // Optional: Fetch the initial data or handle side effects here
-  }, [id]);
-
   if (!productData && !error) {
     return (
       <div className="flex justify-center items-center h-screen">
@@ -44,91 +41,91 @@ const ProductDetail = () => {
   }
 
   if (error) {
-    return <div>Error fetching product data</div>;
+    return <div className="text-center text-red-500">Error fetching product data</div>;
   }
 
   return (
-    <>
-      <Card>
+    <div className="   ">
+      <Card className="shadow-lg">
         <CardHeader>
-          <div className="flex justify-between">
+          <div className="flex justify-between items-center mb-6">
             <Button
-              variant="destructive"
+              variant="outline"
               onClick={() => router.back()}
-              className="mb-4"
+              className="hover:bg-gray-100"
             >
-              กลับ
+              ← กลับ
             </Button>
-            <Button onClick={() => setOpenEditModal(true)} className="mb-4">
-              แก้ไข
+            <Button 
+              onClick={() => setOpenEditModal(true)}
+              className="bg-blue-500 hover:bg-blue-600 text-white"
+            >
+              แก้ไขสินค้า
             </Button>
           </div>
-          <CardTitle className="text-3xl font-bold mb-4">
-            {productData.name}
-          </CardTitle>
-          <CardDescription>
-            <div className="flex flex-col md:flex-row items-start md:items-center">
-              {productData.imageUrl && (
-                <div className="flex-shrink-0 mb-4 md:mb-0">
-                  <Image
-                    src={productData.imageUrl}
-                    alt={productData.name}
-                    width={300}
-                    height={300}
-                    className="object-cover rounded-lg shadow-md"
+          <div className="flex flex-col md:flex-row">
+            {productData.imageUrl && (
+              <div className="md:w-1/3 mb-6 md:mb-0">
+                <Image
+                  src={productData.imageUrl}
+                  alt={productData.name}
+                  width={400}
+                  height={400}
+                  className="rounded-lg shadow-md object-cover w-full h-auto"
+                />
+              </div>
+            )}
+            <div className="md:w-2/3 md:pl-8">
+              <CardTitle className="text-3xl font-bold mb-4">
+                {productData.name}
+              </CardTitle>
+              <CardDescription>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                  <InfoItem label="รายละเอียด" value={productData.description} />
+                  <InfoItem label="จำนวน" value={productData.stock} />
+                  <InfoItem label="สี" value={productData.color} />
+                  <InfoItem label="ขนาด" value={productData.size} />
+                  <InfoItem label="หมวดหมู่" value={productData.Category.name} />
+                  <InfoItem 
+                    label="สถานะการเผยแพร่" 
+                    value={
+                      <Badge variant={productData.isPublished ? "success" : "secondary"}>
+                        {productData.isPublished ? "เผยแพร่" : "ไม่เผยแพร่"}
+                      </Badge>
+                    } 
+                  />
+                  <InfoItem 
+                    label="วันที่สร้าง" 
+                    value={new Date(productData.createdAt).toLocaleDateString("th-TH", {
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                    })} 
                   />
                 </div>
-              )}
-              <div className="md:ml-8 w-full">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                  <p className="text-lg">
-                    <strong>รายละเอียด:</strong> {productData.description}
-                  </p>
-                  <p className="text-lg">
-                    <strong>จำนวน:</strong> {productData.stock}
-                  </p>
-                  <p className="text-lg">
-                    <strong>สี:</strong> {productData.color}
-                  </p>
-                  <p className="text-lg">
-                    <strong>ขนาด:</strong> {productData.size}
-                  </p>
-                  <p className="text-lg">
-                    <strong>หมวดหมู่:</strong> {productData.Category.name}
-                  </p>
-                  <p className="text-lg">
-                    <strong>สถานะการเผยแพร่:</strong>{" "}
-                    {productData.isPublished ? "เผยแพร่" : "ไม่เผยแพร่"}
-                  </p>
-                  <p className="text-lg">
-                    <strong>วันที่สร้าง:</strong>{" "}
-                    {new Date(productData.createdAt).toLocaleDateString(
-                      "th-TH",
-                      {
-                        year: "numeric",
-                        month: "long",
-                        day: "numeric",
-                      }
-                    )}
-                  </p>
-                </div>
-              </div>
+              </CardDescription>
             </div>
-          </CardDescription>
+          </div>
         </CardHeader>
-        <CardContent></CardContent>
       </Card>
       {openEditModal && (
         <ModalEditProduct
           product={productData}
           onProductUpdated={(updatedProduct) => {
-            mutate(updatedProduct, false); // Update the cache with the new data
+            mutate(updatedProduct, false);
             setOpenEditModal(false);
           }}
         />
       )}
-    </>
+    </div>
   );
 };
+
+const InfoItem = ({ label, value }) => (
+  <div>
+    <span className="font-semibold text-gray-700">{label}:</span>{" "}
+    <span className="text-gray-600">{value}</span>
+  </div>
+);
 
 export default ProductDetail;

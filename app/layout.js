@@ -3,7 +3,7 @@ import "./globals.css";
 import SessionProvider from "../components/SessionProvider";
 import { Toaster } from 'react-hot-toast';
 import { Suspense } from "react";
-
+import Loading from "@/components/spinner/Spinner";
 const prompt = Prompt({
   subsets: ["latin"],
   weight: ["400", "700"],
@@ -57,7 +57,11 @@ export default function RootLayout({ children }) {
       </head>
       <body className={prompt.className}>
         <SessionProvider>
-          <Suspense fallback={<div>Loading...</div>}>{children}</Suspense>
+          <Suspense fallback={<div className="flex justify-center h-screen items-center">
+            <Loading />
+            </div>}>
+            {children}
+            </Suspense>
         </SessionProvider>
         <Toaster />
       </body>

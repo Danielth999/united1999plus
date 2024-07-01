@@ -1,32 +1,33 @@
 "use client";
-import { useToast } from "@/components/ui/use-toast";
+
+import toast, { Toaster } from 'react-hot-toast';
 import axios from "axios";
 import { useState, useEffect } from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetDescription,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import Image from "next/image";
 import { Checkbox } from "@/components/ui/checkbox";
 
 const ModalEditProduct = ({ product, onProductUpdated }) => {
-  const { toast } = useToast();
   const [editProduct, setEditProduct] = useState({
     name: "",
     description: "",
-
     stock: "",
     color: "",
     size: "",
-
     isPublished: false,
     categoryId: "",
     image: null,
@@ -40,17 +41,15 @@ const ModalEditProduct = ({ product, onProductUpdated }) => {
       setEditProduct({
         name: product.name,
         description: product.description,
-
         stock: product.stock,
         color: product.color,
         size: product.size,
-
         isPublished: product.isPublished,
         categoryId: product.categoryId ? product.categoryId.toString() : "",
         image: null,
       });
       setPreviewImage(product.imageUrl || null);
-      setOpen(true); // Open the dialog
+      setOpen(true);
     }
   }, [product]);
 
@@ -88,24 +87,11 @@ const ModalEditProduct = ({ product, onProductUpdated }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    // Check if all fields are filled
-    if (
-      !editProduct.name ||
-      !editProduct.description ||
-      !editProduct.categoryId
-    ) {
-      toast({
-        title: "Error",
-        description: "กรุณากรอกข้อมูลให้ครบทุกช่อง",
-        status: "error",
-        variant: "destructive",
-        isClosable: true,
-      });
+    if (!editProduct.name || !editProduct.description || !editProduct.categoryId) {
+      toast.error("กรุณากรอกข้อมูลให้ครบทุกช่อง");
       return;
     }
 
-    // Optimistic UI Update
     const updatedProduct = { ...product, ...editProduct };
     onProductUpdated(updatedProduct);
     setOpen(false);
@@ -114,11 +100,9 @@ const ModalEditProduct = ({ product, onProductUpdated }) => {
     const formData = new FormData();
     formData.append("name", editProduct.name);
     formData.append("description", editProduct.description);
-
     formData.append("stock", editProduct.stock);
     formData.append("color", editProduct.color);
     formData.append("size", editProduct.size);
-
     formData.append("isPublished", editProduct.isPublished);
     formData.append("categoryId", editProduct.categoryId);
     if (editProduct.image) {
@@ -135,146 +119,164 @@ const ModalEditProduct = ({ product, onProductUpdated }) => {
           },
         }
       );
-      toast({
-        title: "Success",
-        description: "แก้ไขสินค้าสำเร็จ",
-        status: "success",
-        variant: "success",
-        isClosable: true,
-      });
+      toast.success("แก้ไขสินค้าสำเร็จ");
     } catch (error) {
       console.error("Error updating product:", error);
-      toast({
-        title: "Error",
-        description: "เกิดข้อผิดพลาดในการแก้ไขสินค้า",
-        status: "error",
-        variant: "destructive",
-        isClosable: true,
-      });
-      // Revert Optimistic Update on Error
+      toast.error("เกิดข้อผิดพลาดในการแก้ไขสินค้า");
       onProductUpdated(product);
     }
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button className="bg-[#204d9c] hidden text-white">แก้ไขสินค้า</Button>
-      </DialogTrigger>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>แก้ไขสินค้า</DialogTitle>
-          <DialogDescription>กรุณากรอกข้อมูลเพื่อแก้ไขสินค้า</DialogDescription>
-        </DialogHeader>
-        <Tabs defaultValue="info" className="w-full">
-          <TabsList>
-            <TabsTrigger value="info">ข้อมูลสินค้า</TabsTrigger>
-            <TabsTrigger value="upload">อัปโหลดรูปภาพ</TabsTrigger>
-          </TabsList>
-          <form onSubmit={handleSubmit} encType="multipart/form-data">
-            <TabsContent value="info">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <Input
-                  type="text"
-                  name="name"
-                  value={editProduct.name}
-                  onChange={handleChange}
-                  placeholder="ชื่อผลิตภัณฑ์"
-                  className="col-span-2"
-                />
-
-                <Textarea
-                  name="stock"
-                  value={editProduct.stock}
-                  onChange={handleChange}
-                  placeholder="จำนวน"
-                  className="col-span-2"
-                />
-
-                <Input
-                  type="text"
-                  name="color"
-                  value={editProduct.color}
-                  onChange={handleChange}
-                  placeholder="สี"
-                />
-                <Input
-                  type="text"
-                  name="size"
-                  value={editProduct.size}
-                  onChange={handleChange}
-                  placeholder="ขนาด"
-                />
-                <select
-                  name="categoryId"
-                  value={editProduct.categoryId}
-                  onChange={handleChange}
-                  className="w-full border rounded p-2 col-span-2"
-                >
-                  <option>เลือกหมวดหมู่</option>
-                  {categories.map((category) => (
-                    <option
-                      key={category.categoryId}
-                      value={category.categoryId.toString()}
+    <>
+      <Toaster />
+      <Sheet open={open} onOpenChange={setOpen}>
+        <SheetTrigger asChild>
+          <Button  variant="outline">แก้ไขสินค้า</Button>
+        </SheetTrigger>
+        <SheetContent className="overflow-auto">
+          <SheetHeader>
+            <SheetTitle>แก้ไขสินค้า</SheetTitle>
+            <SheetDescription>กรุณากรอกข้อมูลเพื่อแก้ไขสินค้า</SheetDescription>
+          </SheetHeader>
+          <form onSubmit={handleSubmit}>
+            <Tabs defaultValue="product-info">
+              <TabsList>
+                <TabsTrigger value="product-info">ข้อมูลสินค้า</TabsTrigger>
+                <TabsTrigger value="image-upload">อัปโหลดรูปภาพ</TabsTrigger>
+              </TabsList>
+              <TabsContent value="product-info">
+                <div className="grid gap-4 py-4">
+                  <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="name" className="col-span-4">
+                      ชื่อสินค้า
+                    </Label>
+                    <Input
+                      id="name"
+                      name="name"
+                      value={editProduct.name}
+                      onChange={handleChange}
+                      className="col-span-4"
+                    />
+                  </div>
+                  <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="description" className="col-span-4">
+                      รายละเอียด
+                    </Label>
+                    <Textarea
+                      id="description"
+                      name="description"
+                      value={editProduct.description}
+                      onChange={handleChange}
+                      className="col-span-4"
+                    />
+                  </div>
+                  <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="stock" className="col-span-4">
+                      จำนวนสินค้า
+                    </Label>
+                    <Input
+                      id="stock"
+                      name="stock"
+                      type="number"
+                      value={editProduct.stock}
+                      onChange={handleChange}
+                      className="col-span-4"
+                    />
+                  </div>
+                  <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="color" className="col-span-4">
+                      สี
+                    </Label>
+                    <Input
+                      id="color"
+                      name="color"
+                      value={editProduct.color}
+                      onChange={handleChange}
+                      className="col-span-4"
+                    />
+                  </div>
+                  <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="size" className="col-span-4">
+                      ขนาด
+                    </Label>
+                    <Input
+                      id="size"
+                      name="size"
+                      value={editProduct.size}
+                      onChange={handleChange}
+                      className="col-span-4"
+                    />
+                  </div>
+                  <div className="grid grid-cols-4 gap-2">
+                    <Label htmlFor="categoryId" className="col-span-4">
+                      หมวดหมู่
+                    </Label>
+                    <select
+                      id="categoryId"
+                      name="categoryId"
+                      value={editProduct.categoryId}
+                      onChange={handleChange}
+                      className="col-span-4"
                     >
-                      {category.name}
-                    </option>
-                  ))}
-                </select>
-                <Textarea
-                  name="description"
-                  value={editProduct.description}
-                  onChange={handleChange}
-                  placeholder="รายละเอียด"
-                  className="col-span-2"
-                />
-                <div className="flex items-center space-x-2 col-span-1 md:col-span-2">
-                  <Checkbox
-                    name="isPublished"
-                    checked={editProduct.isPublished}
-                    onCheckedChange={(checked) =>
-                      setEditProduct((prevData) => ({
-                        ...prevData,
-                        isPublished: checked,
-                      }))
-                    }
-                  />
-                  <span>เผยแพร่</span>
+                      <option value="">เลือกหมวดหมู่</option>
+                      {categories.map((category) => (
+                        <option key={category.id} value={category.id}>
+                          {category.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Checkbox
+                      id="isPublished"
+                      name="isPublished"
+                      checked={editProduct.isPublished}
+                      onCheckedChange={(checked) =>
+                        setEditProduct((prevData) => ({
+                          ...prevData,
+                          isPublished: checked,
+                        }))
+                      }
+                    />
+                    <label
+                      htmlFor="isPublished"
+                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                    >
+                      เผยแพร่
+                    </label>
+                  </div>
                 </div>
-              </div>
-            </TabsContent>
-            <TabsContent value="upload">
-              <div className="space-y-4">
-                <Input type="file" name="image" onChange={handleFileChange} />
+              </TabsContent>
+              <TabsContent value="image-upload">
+                <Label htmlFor="picture">รูปภาพ</Label>
+                <div className="grid w-full max-w-sm items-center gap-1.5">
+                  <Input id="picture" type="file" onChange={handleFileChange} />
+                </div>
                 {previewImage && (
-                  <div className="flex justify-center">
+                  <div className="mt-4">
                     <Image
                       src={previewImage}
                       alt="Preview"
                       width={200}
                       height={200}
-                      className="object-cover"
+                      className="rounded-md"
                     />
                   </div>
                 )}
-              </div>
-            </TabsContent>
-            <div className="flex justify-end space-x-2 mt-4">
-              <Button type="submit" className="bg-[#204d9c] text-white">
-                บันทึก
-              </Button>
-              <Button
-                type="button"
-                variant="destructive"
-                onClick={() => setOpen(false)}
-              >
-                ยกเลิก
-              </Button>
-            </div>
+              </TabsContent>
+            </Tabs>
+            <SheetFooter>
+              <SheetClose asChild>
+                <Button className="w-full" type="submit">
+                  บันทึก
+                </Button>
+              </SheetClose>
+            </SheetFooter>
           </form>
-        </Tabs>
-      </DialogContent>
-    </Dialog>
+        </SheetContent>
+      </Sheet>
+    </>
   );
 };
 
