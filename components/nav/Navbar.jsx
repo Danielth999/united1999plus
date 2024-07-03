@@ -3,9 +3,9 @@ import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import Head from "next/head";
-import logo from "../../public/logo/logo-real-no-bg.png";
+import logo from '@/public/logo/logo.png';
 import { useSession, signOut } from "next-auth/react";
-import { Search, Menu, X, LayoutGrid } from "lucide-react";
+import {  Menu, X, LayoutGrid } from "lucide-react";
 import Header from "./Header";
 import {
   DropdownMenu,

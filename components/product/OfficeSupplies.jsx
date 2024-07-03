@@ -1,7 +1,8 @@
 import { Suspense } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import Head from "next/head";
+
+import logo from "@/public/logo/logo.png";
 import {
   Card,
   CardContent,
@@ -11,16 +12,17 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import ProductDetailWrapper from "@/components/product/action/ProductDetailWrapper";
-import Loading from "@/components/spinner/Spinner";
+
+
 async function fetchOfficeSuppliesData() {
   const res = await fetch(
     `${process.env.NEXT_PUBLIC_API_URL}/api/category/filter/office-supplies?limit=10`,
     {
-      cache: "no-store" // Revalidate every minute
+      cache: "no-store",
     }
   );
   if (!res.ok) {
-    throw new Error("Failed to fetch data");
+    console.error("Failed to fetch data from server");
   }
   return res.json();
 }
@@ -39,7 +41,7 @@ export default async function OfficeSupplies() {
     brand: {
       "@type": "Brand",
       name: "UNITED 1999 PLUS",
-      logo: "https://united1999plus.vercel.app/logo/logo-real-no-bg.png",
+      logo: logo.src,
     },
     category: "Office Supplies",
     product: products.map((item) => ({
@@ -58,18 +60,7 @@ export default async function OfficeSupplies() {
 
   return (
     <>
-      <Head>
-        <title>อุปกรณ์สำนักงาน - UNITED 1999 PLUS</title>
-        <meta
-          name="description"
-          content="อุปกรณ์สำนักงานจาก UNITED 1999 PLUS"
-        />
-        {/* ... (other meta tags remain the same) ... */}
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
-        />
-      </Head>
+  
       <main>
         <section className="mt-10">
           <h1 className="font-bold text-xl text-black">อุปกรณ์สำนักงาน</h1>
@@ -77,38 +68,35 @@ export default async function OfficeSupplies() {
         <section className="container mx-auto px-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 mt-5">
             {products.map((item) => (
-                <Suspense key={item.productId} fallback={<Loading />}>
-              <ProductDetailWrapper
-                key={item.productId}
-                productId={item.productId}
-              >
-                <Card className="hover:shadow-xl hover:border-[#204d9c] border flex flex-col">
-                  <CardHeader className="border-b w-full h-60 relative">
-                    <Image
-                      src={item.imageUrl}
-                      alt={item.name}
-                      fill
-                      style={{ objectFit: "contain" }}
-                      className="max-h-full"
-                      priority={true}
-                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                    />
-                  </CardHeader>
-                  <CardContent className="flex-grow">
-                    <CardTitle className="line-clamp-2">{item.name}</CardTitle>
-                  </CardContent>
-                  <CardFooter className="flex justify-between p-4 border-t">
-                    <div className="flex flex-col items-center">
-                      <Badge
-                        variant="customSecondary"
-                        className="w-full text-center line-clamp-1"
-                      >
-                        {category.name}
-                      </Badge>
-                    </div>
-                  </CardFooter>
-                </Card>
-              </ProductDetailWrapper>
+              <Suspense key={item.productId}>
+                <ProductDetailWrapper productId={item.productId}>
+                  <Card className="hover:shadow-xl hover:border-[#204d9c] border flex flex-col">
+                    <CardHeader className="border-b w-full h-60 relative">
+                      <Image
+                        src={item.imageUrl}
+                        alt={item.name}
+                        fill
+                        style={{ objectFit: "contain" }}
+                        className="max-h-full"
+                        priority={true}
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                      />
+                    </CardHeader>
+                    <CardContent className="flex-grow">
+                      <CardTitle className="line-clamp-2">{item.name}</CardTitle>
+                    </CardContent>
+                    <CardFooter className="flex justify-between p-4 border-t">
+                      <div className="flex flex-col items-center">
+                        <Badge
+                          variant="customSecondary"
+                          className="w-full text-center line-clamp-1"
+                        >
+                          {category.name}
+                        </Badge>
+                      </div>
+                    </CardFooter>
+                  </Card>
+                </ProductDetailWrapper>
               </Suspense>
             ))}
           </div>

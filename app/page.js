@@ -13,6 +13,7 @@ export default function Home() {
       <header>
         <Navbar />
       </header>
+      
 
       <div className="shap-bg p-5">
         <main className="max-w-7xl mx-auto">

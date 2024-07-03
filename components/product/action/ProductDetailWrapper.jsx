@@ -1,4 +1,3 @@
-// components/product/action/ProductDetailWrapper.jsx
 "use client";
 
 import { useState } from "react";

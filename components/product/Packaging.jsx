@@ -1,6 +1,6 @@
 import Image from "next/image";
+import logo from "@/public/logo/logo.png";
 import Link from "next/link";
-import { Suspense } from "react";
 import {
   Card,
   CardContent,
@@ -9,22 +9,23 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import ProductDetailWrapper from "@/components/product/action/ProductDetailWrapper";
-import Loading from "@/components/spinner/Spinner";
 
+
+// ฟังก์ชันเพื่อดึงข้อมูลบรรจุภัณฑ์จาก API
 async function fetchPackagingData() {
   const res = await fetch(
     `${process.env.NEXT_PUBLIC_API_URL}/api/category/filter/packaging?limit=10`,
     {
-      cache: "no-store"
+      cache: "no-store",
     }
   );
   if (!res.ok) {
-    throw new Error("Failed to fetch data");
+    console.error("Failed to fetch data from server");
   }
   return res.json();
 }
 
+// ฟังก์ชันเพื่อสร้าง metadata สำหรับหน้าแสดงบรรจุภัณฑ์
 export async function generateMetadata() {
   const category = await fetchPackagingData();
   const products = category?.Product || [];
@@ -39,16 +40,15 @@ export async function generateMetadata() {
     brand: {
       "@type": "Brand",
       name: "UNITED 1999 PLUS",
-      logo: "https://united1999plus.vercel.app/logo/logo-real-no-bg.png",
+      logo: logo.src,
     },
     category: "Packaging",
     product: products.map((item) => ({
       "@type": "Product",
       name: item.name,
       image: item.imageUrl,
-      url: `https://united1999plus.vercel.app/product/${item.productId}`,
+      url: `https://united1999plus.vercel.app/detail/${item.name}?id=${item.productId}`,
       description: item.description,
-      sku: item.sku,
       brand: {
         "@type": "Brand",
         name: "UNITED 1999 PLUS",
@@ -63,7 +63,7 @@ export async function generateMetadata() {
     openGraph: {
       title: "บรรจุภัณฑ์เฟสต์ - UNITED 1999 PLUS",
       description: "บรรจุภัณฑ์เฟสต์จาก UNITED 1999 PLUS",
-      images: ["https://united1999plus.vercel.app/logo/logo-real-no-bg.png"],
+      images: [logo.src],
       url: "https://united1999plus.vercel.app/category/packaging",
       type: "website",
     },
@@ -71,7 +71,7 @@ export async function generateMetadata() {
       card: "summary_large_image",
       title: "บรรจุภัณฑ์เฟสต์ - UNITED 1999 PLUS",
       description: "บรรจุภัณฑ์เฟสต์จาก UNITED 1999 PLUS",
-      images: ["https://united1999plus.vercel.app/logo/logo-real-no-bg.png"],
+      images: [logo.src],
     },
     other: {
       "application-ld+json": JSON.stringify(structuredData),
@@ -79,6 +79,7 @@ export async function generateMetadata() {
   };
 }
 
+// ฟังก์ชันเริ่มต้นเพื่อเรนเดอร์หน้าแสดงบรรจุภัณฑ์
 export default async function Packaging() {
   const category = await fetchPackagingData();
   const products = category?.Product || [];
@@ -91,36 +92,34 @@ export default async function Packaging() {
       <section className="container mx-auto px-4">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 mt-5">
           {products.map((item) => (
-            <Suspense key={item.productId} fallback={<Loading />}>
-              <ProductDetailWrapper productId={item.productId}>
-                <Card className="hover:shadow-xl hover:border-[#204d9c] border flex flex-col">
-                  <CardHeader className="border-b w-full h-60 relative">
-                    <Image
-                      src={item.imageUrl}
-                      alt={item.name}
-                      fill
-                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                      style={{ objectFit: "contain" }}
-                      className="max-h-full"
-                      priority={true}
-                    />
-                  </CardHeader>
-                  <CardContent className="flex-grow">
-                    <CardTitle className="line-clamp-2">{item.name}</CardTitle>
-                  </CardContent>
-                  <CardFooter className="flex justify-between p-4 border-t">
-                    <div className="flex flex-col items-center">
-                      <Badge
-                        variant="customSecondary"
-                        className="w-full text-center line-clamp-1"
-                      >
-                        {category.name}
-                      </Badge>
-                    </div>
-                  </CardFooter>
-                </Card>
-              </ProductDetailWrapper>
-            </Suspense>
+            <Link key={item.productId} href={`/detail/${item.name}?id=${item.productId}`}>
+              <Card className="hover:shadow-xl hover:border-blue-500 border flex flex-col">
+                <CardHeader className="border-b w-full h-60 relative">
+                  <Image
+                    src={item.imageUrl}
+                    alt={item.name}
+                    fill
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                    style={{ objectFit: "contain" }}
+                    className="max-h-full"
+                    priority={true}
+                  />
+                </CardHeader>
+                <CardContent className="flex-grow">
+                  <CardTitle className="line-clamp-2">{item.name}</CardTitle>
+                </CardContent>
+                <CardFooter className="flex justify-between p-4 border-t">
+                  <div className="flex flex-col items-center">
+                    <Badge
+                      variant="customSecondary"
+                      className="w-full text-center line-clamp-1"
+                    >
+                      {category.name}
+                    </Badge>
+                  </div>
+                </CardFooter>
+              </Card>
+            </Link>
           ))}
         </div>
 
