@@ -18,8 +18,6 @@ import { Badge } from "@/components/ui/badge";
 import useSWR from "swr";
 import PaginationComponent from "@/components/Pagination";
 
-import ProductDetail from "@/components/product/action/ProductDetail";
-
 const fetcher = (url) => axios.get(url).then((res) => res.data);
 
 const ProductList = ({ searchQuery, setResultsCount, onViewProduct }) => {
@@ -31,7 +29,6 @@ const ProductList = ({ searchQuery, setResultsCount, onViewProduct }) => {
     {
       revalidateOnFocus: true,
       revalidateOnReconnect: true,
-     
     }
   );
   const [currentPage, setCurrentPage] = useState(1);
@@ -73,36 +70,41 @@ const ProductList = ({ searchQuery, setResultsCount, onViewProduct }) => {
     <>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 mt-5">
         {currentProducts.map((item) => (
-          <Card
+          <Link
             key={item.productId}
-            className="hover:shadow-xl hover:border-[#204d9c] border flex flex-col cursor-pointer"
-            onClick={() => onViewProduct(item.productId)}
+            href={`/detail/${item.name}?id=${item.productId}`}
           >
-            <CardHeader className="border-b">
-              <div className="relative w-full h-48 overflow-hidden">
-                <Image
-                  src={item.imageUrl}
-                  alt={item.name}
-                  fill
-                  style={{ objectFit: "contain" }}
-                  className="max-h-full"
-                />
-              </div>
-            </CardHeader>
-            <CardContent className="flex-grow">
-              <CardTitle className="line-clamp-2">{item.name}</CardTitle>
-            </CardContent>
-            <CardFooter className="flex justify-between p-4 border-t">
-              <div className="flex flex-col items-center">
-                <Badge
-                  variant="customSecondary"
-                  className="w-full text-center line-clamp-1"
-                >
-                  {item.Category.name}
-                </Badge>
-              </div>
-            </CardFooter>
-          </Card>
+            <Card
+              key={item.productId}
+              className="hover:shadow-xl hover:border-[#204d9c] border flex flex-col cursor-pointer"
+              onClick={() => onViewProduct(item.productId)}
+            >
+              <CardHeader className="border-b">
+                <div className="relative w-full h-48 overflow-hidden">
+                  <Image
+                    src={item.imageUrl}
+                    alt={item.name}
+                    fill
+                    style={{ objectFit: "contain" }}
+                    className="max-h-full"
+                  />
+                </div>
+              </CardHeader>
+              <CardContent className="flex-grow">
+                <CardTitle className="line-clamp-2">{item.name}</CardTitle>
+              </CardContent>
+              <CardFooter className="flex justify-between p-4 border-t">
+                <div className="flex flex-col items-center">
+                  <Badge
+                    variant="customSecondary"
+                    className="w-full text-center line-clamp-1"
+                  >
+                    {item.Category.name}
+                  </Badge>
+                </div>
+              </CardFooter>
+            </Card>
+          </Link>
         ))}
       </div>
       <div className="flex justify-center mt-5">
@@ -159,13 +161,6 @@ const ProductPage = () => {
         />
       </div>
       <Footer />
-      {selectedProductId && (
-        <ProductDetail
-          productId={selectedProductId}
-          open={!!selectedProductId}
-          setOpen={setSelectedProductId}
-        />
-      )}
     </>
   );
 };

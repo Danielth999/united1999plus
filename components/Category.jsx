@@ -2,10 +2,10 @@
 import axios from "axios";
 import Link from "next/link";
 import Image from "next/image";
-import { Swiper, SwiperSlide } from 'swiper/react';
-import { Pagination, Autoplay } from 'swiper/modules';
-import 'swiper/css';
-import 'swiper/css/pagination';
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Pagination, Autoplay } from "swiper/modules";
+import "swiper/css";
+import "swiper/css/pagination";
 import useSWR from "swr";
 import { memo, useMemo, useCallback } from "react";
 import CategorySkeleton from "@/components/skeleton/CategorySkeleton";
@@ -29,7 +29,6 @@ const Category = () => {
     }),
     []
   );
-  
 
   // ดึงข้อมูลหมวดหมู่จาก API
   const { data: category, error } = useSWR(
@@ -131,9 +130,7 @@ const Category = () => {
           <Swiper {...swiperOptions}>
             {category.map((cateItem) => (
               <SwiperSlide key={cateItem.categoryId}>
-                <div className="p-4">
-                  {renderCategory(cateItem)}
-                </div>
+                <div className="p-4">{renderCategory(cateItem)}</div>
               </SwiperSlide>
             ))}
           </Swiper>

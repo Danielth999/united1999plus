@@ -7,19 +7,34 @@ import OfficeSupplies from "@/components/product/OfficeSupplies";
 import CleaningProducts from "@/components/product/CleaningProducts";
 import ScrollToTopButton from "@/components/ScrollToTopButton";
 import Footer from "@/components/Footer";
-export default function Home() {
+// ssg for category
+const fetchCategory = async () => {
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/category`);
+    // เช็กสถานะของ response
+    if (!res.ok) {
+      throw new Error("เกิดข้อผิดพลาดในการดึงข้อมูล");
+    }
+    // ถ้า response สำเร็จจะ return ข้อมูลกลับ
+    return res.json();
+  } catch (error) {
+    // ถ้าเกิดข้อผิดพลาดจะ return ข้อความผิดพลาด
+    return { error: error.message };
+  }
+};
+export default async function Home() {
+  const { category, error } = await fetchCategory();
   return (
     <>
       <header>
         <Navbar />
       </header>
-      
 
       <div className="shap-bg p-5">
         <main className="max-w-7xl mx-auto">
           <Carousel />
           <section>
-            <Category />
+            <Category category={category} error={error} />
           </section>
         </main>
       </div>
