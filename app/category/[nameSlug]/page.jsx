@@ -1,12 +1,10 @@
 "use client";
-
 import useSWR from "swr";
 import axios from "axios";
 import { useParams } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
-import Head from "next/head";
 import Navbar from "@/components/nav/Navbar";
 import Footer from "@/components/Footer";
 import Spinner from "@/components/spinner/Spinner";
@@ -20,8 +18,7 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 
-import ProductDetail from "@/components/product/action/ProductDetail"; // ตรวจสอบตำแหน่งให้ถูกต้อง
-
+  
 const fetcher = (url) => axios.get(url).then((res) => res.data);
 
 const CategoryPage = () => {
@@ -63,64 +60,8 @@ const CategoryPage = () => {
     setCurrentPage(page);
   };
 
-  const structuredData = {
-    "@context": "https://schema.org",
-    "@type": "ItemList",
-    itemListElement: category.Product.map((product, index) => ({
-      "@type": "ListItem",
-      position: index + 1,
-      url: `https://united1999plus.vercel.app/product/${product.productId}`,
-      name: product.name,
-    })),
-  };
-
   return (
     <>
-      <Head>
-        <title>หมวดหมู่: {category.name} - UNITED 1999 PLUS</title>
-        <meta
-          name="description"
-          content={`เลือกดูสินค้าหมวดหมู่ ${category.name} จาก UNITED 1999 PLUS`}
-        />
-        <meta
-          name="keywords"
-          content={`หมวดหมู่สินค้า, ${category.name}, UNITED 1999 PLUS`}
-        />
-        <meta
-          property="og:title"
-          content={`หมวดหมู่: ${category.name} - UNITED 1999 PLUS`}
-        />
-        <meta
-          property="og:description"
-          content={`เลือกดูสินค้าหมวดหมู่ ${category.name} จาก UNITED 1999 PLUS`}
-        />
-        <meta
-          property="og:url"
-          content={`https://united1999plus.vercel.app/category/${nameSlug}`}
-        />
-        <meta property="og:type" content="website" />
-        <meta
-          property="og:image"
-          content="https://united1999plus.vercel.app/logo/logo-real-no-bg.png"
-        />
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta
-          name="twitter:title"
-          content={`หมวดหมู่: ${category.name} - UNITED 1999 PLUS`}
-        />
-        <meta
-          name="twitter:description"
-          content={`เลือกดูสินค้าหมวดหมู่ ${category.name} จาก UNITED 1999 PLUS`}
-        />
-        <meta
-          name="twitter:image"
-          content="https://united1999plus.vercel.app/logo/logo-real-no-bg.png"
-        />
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
-        />
-      </Head>
       <Navbar />
       <div className="container mx-auto">
         <div className="mt-10">
@@ -132,6 +73,10 @@ const CategoryPage = () => {
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 mt-5">
           {currentProducts.map((item) => (
+              <Link
+              key={item.productId}
+              href={`/detail/${item.name}?id=${item.productId}`}
+            >
             <Card
               key={item.productId}
               className="hover:shadow-xl hover:border-[#204d9c] border flex flex-col"
@@ -162,6 +107,7 @@ const CategoryPage = () => {
                 </div>
               </CardFooter>
             </Card>
+            </Link>
           ))}
         </div>
         <div className="flex justify-center mt-5">
@@ -172,13 +118,6 @@ const CategoryPage = () => {
           />
         </div>
       </div>
-      {selectedProductId && (
-        <ProductDetail
-          productId={selectedProductId}
-          open={!!selectedProductId}
-          setOpen={setSelectedProductId}
-        />
-      )}
       <Footer />
     </>
   );

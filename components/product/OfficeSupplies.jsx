@@ -11,8 +11,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import ProductDetailWrapper from "@/components/product/action/ProductDetailWrapper";
-
 
 async function fetchOfficeSuppliesData() {
   const res = await fetch(
@@ -31,36 +29,8 @@ export default async function OfficeSupplies() {
   const category = await fetchOfficeSuppliesData();
   const products = category?.Product || [];
 
-  const structuredData = {
-    "@context": "https://schema.org",
-    "@type": "ProductGroup",
-    name: "อุปกรณ์สำนักงาน",
-    description: "อุปกรณ์สำนักงานจาก UNITED 1999 PLUS",
-    url: "https://united1999plus.vercel.app/category/office-supplies",
-    image: products.map((item) => item.imageUrl),
-    brand: {
-      "@type": "Brand",
-      name: "UNITED 1999 PLUS",
-      logo: logo.src,
-    },
-    category: "Office Supplies",
-    product: products.map((item) => ({
-      "@type": "Product",
-      name: item.name,
-      image: item.imageUrl,
-      url: `https://united1999plus.vercel.app/product/${item.productId}`,
-      description: item.description,
-      sku: item.sku,
-      brand: {
-        "@type": "Brand",
-        name: "UNITED 1999 PLUS",
-      },
-    })),
-  };
-
   return (
     <>
-  
       <main>
         <section className="mt-10">
           <h1 className="font-bold text-xl text-black">อุปกรณ์สำนักงาน</h1>
@@ -68,8 +38,7 @@ export default async function OfficeSupplies() {
         <section className="container mx-auto px-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 mt-5">
             {products.map((item) => (
-              <Suspense key={item.productId}>
-                <ProductDetailWrapper productId={item.productId}>
+              <Link key={item.productId} href={`/detail/${item.name}?id=${item.productId}`}>
                   <Card className="hover:shadow-xl hover:border-[#204d9c] border flex flex-col">
                     <CardHeader className="border-b w-full h-60 relative">
                       <Image
@@ -83,7 +52,9 @@ export default async function OfficeSupplies() {
                       />
                     </CardHeader>
                     <CardContent className="flex-grow">
-                      <CardTitle className="line-clamp-2">{item.name}</CardTitle>
+                      <CardTitle className="line-clamp-2">
+                        {item.name}
+                      </CardTitle>
                     </CardContent>
                     <CardFooter className="flex justify-between p-4 border-t">
                       <div className="flex flex-col items-center">
@@ -96,8 +67,7 @@ export default async function OfficeSupplies() {
                       </div>
                     </CardFooter>
                   </Card>
-                </ProductDetailWrapper>
-              </Suspense>
+              </Link>
             ))}
           </div>
           {products.length === 10 && (

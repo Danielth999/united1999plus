@@ -25,59 +25,6 @@ async function fetchPackagingData() {
   return res.json();
 }
 
-// ฟังก์ชันเพื่อสร้าง metadata สำหรับหน้าแสดงบรรจุภัณฑ์
-export async function generateMetadata() {
-  const category = await fetchPackagingData();
-  const products = category?.Product || [];
-
-  const structuredData = {
-    "@context": "https://schema.org",
-    "@type": "ProductGroup",
-    name: "บรรจุภัณฑ์เฟสต์",
-    description: "บรรจุภัณฑ์เฟสต์จาก UNITED 1999 PLUS",
-    url: "https://united1999plus.vercel.app/category/packaging",
-    image: products.map((item) => item.imageUrl),
-    brand: {
-      "@type": "Brand",
-      name: "UNITED 1999 PLUS",
-      logo: logo.src,
-    },
-    category: "Packaging",
-    product: products.map((item) => ({
-      "@type": "Product",
-      name: item.name,
-      image: item.imageUrl,
-      url: `https://united1999plus.vercel.app/detail/${item.name}?id=${item.productId}`,
-      description: item.description,
-      brand: {
-        "@type": "Brand",
-        name: "UNITED 1999 PLUS",
-      },
-    })),
-  };
-
-  return {
-    title: "บรรจุภัณฑ์เฟสต์ - UNITED 1999 PLUS",
-    description: "บรรจุภัณฑ์เฟสต์จาก UNITED 1999 PLUS",
-    keywords: "บรรจุภัณฑ์, UNITED 1999 PLUS, บรรจุภัณฑ์เฟสต์",
-    openGraph: {
-      title: "บรรจุภัณฑ์เฟสต์ - UNITED 1999 PLUS",
-      description: "บรรจุภัณฑ์เฟสต์จาก UNITED 1999 PLUS",
-      images: [logo.src],
-      url: "https://united1999plus.vercel.app/category/packaging",
-      type: "website",
-    },
-    twitter: {
-      card: "summary_large_image",
-      title: "บรรจุภัณฑ์เฟสต์ - UNITED 1999 PLUS",
-      description: "บรรจุภัณฑ์เฟสต์จาก UNITED 1999 PLUS",
-      images: [logo.src],
-    },
-    other: {
-      "application-ld+json": JSON.stringify(structuredData),
-    },
-  };
-}
 
 // ฟังก์ชันเริ่มต้นเพื่อเรนเดอร์หน้าแสดงบรรจุภัณฑ์
 export default async function Packaging() {

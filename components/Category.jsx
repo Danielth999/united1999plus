@@ -6,7 +6,6 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import { Pagination, Autoplay } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/pagination';
-import { useToast } from "@/components/ui/use-toast";
 import useSWR from "swr";
 import { memo, useMemo, useCallback } from "react";
 import CategorySkeleton from "@/components/skeleton/CategorySkeleton";
@@ -31,7 +30,6 @@ const Category = () => {
     []
   );
   
-  const { toast } = useToast();
 
   // ดึงข้อมูลหมวดหมู่จาก API
   const { data: category, error } = useSWR(

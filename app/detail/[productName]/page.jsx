@@ -1,6 +1,6 @@
-import Image from "next/image";
+
 import { notFound } from "next/navigation";
-import ProductDetailsClient from '@/components/product/ProductDetailsClient';
+import ProductDetailsClient from '../components/ProductDetailsClient';
 import Navbar from '@/components/nav/Navbar'
 // ฟังก์ชันเพื่อดึงข้อมูลสินค้าจาก API
 async function fetchProductData(productId) {
