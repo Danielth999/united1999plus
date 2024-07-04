@@ -23,7 +23,6 @@ const fetchCategory = async () => {
   }
 };
 export default async function Home() {
-  const { category, error } = await fetchCategory();
   return (
     <>
       <header>
@@ -34,7 +33,7 @@ export default async function Home() {
         <main className="max-w-7xl mx-auto">
           <Carousel />
           <section>
-            <Category category={category} error={error} />
+            <Category />
           </section>
         </main>
       </div>

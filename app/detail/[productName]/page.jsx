@@ -11,9 +11,7 @@ async function fetchProductData(productId) {
 
   try {
     // ดึงข้อมูลสินค้าจาก API
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/products/${productId}`, {
-      cache: "no-store", // ปิดการแคชเพื่อให้ได้ข้อมูลใหม่เสมอ
-    });
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/products/${productId}`);
 
     // จัดการกับกรณีที่การตอบกลับจากเซิร์ฟเวอร์ไม่ใช่ OK
     if (!res.ok) {
