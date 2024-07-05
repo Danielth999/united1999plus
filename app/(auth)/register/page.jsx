@@ -122,7 +122,7 @@ const RegisterPage = () => {
         <div className="w-full max-w-xl py-6">
           <header className="text-center">
             <h1 className="mb-2 inline-flex items-center gap-2 text-2xl font-bold">
-              <img src="/logo/logo-real-no-bg.png" width="40" height="auto" alt="logo company" />
+              <img src="/logo/logo.png" width="40" height="auto" alt="logo company" />
               <span className="text-[#0571cc]">United 1999 Plus</span>
             </h1>
             <h2 className="text-sm font-medium text-gray-500 dark:text-gray-400">
